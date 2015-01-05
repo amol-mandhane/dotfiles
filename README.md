@@ -6,13 +6,13 @@ Dotfiles uses [Dotbot][dotbot] for installation.
 
 Details
 -------
-| | |
-|-----|-----|
+
 | Operating System | Ubuntu 14.04 LTS x64 Desktop version |
-| Window Manager | xmonad |
-| Code Editor | vim |
-| Terminal | urxvt |
-| Shell | zsh |
+|-----|----|
+| Window Manager | `xmonad` |
+| Code Editor | `vim` |
+| Terminal | `urxvt` |
+| Shell | `zsh` |
 
 License
 -------
