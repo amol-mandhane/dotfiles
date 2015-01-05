@@ -1,0 +1,4 @@
+# xmonad
+xmonad/*.jpg
+xmonad/xmonad*
+!xmonad/xmonad.hs

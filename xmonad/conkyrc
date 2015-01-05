@@ -1,0 +1,46 @@
+background no
+out_to_console yes
+out_to_x no
+update_interval 1.0
+total_run_times 0
+use_spacer none
+
+color1 FF0000
+color2 00FF00
+color3 0000FF
+color4 00FFFF
+color5 FFFF00
+color6 888888
+
+template1 ${cpu cpu1}
+template2 ${cpu cpu2}
+template3 ${cpu cpu3}
+template4 ${cpu cpu4}
+template5 ${hwmon temp 1}
+template6 ${memperc}
+template7 ${swapperc}
+template8 ${battery_percent BAT1}
+
+
+TEXT
+^i(/home/amol/.xmonad/dzen2_icons/cpu.xbm) \
+${if_match ${template1} >= 50}^fg(\#FF0000)${else}${if_match ${template1} >= 20}^fg(\#FFFF00)${else}^fg(\#888888)${endif}${endif}${template1}^fg()-\
+${if_match ${template2} >= 50}^fg(\#FF0000)${else}${if_match ${template2} >= 20}^fg(\#FFFF00)${else}^fg(\#888888)${endif}${endif}${template2}^fg()-\
+${if_match ${template3} >= 50}^fg(\#FF0000)${else}${if_match ${template3} >= 20}^fg(\#FFFF00)${else}^fg(\#888888)${endif}${endif}${template3}^fg()-\
+${if_match ${template4} >= 50}^fg(\#FF0000)${else}${if_match ${template4} >= 20}^fg(\#FFFF00)${else}^fg(\#888888)${endif}${endif}${template4}^fg() \
+\
+${if_match ${template5} >= 60}^fg(\#FF0000)${else}${if_match ${template5} >= 50}^fg(\#FFFF00)${else}^fg(\#999999)${endif}${endif}\
+^i(/home/amol/.xmonad/dzen2_icons/temp.xbm) ${template5}°C^fg()  \
+\
+^i(/home/amol/.xmonad/dzen2_icons/mem.xbm) \
+${if_match ${template6} >= 60}^fg(\#FF0000)${else}${if_match ${template6} >= 40}^fg(\#FFFF00)${else}^fg(\#888888)${endif}${endif}${template6}%^fg()-\
+${if_match ${template7} >= 10}^fg(\#FF0000)${else}${if_match ${template7} > 1}^fg(\#FFFF00)${else}^fg(\#888888)${endif}${endif}${template7}%^fg()  \
+\
+^i(/home/amol/.xmonad/dzen2_icons/time.xbm) ${uptime_short}  \
+\
+${if_match ${template8} <= 25}^fg(\#FF0000)${else}${if_match ${template8} <= 75}^fg(\#FFFF00)${else}^fg(\#00FF00)${endif}${endif}\
+(${template8}% \
+${if_match "${acpiacadapter}" == "on-line"}^i(/home/amol/.xmonad/dzen2_icons/power-ac.xbm)${else}^i(/home/amol/.xmonad/dzen2_icons/power-bat.xbm)${endif}\
+)^fg()  \
+\
+^fg(\#ffffff)^bg(\#2A2A2A)^ca(1,/home/amol/.xmonad/calendar.sh) ${time %a %b %d %Y %l:%M:%S %p} ^ca()^bg()^fg()
