@@ -22,8 +22,12 @@ Plugin 'scrooloose/syntastic'
 Plugin 'sjl/gundo.vim'
 Plugin 'klen/python-mode'
 Plugin 'scrooloose/nerdcommenter'
+Plugin 'jmcantrell/vim-virtualenv'
+Plugin 'tpope/vim-surround'
+Plugin 'nathanaelkane/vim-indent-guides'
 
 " ============== GENERAL CONFIG ==============
+set clipboard=unnamed
 set number                        " Line numbers
 set backspace=indent,eol,start    " Backspace in normal mode
 set autoread                      " Autoreload
@@ -65,7 +69,7 @@ filetype indent on
 
 " ============== Color Scheme ---------------------
 set t_Co=256
-colorscheme Tomorrow-Night-Eighties
+colorscheme github
 
 " =============== Highlighting =====================
 set cursorline
@@ -104,8 +108,15 @@ call CreateCommandShortcut('<C-S-k>', ':dl')       " Ctrl-Shift-K delete line
 let g:airline_powerline_fonts=1
 set timeoutlen=50
 
+" ======= Nerdtree ==============
+let NERDTreeShowHidden=1
+
 " ======== nerdtree-tabs ========
 let g:nerdtree_tabs_open_on_console_startup=1
+
+" ======== vim-indent-guides ====
+let g:indent_guides_start_level=2
+let g:indent_guides_guide_size=4
 
 " ============== Startup =======================
 autocmd vimenter * NERDTree
