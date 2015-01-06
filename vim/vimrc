@@ -1,0 +1,67 @@
+" Autoreload .vimrc and .vim/vimrc
+autocmd! BufWritePost .vimrc source %
+autocmd! BufWritePost vimrc source %
+
+" vundle settings
+set nocompatible
+filetype off
+set rtp+=~/.vim/bundle/Vundle.vim
+call vundle#begin()
+
+Plugin 'gmarik/Vundle.vim'
+
+" =========== Plugin: Operational plugins ===============
+Plugin 'bling/vim-airline'
+Plugin 'kien/ctrlp.vim'
+
+
+" ============== GENERAL CONFIG ==============
+set number                        " Line numbers
+set backspace=indent,eol,start    " Backspace in normal mode
+set autoread                      " Autoreload
+set history=700
+set undolevels=700
+set hidden                 " set Vim like any other editor (butffers, etc)
+
+set tw=79                  " width of document (used by gd)
+set colorcolumn=80
+set nowrap                 " don't automatically wrap on load
+set fo-=t                  " don't automatically wrap text when typing
+set linebreak              " Wrap lines at convenient points
+set scrolloff=2
+
+set laststatus=2           " Turn on vim-airline
+
+set list                   " show EOL
+autocmd BufWritePre * :%s/\s\+$//e      " Trim trailing whitespaces
+
+syntax on
+
+
+" ============= Turn Off Swap Files =========
+set noswapfile
+set nobackup
+set nowb
+
+" ================ Indentation ======================
+set autoindent
+set smartindent
+set smarttab
+set shiftwidth=4
+set softtabstop=4
+set tabstop=4
+set expandtab
+filetype plugin on
+filetype indent on
+
+
+" =============== Highlighting =====================
+set cursorline
+set cursorcolumn
+
+" ============== Color Scheme ======================
+set t_Co=256
+colorscheme hybrid
+
+" ============== Shortcuts =========================
+
