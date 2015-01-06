@@ -95,6 +95,16 @@ function! CreateCommandShortcut(shortcut, command)
     exe 'vnoremap ' . a:shortcut . ' <Esc>' . a:command . '<Enter>'
 endfunction
 
+function! CreateShortcut(shortcut, command, ...)
+    exe 'nnoremap ' . a:shortcut . ' ' . a:command
+    exe 'inoremap ' . a:shortcut . ' <Esc>' . a:command
+    if a:2 > 0
+        exe 'vnoremap ' . a:shortcut . ' ' . a:command
+    else
+        exe 'vnoremap ' . a:shortcut . ' <Esc>' . a:command
+    end
+endfunction
+
 call CreateCommandShortcut('<C-s>', ':update')     " Ctrl-S save
 call CreateCommandShortcut('<C-z>', ':undo')       " Ctrl-Z undo
 call CreateCommandShortcut('<C-y>', ':redo')       " Ctrl-Y redo
@@ -102,6 +112,8 @@ call CreateCommandShortcut('<C-S-z>', ':redo')     " Ctrl-Shift-Z redo
 
 call CreateCommandShortcut('<C-S-k>', ':dl')       " Ctrl-Shift-K delete line
 
+call CreateCommandShortcut('<C-t>', ':tabnew')      " Ctrl-T new tab
+call CreateCommandShortcut('<C-w>', ':tabclose')    " Ctrl-W close tab
 " =========== Plugin Configs ======================
 
 " ======= vim-airline ===========
@@ -117,6 +129,13 @@ let g:nerdtree_tabs_open_on_console_startup=1
 " ======== vim-indent-guides ====
 let g:indent_guides_start_level=2
 let g:indent_guides_guide_size=4
+
+" ======== Syntastic ============
+let g:syntastic_always_populate_loc_list = 1
+let g:syntastic_auto_loc_list = 1
+let g:syntastic_check_on_open = 1
+let g:syntastic_check_on_wq = 0
+
 
 " ============== Startup =======================
 autocmd vimenter * NERDTree

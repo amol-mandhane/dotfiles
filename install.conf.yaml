@@ -3,6 +3,8 @@
 - link:
     ~/.xmonad: xmonad
     ~/.vim: vim
+    ~/.fonts: fonts
 
 - shell:
   - [git submodule update --init --recursive, Installing/updating submodules]
+  - [fc-cache -vf ~/.fonts/, Updating local fonts]
