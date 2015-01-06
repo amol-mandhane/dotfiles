@@ -17,6 +17,7 @@ Plugin 'airblade/vim-gitgutter'
 Plugin 'scrooloose/nerdtree'
 Plugin 'jistr/vim-nerdtree-tabs'
 Plugin 'Valloric/YouCompleteMe'
+Plugin 'tpope/vim-fugitive'
 
 
 " ============== GENERAL CONFIG ==============
@@ -61,7 +62,7 @@ filetype indent on
 
 " ============== Color Scheme ---------------------
 set t_Co=256
-colorscheme hybrid
+colorscheme Tomorrow-Night-Eighties
 
 " =============== Highlighting =====================
 set cursorline
@@ -79,7 +80,14 @@ au InsertLeave * silent execute "!gconftool-2 --type string --set /apps/gnome-te
 au VimLeave * silent execute "!gconftool-2 --type string --set /apps/gnome-terminal/profiles/Default/cursor_shape underline"
 au VimEnter * silent execute "!gconftool-2 --type string --set /apps/gnome-terminal/profiles/Default/cursor_shape block"
 
-" ============== Shortcuts =========================
+" ============== Shortcuts ========================
+
+
+" =========== Plugin Configs ======================
+
+" ======= vim-airline ===========
+let g:airline_powerline_fonts=1
+set timeoutlen=50
 
 " ============== Startup =======================
 autocmd vimenter * NERDTree
