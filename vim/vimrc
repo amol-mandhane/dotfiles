@@ -18,7 +18,10 @@ Plugin 'scrooloose/nerdtree'
 Plugin 'jistr/vim-nerdtree-tabs'
 Plugin 'Valloric/YouCompleteMe'
 Plugin 'tpope/vim-fugitive'
-
+Plugin 'scrooloose/syntastic'
+Plugin 'sjl/gundo.vim'
+Plugin 'klen/python-mode'
+Plugin 'scrooloose/nerdcommenter'
 
 " ============== GENERAL CONFIG ==============
 set number                        " Line numbers
@@ -81,7 +84,19 @@ au VimLeave * silent execute "!gconftool-2 --type string --set /apps/gnome-termi
 au VimEnter * silent execute "!gconftool-2 --type string --set /apps/gnome-terminal/profiles/Default/cursor_shape block"
 
 " ============== Shortcuts ========================
+" General shortcut creation function
+function! CreateCommandShortcut(shortcut, command)
+    exe 'nnoremap ' . a:shortcut . ' ' . a:command . '<Enter>'
+    exe 'inoremap ' . a:shortcut . ' <Esc>' . a:command . '<Enter>i'
+    exe 'vnoremap ' . a:shortcut . ' <Esc>' . a:command . '<Enter>'
+endfunction
 
+call CreateCommandShortcut('<C-s>', ':update')     " Ctrl-S save
+call CreateCommandShortcut('<C-z>', ':undo')       " Ctrl-Z undo
+call CreateCommandShortcut('<C-y>', ':redo')       " Ctrl-Y redo
+call CreateCommandShortcut('<C-S-z>', ':redo')     " Ctrl-Shift-Z redo
+
+call CreateCommandShortcut('<C-S-k>', ':dl')       " Ctrl-Shift-K delete line
 
 " =========== Plugin Configs ======================
 
@@ -89,9 +104,11 @@ au VimEnter * silent execute "!gconftool-2 --type string --set /apps/gnome-termi
 let g:airline_powerline_fonts=1
 set timeoutlen=50
 
+" ======== nerdtree-tabs ========
+let g:nerdtree_tabs_open_on_console_startup=1
+
 " ============== Startup =======================
 autocmd vimenter * NERDTree
-autocmd vimenter * NERDTreeTabsOpen
 
 
 call vundle#end()
