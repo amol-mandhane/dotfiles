@@ -13,6 +13,9 @@ Plugin 'gmarik/Vundle.vim'
 " =========== Plugin: Operational plugins ===============
 Plugin 'bling/vim-airline'
 Plugin 'kien/ctrlp.vim'
+Plugin 'airblade/vim-gitgutter'
+Plugin 'scrooloose/nerdtree'
+Plugin 'jistr/vim-nerdtree-tabs'
 
 
 " ============== GENERAL CONFIG ==============
@@ -55,13 +58,31 @@ filetype plugin on
 filetype indent on
 
 
+" ============== Color Scheme ---------------------
+set t_Co=256
+colorscheme hybrid
+
 " =============== Highlighting =====================
 set cursorline
 set cursorcolumn
 
-" ============== Color Scheme ======================
-set t_Co=256
-colorscheme hybrid
+highlight Cursor guifg=white guibg=black
+highlight iCursor guifg=white guibg=steelblue
+set guicursor=n-v-c:block-Cursor
+set guicursor+=i:ver100-iCursor
+set guicursor+=n-v-c:blinkon0
+set guicursor+=i:blinkwait10
+
+au InsertEnter * silent execute "!gconftool-2 --type string --set /apps/gnome-terminal/profiles/Default/cursor_shape ibeam"
+au InsertLeave * silent execute "!gconftool-2 --type string --set /apps/gnome-terminal/profiles/Default/cursor_shape block"
+au VimLeave * silent execute "!gconftool-2 --type string --set /apps/gnome-terminal/profiles/Default/cursor_shape underline"
+au VimEnter * silent execute "!gconftool-2 --type string --set /apps/gnome-terminal/profiles/Default/cursor_shape block"
 
 " ============== Shortcuts =========================
 
+" ============== Startup =======================
+autocmd vimenter * NERDTree
+autocmd vimenter * NERDTreeTabsOpen
+
+
+call vundle#end()
