@@ -27,7 +27,9 @@ Plugin 'tpope/vim-surround'
 Plugin 'nathanaelkane/vim-indent-guides'
 
 " ============== GENERAL CONFIG ==============
-set clipboard=unnamed
+let mapleader=" "
+set mouse=a
+set clipboard=unnamedplus
 set number                        " Line numbers
 set backspace=indent,eol,start    " Backspace in normal mode
 set autoread                      " Autoreload
@@ -75,17 +77,13 @@ colorscheme github
 set cursorline
 set cursorcolumn
 
-highlight Cursor guifg=white guibg=black
-highlight iCursor guifg=white guibg=steelblue
-set guicursor=n-v-c:block-Cursor
-set guicursor+=i:ver100-iCursor
-set guicursor+=n-v-c:blinkon0
-set guicursor+=i:blinkwait10
-
 au InsertEnter * silent execute "!gconftool-2 --type string --set /apps/gnome-terminal/profiles/Default/cursor_shape ibeam"
 au InsertLeave * silent execute "!gconftool-2 --type string --set /apps/gnome-terminal/profiles/Default/cursor_shape block"
 au VimLeave * silent execute "!gconftool-2 --type string --set /apps/gnome-terminal/profiles/Default/cursor_shape underline"
 au VimEnter * silent execute "!gconftool-2 --type string --set /apps/gnome-terminal/profiles/Default/cursor_shape block"
+
+" Cursor automove issue
+au InsertLeave * call cursor([getpos('.')[1], getpos('.')[2]+1])
 
 " ============== Shortcuts ========================
 " General shortcut creation function
@@ -98,7 +96,7 @@ endfunction
 function! CreateShortcut(shortcut, command, ...)
     exe 'nnoremap ' . a:shortcut . ' ' . a:command
     exe 'inoremap ' . a:shortcut . ' <Esc>' . a:command
-    if a:2 > 0
+    if a:0 > 0
         exe 'vnoremap ' . a:shortcut . ' ' . a:command
     else
         exe 'vnoremap ' . a:shortcut . ' <Esc>' . a:command
@@ -113,7 +111,17 @@ call CreateCommandShortcut('<C-S-z>', ':redo')     " Ctrl-Shift-Z redo
 call CreateCommandShortcut('<C-S-k>', ':dl')       " Ctrl-Shift-K delete line
 
 call CreateCommandShortcut('<C-t>', ':tabnew')      " Ctrl-T new tab
-call CreateCommandShortcut('<C-q>', ':q')    " Ctrl-W close tab
+call CreateCommandShortcut('<C-q>', ':q')           " Ctrl-W close tab
+
+
+" Decrement number. Increment by Ctrl-A
+nnoremap <C-d> <C-x>
+
+vnoremap <C-x> d
+vnoremap <C-c> y
+vnoremap <C-v> p
+nnoremap <C-v> p
+inoremap <C-v> <Esc>pi
 " =========== Plugin Configs ======================
 
 " ======= vim-airline ===========
