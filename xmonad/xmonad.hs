@@ -24,7 +24,7 @@ main = do
         , modMask = mod4Mask     -- Rebind Mod to the Windows key
         , workspaces = myWorkspaces
         , normalBorderColor  = "#000000"
-    	, focusedBorderColor = "#0000ff"
+        , focusedBorderColor = "#0000ff"
         } `additionalKeysP` myKeys
 
 

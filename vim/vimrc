@@ -113,7 +113,7 @@ call CreateCommandShortcut('<C-S-z>', ':redo')     " Ctrl-Shift-Z redo
 call CreateCommandShortcut('<C-S-k>', ':dl')       " Ctrl-Shift-K delete line
 
 call CreateCommandShortcut('<C-t>', ':tabnew')      " Ctrl-T new tab
-call CreateCommandShortcut('<C-w>', ':tabclose')    " Ctrl-W close tab
+call CreateCommandShortcut('<C-q>', ':q')    " Ctrl-W close tab
 " =========== Plugin Configs ======================
 
 " ======= vim-airline ===========

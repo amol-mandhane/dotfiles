@@ -5,6 +5,7 @@
     ~/.vim: vim
     ~/.fonts: fonts
     ~/.zshrc: zsh/zshrc
+    ~/.Xresources: urxvt/Xresources
 
 - shell:
   - [git submodule update --init --recursive dotbot, Installing/updating dotbot submodules]

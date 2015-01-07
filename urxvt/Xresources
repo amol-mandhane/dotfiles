@@ -1,0 +1,74 @@
+!-----------------------------------------------------------------------------
+! Xft settings
+!-----------------------------------------------------------------------------
+
+Xft.dpi:                    96
+Xft.antialias:              false
+Xft.rgba:                   rgb
+Xft.hinting:                true
+Xft.hintstyle:              hintslight
+
+!-----------------------------------------------------------------------------
+! URxvt settings
+!-----------------------------------------------------------------------------
+
+URxvt.depth:                32
+URxvt.geometry:             90x30
+URxvt.transparent:          false
+URxvt.fading:               0
+URxvt.loginShell:           true
+URxvt.saveLines:            1000
+URxvt.internalBorder:       3
+URxvt.lineSpace:            0
+
+! Fonts
+URxvt.allow_bold:           true
+URxvt.font:                 xft:Inconsolata\\-dz for Powerline:dz:size=10
+URxvt.boldFont:             xft:Inconsolata\\-dz for Powerline:bold:size=10
+
+! Fix font space
+URxvt*letterSpace: -1
+
+! Scrollbar
+URxvt.scrollstyle:          plain
+URxvt*scrollBar_right:      true
+URxvt.scrollBar:            true
+
+! Perl extensions
+URxvt.perl-ext-common:      default,matcher,clipboard
+URxvt.matcher.button:       1
+URxvt.urlLauncher:          firefox
+
+! Cursor
+URxvt.cursorBlink:          true
+URxvt.cursorColor:          #e0e0e0
+URxvt.cursorUnderline:      true
+
+! Pointer
+URxvt.pointerBlank:         true
+
+
+! Shortcuts
+URxvt.keysym.C-C:   perl:clipboard:copy
+URxvt.keysym.C-V:   perl:clipboard:paste
+
+!! https://github.com/brainss/dotfiles/blob/master/.colors/molokai
+
+URxvt*background: #1a1a1a
+URxvt*foreground: #e0e0e0
+URxvt*color0: #101010
+URxvt*color1: #960050
+URxvt*color2: #66aa11
+URxvt*color3: #c47f2c
+URxvt*color4: #30309b
+URxvt*color5: #7e40a5
+URxvt*color6: #3579a8
+URxvt*color7: #9999aa
+URxvt*color8: #303030
+URxvt*color9: #ff0090
+URxvt*color10: #80ff00
+URxvt*color11: #ffba68
+URxvt*color12: #5f5fee
+URxvt*color13: #bb88dd
+URxvt*color14: #4eb4fa
+URxvt*color15: #d0d0d0
