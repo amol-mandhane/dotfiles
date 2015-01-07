@@ -5,8 +5,10 @@
     ~/.vim: vim
     ~/.fonts: fonts
     ~/.zshrc: zsh/zshrc
+    ~/.antigen: zsh/antigen
     ~/.Xresources: urxvt/Xresources
 
 - shell:
   - [git submodule update --init --recursive dotbot, Installing/updating dotbot submodules]
+  - [git submodule update --init --recursive zsh/antigen, Installing/updating zsh submodules]
   - [fc-cache -vf ~/.fonts/, Updating local fonts]

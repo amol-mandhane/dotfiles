@@ -1,13 +1,13 @@
 # Set up the prompt
 
-autoload -Uz promptinit
-promptinit
-prompt adam1
+# autoload -Uz promptinit
+# promptinit
+# prompt adam1
 
-setopt histignorealldups sharehistory
+# setopt histignorealldups sharehistory
 
 # Use emacs keybindings even if our EDITOR is set to vi
-bindkey -e
+# bindkey -e
 
 # Keep 1000 lines of history within the shell and save it to ~/.zsh_history:
 HISTSIZE=1000
@@ -37,3 +37,23 @@ zstyle ':completion:*:*:kill:*:processes' list-colors '=(#b) #([0-9]#)*=0=01;31'
 zstyle ':completion:*:kill:*' command 'ps -u $USER -o pid,%cpu,tty,cputime,cmd'
 
 stty -ixon
+
+# Plugins
+#
+export TERM='xterm-256color'
+
+source ~/.antigen/antigen.zsh
+
+antigen use oh-my-zsh
+
+
+antigen bundle git
+antigen bundle pip
+antigen bundle command-not-found
+antigen bundle virtualenvwrapper
+
+antigen bundle zsh-users/zsh-syntax-highlighting
+
+antigen theme powerline
+
+antigen apply
