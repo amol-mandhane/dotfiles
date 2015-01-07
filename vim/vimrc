@@ -25,6 +25,8 @@ Plugin 'scrooloose/nerdcommenter'
 Plugin 'jmcantrell/vim-virtualenv'
 Plugin 'tpope/vim-surround'
 Plugin 'nathanaelkane/vim-indent-guides'
+Plugin 'altercation/vim-colors-solarized'
+
 
 " ============== GENERAL CONFIG ==============
 let mapleader=" "
@@ -68,10 +70,20 @@ set expandtab
 filetype plugin on
 filetype indent on
 
+" =============== Searching =========================
 
-" ============== Color Scheme ---------------------
+set hlsearch
+set incsearch
+set ignorecase
+set smartcase
+
+" ============== Color Scheme =======================
 set t_Co=256
-colorscheme github
+let g:solarized_termcolors=256
+let g:solarized_bold=1
+let g:solarized_italic=1
+set background=light
+colorscheme solarized
 
 " =============== Highlighting =====================
 set cursorline
@@ -84,6 +96,9 @@ au VimEnter * silent execute "!gconftool-2 --type string --set /apps/gnome-termi
 
 " Cursor automove issue
 au InsertLeave * call cursor([getpos('.')[1], getpos('.')[2]+1])
+
+set guifont=Inconsolata-dz\ for\ Powerline\ Medium\ 10
+set guioptions -=T
 
 " ============== Shortcuts ========================
 " General shortcut creation function
@@ -113,6 +128,7 @@ call CreateCommandShortcut('<C-S-k>', ':dl')       " Ctrl-Shift-K delete line
 call CreateCommandShortcut('<C-t>', ':tabnew')      " Ctrl-T new tab
 call CreateCommandShortcut('<C-q>', ':q')           " Ctrl-W close tab
 
+call CreateCommandShortcut('<C-l>', ':nohl')        " Ctrl-L close search
 
 " Decrement number. Increment by Ctrl-A
 nnoremap <C-d> <C-x>

@@ -50,6 +50,7 @@ myWorkspaces = ["^ca(1, xdotool key super+" ++ (show i) ++ ")" ++ s ++ "^ca()" |
 myManageHook = composeAll . concat $
    [ [ className =? "Firefox" --> doShift (myWorkspaces !! 0) ]
     , [ className =? "Sublime_text" --> doShift (myWorkspaces !! 2) ]
+    , [ className =? "Gvim" --> doShift (myWorkspaces !! 2) ]
     , [ className =? "Vlc" --> doShift (myWorkspaces !! 4) ]
     , [ className =? "Smplayer" --> doShift (myWorkspaces !! 4)]
     , [ className =? "Nautilus" --> doShift (myWorkspaces !! 5) ]
