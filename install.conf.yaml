@@ -4,7 +4,8 @@
     ~/.xmonad: xmonad
     ~/.vim: vim
     ~/.fonts: fonts
+    ~/.zshrc: zsh/zshrc
 
 - shell:
-  - [git submodule update --init --recursive, Installing/updating submodules]
+  - [git submodule update --init --recursive dotbot, Installing/updating dotbot submodules]
   - [fc-cache -vf ~/.fonts/, Updating local fonts]
