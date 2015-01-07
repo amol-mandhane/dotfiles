@@ -33,6 +33,7 @@ let mapleader=" "
 set mouse=a
 set clipboard=unnamedplus
 set number                        " Line numbers
+set numberwidth=6
 set backspace=indent,eol,start    " Backspace in normal mode
 set autoread                      " Autoreload
 set history=700
@@ -146,6 +147,7 @@ set timeoutlen=50
 
 " ======= Nerdtree ==============
 let NERDTreeShowHidden=1
+let g:NERDTreeChDirMode=2
 
 " ======== nerdtree-tabs ========
 let g:nerdtree_tabs_open_on_console_startup=1
