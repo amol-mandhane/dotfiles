@@ -26,6 +26,8 @@ Plugin 'jmcantrell/vim-virtualenv'
 Plugin 'tpope/vim-surround'
 Plugin 'nathanaelkane/vim-indent-guides'
 Plugin 'altercation/vim-colors-solarized'
+Plugin 'lervag/vim-latex'
+Plugin 'Lokaltog/vim-easymotion'
 
 
 " ============== GENERAL CONFIG ==============
