@@ -20,7 +20,9 @@ Plugin 'Valloric/YouCompleteMe'
 Plugin 'tpope/vim-fugitive'
 Plugin 'scrooloose/syntastic'
 Plugin 'sjl/gundo.vim'
-Plugin 'klen/python-mode'
+" Plugin 'klen/python-mode'
+Plugin 'davidhalter/jedi-vim'
+Plugin 'tell-k/vim-autopep8'
 Plugin 'scrooloose/nerdcommenter'
 Plugin 'jmcantrell/vim-virtualenv'
 Plugin 'tpope/vim-surround'
@@ -31,7 +33,7 @@ Plugin 'Lokaltog/vim-easymotion'
 
 
 " ============== GENERAL CONFIG ==============
-let mapleader=" "
+let mapleader = ","
 set mouse=a
 set clipboard=unnamedplus
 set number                        " Line numbers
@@ -86,7 +88,7 @@ let g:solarized_termcolors=256
 let g:solarized_bold=1
 let g:solarized_italic=1
 set background=light
-colorscheme solarized
+colorscheme vividchalk
 
 " =============== Highlighting =====================
 set cursorline
@@ -155,8 +157,9 @@ let g:NERDTreeChDirMode=2
 let g:nerdtree_tabs_open_on_console_startup=1
 
 " ======== vim-indent-guides ====
-let g:indent_guides_start_level=2
-let g:indent_guides_guide_size=4
+" let g:indent_guides_start_level=1
+" let g:indent_guides_guide_size=4
+let g:indent_guides_enable_on_vim_startup=1
 
 " ======== Syntastic ============
 let g:syntastic_always_populate_loc_list = 1
@@ -164,6 +167,13 @@ let g:syntastic_auto_loc_list = 1
 let g:syntastic_check_on_open = 1
 let g:syntastic_check_on_wq = 0
 
+let g:syntastic_python_checkers = ['flake8']
+
+" ======== YouCompleteMe ========
+let g:ycm_key_list_select_completion = ['<TAB>', '<Enter>']
+let g:ycm_key_list_previous_completion = ['<S-TAB>']
+let g:ycm_autoclose_preview_window_after_completion = 1
+let g:ycm_complete_in_comments = 1
 
 " ============== Startup =======================
 autocmd vimenter * NERDTree
