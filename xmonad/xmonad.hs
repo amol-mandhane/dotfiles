@@ -8,6 +8,7 @@ import System.IO
 import XMonad.Layout.Spacing
 import XMonad.Layout.LayoutCombinators hiding ( (|||) )
 import XMonad.Layout.NoBorders
+import XMonad.Layout.Circle
 import XMonad.Hooks.EwmhDesktops
 
 
@@ -58,7 +59,7 @@ myManageHook = composeAll . concat $
 
 customTile = (Tall 1 (2/100) (2/3))
 
-myLayoutHook = smartBorders $ (customTile ||| Mirror customTile ||| Full)
+myLayoutHook = smartBorders $ (customTile ||| Mirror customTile ||| Full ||| Circle)
 
 myDzenPP  = dzenPP
     { ppCurrent = dzenColor "#000000" "#ffff00" . wrap " " " "
