@@ -55,6 +55,7 @@ myManageHook = composeAll . concat $
     , [ className =? "Vlc" --> doShift (myWorkspaces !! 4) ]
     , [ className =? "Smplayer" --> doShift (myWorkspaces !! 4)]
     , [ className =? "Nautilus" --> doShift (myWorkspaces !! 5) ]
+    , [ className =? "Thunderbird" --> doShift (myWorkspaces !! 8) ]
     , [ className =? "Gimp" --> doFloat ]]
 
 customTile = (Tall 1 (2/100) (2/3))
