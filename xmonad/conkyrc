@@ -20,6 +20,8 @@ template5 ${hwmon temp 1}
 template6 ${memperc}
 template7 ${swapperc}
 template8 ${battery_percent BAT1}
+template9 ${exec eval "vnstat -i wlan0 | grep -i mib | grep \\\' | sed -e \'s/\\s/\\n/g\' | grep -i \'[0-9]\' | tail -n 2 | head -n 1"}
+
 
 
 TEXT
@@ -39,8 +41,8 @@ ${if_match ${template7} >= 10}^fg(\#FF0000)${else}${if_match ${template7} > 1}^f
 ^i(/home/amol/.xmonad/dzen2_icons/time.xbm) ${uptime_short}  \
 \
 ${if_match ${template8} <= 25}^fg(\#FF0000)${else}${if_match ${template8} <= 75}^fg(\#FFFF00)${else}^fg(\#00FF00)${endif}${endif}\
-(${template8}% \
 ${if_match "${acpiacadapter}" == "on-line"}^i(/home/amol/.xmonad/dzen2_icons/power-ac.xbm)${else}^i(/home/amol/.xmonad/dzen2_icons/power-bat.xbm)${endif}\
-)^fg()  \
+ ${template8}%\
+^fg()  \
 \
 ^fg(\#ffffff)^bg(\#2A2A2A)^ca(1,/home/amol/.xmonad/calendar.sh) ${time %a %b %d %Y %l:%M:%S %p} ^ca()^bg()^fg()

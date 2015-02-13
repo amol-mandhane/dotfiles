@@ -24,15 +24,17 @@ main = do
         , logHook = myLogHook dzen
         , modMask = mod4Mask     -- Rebind Mod to the Windows key
         , workspaces = myWorkspaces
-        , normalBorderColor  = "#000000"
+        , focusFollowsMouse = False
+        , normalBorderColor  = "#888888"
         , focusedBorderColor = "#0000ff"
+        , borderWidth = 3
         } `additionalKeysP` myKeys
 
 
 myTrayer = "trayer --edge top --align right --SetDockType true --SetPartialStrut true --expand true --width 11 --transparent true --alpha 0 --tint 0x1A1A1A --height 16"
 
-myDzenStatus = "dzen2 -w '655' -ta 'l'" ++ myDzenStyle
-myDzenConky  = "conky -c ~/.xmonad/conkyrc | dzen2 -x '655' -w '560' -ta 'r'" ++ myDzenStyle
+myDzenStatus = "dzen2 -w '656' -ta 'l'" ++ myDzenStyle
+myDzenConky  = "conky -c ~/.xmonad/conkyrc | dzen2 -x '656' -w '560' -ta 'r'" ++ myDzenStyle
 myDzenStyle  = " -e 'button2=;' -h '16' -fg '#BBBBBB' -bg '#1A1A1A' -fn 'Clean:size=8'"
 
 myWorkspaces_img = [
@@ -60,7 +62,7 @@ myManageHook = composeAll . concat $
 
 customTile = (Tall 1 (2/100) (2/3))
 
-myLayoutHook = smartBorders $ (customTile ||| Mirror customTile ||| Full ||| Circle)
+myLayoutHook = smartBorders $ smartSpacing 5 $ (customTile ||| Mirror customTile ||| Full ||| Circle)
 
 myDzenPP  = dzenPP
     { ppCurrent = dzenColor "#000000" "#ffff00" . wrap " " " "
