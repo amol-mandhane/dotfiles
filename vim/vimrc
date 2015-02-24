@@ -143,6 +143,7 @@ vnoremap <C-c> y
 vnoremap <C-v> p
 nnoremap <C-v> p
 inoremap <C-v> <Esc>pi
+inoremap <C-w> <Esc><C-w>
 " =========== Plugin Configs ======================
 
 " ======= vim-airline ===========
@@ -175,6 +176,9 @@ let g:ycm_key_list_previous_completion = ['<S-TAB>']
 let g:ycm_autoclose_preview_window_after_completion = 1
 let g:ycm_complete_in_comments = 1
 
+let g:jedi#popup_on_dot = 0
+let g:jedi#popup_select_first = 0
+let g:jedi#use_splits_not_buffers = "bottom"
 " ============== Startup =======================
 autocmd vimenter * NERDTree
 

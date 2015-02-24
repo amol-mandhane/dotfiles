@@ -54,6 +54,6 @@ antigen bundle virtualenvwrapper
 
 antigen bundle zsh-users/zsh-syntax-highlighting
 
-antigen theme bira
+antigen theme juanghurtado
 
 antigen apply
