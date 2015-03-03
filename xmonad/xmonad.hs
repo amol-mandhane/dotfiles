@@ -51,14 +51,15 @@ myWorkspaces_img = [
 myWorkspaces = ["^ca(1, xdotool key super+" ++ (show i) ++ ")" ++ s ++ "^ca()" | (s, i) <- zip myWorkspaces_img [1..9]]
 
 myManageHook = composeAll . concat $
-   [ [ className =? "Firefox" --> doShift (myWorkspaces !! 0) ]
-    , [ className =? "Sublime_text" --> doShift (myWorkspaces !! 2) ]
-    , [ className =? "Gvim" --> doShift (myWorkspaces !! 2) ]
-    , [ className =? "Vlc" --> doShift (myWorkspaces !! 4) ]
-    , [ className =? "Smplayer" --> doShift (myWorkspaces !! 4)]
-    , [ className =? "Nautilus" --> doShift (myWorkspaces !! 5) ]
-    , [ className =? "Thunderbird" --> doShift (myWorkspaces !! 8) ]
-    , [ className =? "Gimp" --> doFloat ]]
+   [ [ className =? "Firefox"             --> doShift (myWorkspaces !! 0) ]
+    , [ className =? "Sublime_text"       --> doShift (myWorkspaces !! 2) ]
+    , [ className =? "Gvim"               --> doShift (myWorkspaces !! 2) ]
+    , [ className =? "Vlc"                --> doShift (myWorkspaces !! 4) ]
+    , [ className =? "Smplayer"           --> doShift (myWorkspaces !! 4) ]
+    , [ className =? "Nautilus"           --> doShift (myWorkspaces !! 5) ]
+    , [ className =? "Pcmanfm"            --> doShift (myWorkspaces !! 5) ]
+    , [ className =? "Thunderbird"        --> doShift (myWorkspaces !! 8) ]
+    , [ className =? "Gimp"               --> doFloat ]]
 
 customTile = (Tall 1 (2/100) (2/3))
 
@@ -78,6 +79,6 @@ myLogHook h = dynamicLogWithPP $ myDzenPP { ppOutput = hPutStrLn h }
 
 myKeys = [("M1-<Tab>"   , cycleRecentWindows [xK_Alt_L] xK_Tab xK_Tab ) -- classic alt-tab behaviour
          , ("M-<Return>" , spawn "dmenu_run -b"                         ) -- app launcher
-         , ("M-e"        , spawn "nautilus"                      ) -- launch file manager
+         , ("M-e"        , spawn "pcmanfm"                      ) -- launch file manager
          , ("C-M1-l"     , spawn "/home/amol/.xmonad/lock.sh"              ) -- lock screen
          ]
