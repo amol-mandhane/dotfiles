@@ -32,6 +32,10 @@ Plugin 'lervag/vim-latex'
 Plugin 'Lokaltog/vim-easymotion'
 Plugin 'octol/vim-cpp-enhanced-highlight'
 
+Plugin 'MarcWeber/vim-addon-mw-utils'
+Plugin 'tomtom/tlib_vim'
+Plugin 'garbas/vim-snipmate'
+Plugin 'honza/vim-snippets'
 " ============== GENERAL CONFIG ==============
 let mapleader = ","
 set mouse=a
@@ -88,7 +92,7 @@ let g:solarized_termcolors=256
 let g:solarized_bold=1
 let g:solarized_italic=1
 set background=light
-colorscheme vividchalk
+colorscheme habiLight
 
 " =============== Highlighting =====================
 set cursorline
@@ -179,6 +183,10 @@ let g:ycm_complete_in_comments = 1
 let g:jedi#popup_on_dot = 0
 let g:jedi#popup_select_first = 0
 let g:jedi#use_splits_not_buffers = "bottom"
+
+" ======= SnipMate ==============
+imap <C-i> <Plug>snipMateNextOrTrigger
+
 " ============== Startup =======================
 autocmd vimenter * NERDTree
 
