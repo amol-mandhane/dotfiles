@@ -32,14 +32,20 @@ Plugin 'lervag/vim-latex'
 Plugin 'Lokaltog/vim-easymotion'
 Plugin 'octol/vim-cpp-enhanced-highlight'
 
-Plugin 'MarcWeber/vim-addon-mw-utils'
-Plugin 'tomtom/tlib_vim'
-Plugin 'garbas/vim-snipmate'
-Plugin 'honza/vim-snippets'
+" Plugin 'MarcWeber/vim-addon-mw-utils'
+" Plugin 'tomtom/tlib_vim'
+" Plugin 'garbas/vim-snipmate'
+" Plugin 'honza/vim-snippets'
 Plugin 'Raimondi/delimitMate'
-Plugin 'funorpain/vim-cpplint'
+" Plugin 'funorpain/vim-cpplint'
+Plugin 'c.vim'
+Plugin 'mattn/emmet-vim'
+Plugin 'godlygeek/tabular'
+Plugin 'majutsushi/tagbar'
+
 " ============== GENERAL CONFIG ==============
 let mapleader = ","
+set timeoutlen=500
 set mouse=a
 set clipboard=unnamedplus
 set number                        " Line numbers
@@ -93,17 +99,22 @@ set t_Co=256
 let g:solarized_termcolors=256
 let g:solarized_bold=1
 let g:solarized_italic=1
-set background=light
-colorscheme habiLight
+" set background=light
+colorscheme lucius
+LuciusLight
+
+if has('gui_running')
+    colorscheme pencil
+endif
 
 " =============== Highlighting =====================
 set cursorline
 set cursorcolumn
 
-au InsertEnter * silent execute "!gconftool-2 --type string --set /apps/gnome-terminal/profiles/Default/cursor_shape ibeam"
-au InsertLeave * silent execute "!gconftool-2 --type string --set /apps/gnome-terminal/profiles/Default/cursor_shape block"
-au VimLeave * silent execute "!gconftool-2 --type string --set /apps/gnome-terminal/profiles/Default/cursor_shape underline"
-au VimEnter * silent execute "!gconftool-2 --type string --set /apps/gnome-terminal/profiles/Default/cursor_shape block"
+" au InsertEnter * silent execute "!gconftool-2 --type string --set /apps/gnome-terminal/profiles/Default/cursor_shape ibeam"
+" au InsertLeave * silent execute "!gconftool-2 --type string --set /apps/gnome-terminal/profiles/Default/cursor_shape block"
+" au VimLeave * silent execute "!gconftool-2 --type string --set /apps/gnome-terminal/profiles/Default/cursor_shape underline"
+" au VimEnter * silent execute "!gconftool-2 --type string --set /apps/gnome-terminal/profiles/Default/cursor_shape block"
 
 " Cursor automove issue
 au InsertLeave * call cursor([getpos('.')[1], getpos('.')[2]+1])
@@ -140,7 +151,8 @@ call CreateCommandShortcut('<C-t>', ':tabnew')      " Ctrl-T new tab
 call CreateCommandShortcut('<C-q>', ':q')           " Ctrl-W close tab
 
 call CreateCommandShortcut('<C-l>', ':nohl')        " Ctrl-L close search
-
+call CreateShortcut('<S-Home>', '<Esc>v^')
+call CreateShortcut('<S-End>', '<Esc>v$')
 " Decrement number. Increment by Ctrl-A
 nnoremap <C-d> <C-x>
 
@@ -154,10 +166,9 @@ inoremap <C-w> <Esc><C-w>
 
 " ======= vim-airline ===========
 let g:airline_powerline_fonts=1
-set timeoutlen=50
-
+:
 " ======= Nerdtree ==============
-let NERDTreeShowHidden=1
+let NERDTreeShowHidden=0
 let g:NERDTreeChDirMode=2
 
 " ======== nerdtree-tabs ========
@@ -175,12 +186,16 @@ let g:syntastic_check_on_open = 1
 let g:syntastic_check_on_wq = 0
 
 let g:syntastic_python_checkers = ['flake8']
+let g:syntastic_cpp_compiler_options = '-std=c++11'
 
 " ======== YouCompleteMe ========
 let g:ycm_key_list_select_completion = ['<TAB>']
 let g:ycm_key_list_previous_completion = ['<S-TAB>']
 let g:ycm_autoclose_preview_window_after_completion = 1
 let g:ycm_complete_in_comments = 1
+let g:ycm_register_as_syntastic_checker = 1
+let g:ycm_global_ycm_extra_conf = "/home/amol/dotfiles/vim/.ycm_extra_conf.py"
+
 
 let g:jedi#popup_on_dot = 0
 let g:jedi#popup_select_first = 0
@@ -196,5 +211,5 @@ let g:C_UseTool_doxygen = 'yes'
 " ============== Startup =======================
 autocmd vimenter * NERDTree
 
-autocmd BufWritePost *.h,*.cpp call Cpplint()
+"autocmd BufWritePost *.h,*.cpp call Cpplint()
 call vundle#end()
