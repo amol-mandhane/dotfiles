@@ -22,7 +22,7 @@ Plugin 'scrooloose/syntastic'
 Plugin 'sjl/gundo.vim'
 " Plugin 'klen/python-mode'
 Plugin 'davidhalter/jedi-vim'
-Plugin 'tell-k/vim-autopep8'
+" Plugin 'tell-k/vim-autopep8'
 Plugin 'scrooloose/nerdcommenter'
 Plugin 'jmcantrell/vim-virtualenv'
 Plugin 'tpope/vim-surround'
@@ -36,6 +36,8 @@ Plugin 'MarcWeber/vim-addon-mw-utils'
 Plugin 'tomtom/tlib_vim'
 Plugin 'garbas/vim-snipmate'
 Plugin 'honza/vim-snippets'
+Plugin 'Raimondi/delimitMate'
+Plugin 'funorpain/vim-cpplint'
 " ============== GENERAL CONFIG ==============
 let mapleader = ","
 set mouse=a
@@ -187,8 +189,12 @@ let g:jedi#use_splits_not_buffers = "bottom"
 " ======= SnipMate ==============
 imap <C-i> <Plug>snipMateNextOrTrigger
 
+" ========= c.vim ===============
+let g:C_UseTool_cmake = 'yes'
+let g:C_UseTool_doxygen = 'yes'
+
 " ============== Startup =======================
 autocmd vimenter * NERDTree
 
-
+autocmd BufWritePost *.h,*.cpp call Cpplint()
 call vundle#end()
