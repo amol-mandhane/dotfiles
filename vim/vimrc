@@ -11,8 +11,12 @@ call vundle#begin()
 Plugin 'gmarik/Vundle.vim'
 
 " =========== Plugin: Operational plugins ===============
+Plugin 'rust-lang/rust.vim'
 Plugin 'bling/vim-airline'
-Plugin 'kien/ctrlp.vim'
+" Plugin 'kien/ctrlp.vim'
+" Plugin 'Shougo/unite.vim'
+Plugin 'L9'
+Plugin 'FuzzyFinder'
 Plugin 'airblade/vim-gitgutter'
 Plugin 'scrooloose/nerdtree'
 Plugin 'jistr/vim-nerdtree-tabs'
@@ -34,7 +38,7 @@ Plugin 'octol/vim-cpp-enhanced-highlight'
 
 " Plugin 'MarcWeber/vim-addon-mw-utils'
 " Plugin 'tomtom/tlib_vim'
-" Plugin 'garbas/vim-snipmate'
+Plugin 'garbas/vim-snipmate'
 " Plugin 'honza/vim-snippets'
 Plugin 'Raimondi/delimitMate'
 " Plugin 'funorpain/vim-cpplint'
@@ -42,6 +46,8 @@ Plugin 'c.vim'
 Plugin 'mattn/emmet-vim'
 Plugin 'godlygeek/tabular'
 Plugin 'majutsushi/tagbar'
+" Plugin 'django.vim'
+Plugin 'sukima/xmledit'
 
 " ============== GENERAL CONFIG ==============
 let mapleader = ","
@@ -69,7 +75,7 @@ set list                   " show EOL
 autocmd BufWritePre * :%s/\s\+$//e      " Trim trailing whitespaces
 
 syntax on
-
+syntax sync minlines=256
 
 " ============= Turn Off Swap Files =========
 set noswapfile
@@ -100,11 +106,10 @@ let g:solarized_termcolors=256
 let g:solarized_bold=1
 let g:solarized_italic=1
 " set background=light
-colorscheme lucius
-LuciusLight
+colorscheme solarized
 
 if has('gui_running')
-    colorscheme pencil
+"    colorscheme solarized
 endif
 
 " =============== Highlighting =====================
@@ -149,6 +154,7 @@ call CreateCommandShortcut('<C-S-k>', ':dl')       " Ctrl-Shift-K delete line
 
 call CreateCommandShortcut('<C-t>', ':tabnew')      " Ctrl-T new tab
 call CreateCommandShortcut('<C-q>', ':q')           " Ctrl-W close tab
+call CreateCommandShortcut('<C-p>', ':FufFileWithFullCwd')
 
 call CreateCommandShortcut('<C-l>', ':nohl')        " Ctrl-L close search
 call CreateShortcut('<S-Home>', '<Esc>v^')
@@ -170,6 +176,8 @@ let g:airline_powerline_fonts=1
 " ======= Nerdtree ==============
 let NERDTreeShowHidden=0
 let g:NERDTreeChDirMode=2
+
+set fillchars+=vert:\ | let g:NERDTreeMirror=1
 
 " ======== nerdtree-tabs ========
 let g:nerdtree_tabs_open_on_console_startup=1
