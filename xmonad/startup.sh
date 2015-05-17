@@ -8,8 +8,8 @@
 
 nm-applet &
 jupiter &
-dropbox start &
-gnome-sound-applet &
+# dropbox start &
+# gnome-sound-applet &
 feh --bg-scale /home/amol/.xmonad/Wallpaper.jpg &
 
 # xautolock -time 5 -locker /home/amol/.xmonad/lock.sh &
