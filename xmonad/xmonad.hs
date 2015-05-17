@@ -49,11 +49,11 @@ myTrayer = "trayer --edge top --align right --SetDockType true --SetPartialStrut
 
 
 myDzenStyle  = " -e 'button2=;' -h '16' -fg '" ++ fgGray ++ "' -bg '" ++ darkBlack ++ "' -fn '" ++ dzenFont 10 ++ "'"
-myDzenTopBar = "dzen2 -w '800' -ta 'l'" ++ myDzenStyle
-myDzenBottomBar = "dzen2 -y '752' -w '600' -ta 'l'" ++ myDzenStyle
+myDzenTopBar = "dzen2 -w '850' -ta 'l'" ++ myDzenStyle
+myDzenBottomBar = "dzen2 -y '752' -w '400' -ta 'l'" ++ myDzenStyle
 
-myConkyTop = "conky -c ~/.xmonad/conky_top_rc | dzen2 -x '800' -w '416' -ta 'r'" ++ myDzenStyle
-myConkyBottom = "conky -c ~/.xmonad/conky_bottom_rc | dzen2 -y '752' -x '600' -w '766' -ta 'r'" ++ myDzenStyle
+myConkyTop = "conky -c ~/.xmonad/conky_top_rc | dzen2 -x '850' -w '366' -ta 'r'" ++ myDzenStyle
+myConkyBottom = "conky -c ~/.xmonad/conky_bottom_rc | dzen2 -y '752' -x '400' -w '966' -ta 'r'" ++ myDzenStyle
 -- myDzenConky  = "conky -c ~/.xmonad/conkyrc | dzen2 -x '656' -w '560' -ta 'r'" ++ myDzenStyle
 
 -- myWorkspaces_img = [
@@ -89,19 +89,23 @@ myLayoutHook = smartBorders $ smartSpacing 5 $ (customTile ||| Mirror customTile
 
 myTopDzenPP  = dzenPP
     {
-      ppSep     = "^fn(" ++ dzenFont 5 ++ ") ^fn(" ++ dzenFont 10 ++ ")"
-    , ppTitle   = dzenColor darkGray fgGray . wrap "  " "  "
-    , ppLayout  = dzenColor fgGray darkGray . wrap " " " "
-    , ppOrder   = \(ws:l:t:w) -> [l, t]
+    ppCurrent = dzenColor darkBlack lightBlue . wrap " " " ",
+    ppHidden  = dzenColor darkGray fgGray. wrap " " " ",
+    ppHiddenNoWindows = dzenColor darkBlack darkGray . wrap " " " ",
+    ppUrgent  = dzenColor darkBlack lightGreen . wrap " " " ",
+
+    ppWsSep = "^fn(" ++ dzenFont 2 ++ ") ^fn(" ++ dzenFont 10 ++ ")",
+    ppSep     = "^fn(" ++ dzenFont 5 ++ ") ^fn(" ++ dzenFont 10 ++ ")",
+
+    ppTitle   = dzenColor darkGray fgGray . wrap "  " "  ",
+
+    ppOrder   = \(ws:l:t:w) -> [ws, t]
     }
 myBottomDzenPP = dzenPP
     {
-    ppCurrent = dzenColor darkBlack lightBlue . wrap " " " ",
-    ppHidden  = dzenColor fgGray darkGray . wrap " " " ",
-    ppHiddenNoWindows = dzenColor darkBlack darkGray . wrap " " " ",
-    ppUrgent  = dzenColor darkBlack lightGreen . wrap " " " ",
-    ppOrder = \(ws:l:t:w) -> [ws] ++ w,
-    ppWsSep = "^fn(" ++ dzenFont 2 ++ ") ^fn(" ++ dzenFont 10 ++ ")"
+    ppLayout  = dzenColor fgGray darkGray . wrap " " " ",
+    ppSep     = "^fn(" ++ dzenFont 5 ++ ") ^fn(" ++ dzenFont 10 ++ ")",
+    ppOrder = \(ws:l:t:w) -> l:w
     }
 
 myLogHook top bottom = do
@@ -109,7 +113,7 @@ myLogHook top bottom = do
     dynamicLogWithPP $ myBottomDzenPP { ppOutput = hPutStrLn bottom }
 
 myKeys = [("M1-<Tab>"   , cycleRecentWindows [xK_Alt_L] xK_Tab xK_Tab ) -- classic alt-tab behaviour
-         , ("M-<Return>" , spawn "dmenu_run -b"                         ) -- app launcher
+         , ("M-<Return>" , spawn "dmenu_run"                         ) -- app launcher
          , ("M-e"        , spawn "marlin"                      ) -- launch file manager
          , ("C-M1-l"     , spawn "/home/amol/.xmonad/lock.sh"              ) -- lock screen
          ]

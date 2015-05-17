@@ -106,7 +106,7 @@ let g:solarized_termcolors=256
 let g:solarized_bold=1
 let g:solarized_italic=1
 " set background=light
-colorscheme solarized
+colorscheme vividchalk
 
 if has('gui_running')
 "    colorscheme solarized
