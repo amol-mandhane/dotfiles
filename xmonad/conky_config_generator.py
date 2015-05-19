@@ -24,7 +24,9 @@ def bg(c=None):
     return "^bg(%s)" % c
 
 
-spacer = "^fn(Clean:size=2)" + bg(color1) + " ^fn(Clean:size=10)" + bg(color5)
+# spacer =
+# "^fn(Clean:size=2)" + bg(color1) + " ^fn(Clean:size=10)" + bg(color5)
+spacer = ""
 
 
 def cpu_init():
@@ -95,7 +97,7 @@ def mem():
     ret += fg(color2)
     ret += "${endif}"
     ret += "${endif}"
-    ret += " ${template6}% ${mem} "
+    ret += "${template6}% ${mem} "
     ret += bg() + fg() + "\\\n\\"
     return ret
 
@@ -117,7 +119,7 @@ def swap():
     ret += fg(color2)
     ret += "${endif}"
     ret += "${endif}"
-    ret += " ${template7}% "
+    ret += "${template7}% "
     ret += bg() + fg() + "\\\n\\"
     return ret
 
@@ -142,12 +144,12 @@ def battery_init():
 
 def battery():
     ret = " "
-    ret += bg(color5)
+    ret += fg(color1)
     ret += "${if_match \"${acpiacadapter}\" == \"on-line\"}"
-    ret += fg(color_green) + " CHARGE  " + spacer
+    ret += bg(color_green) + " CHARGE "
     ret += "${else}"
-    ret += fg(color_red) + " BATTERY " + spacer
-    ret += "${endif}"
+    ret += bg(color_red) + " BATTERY "
+    ret += "${endif}" + spacer + bg(color5)
     ret += "${if_match ${template8} >= 75}"
     ret += fg(color_green)
     ret += "${else}"
@@ -241,6 +243,20 @@ def uptime():
     return ret
 
 
+def wnet_init():
+    return ""
+
+
+def wnet():
+    ret = " "
+    ret += bg(color5) + fg(color4)
+    ret += " NET "
+    ret += fg(color2)
+    ret += " ${downspeed wlan0} ${upspeed wlan0} "
+    ret += bg() + fg() + "\\\n\\"
+    return ret
+
+
 def main():
     print """background no
 out_to_console yes
@@ -253,10 +269,17 @@ short_units yes
 """
 
     for arg in sys.argv[1:]:
-        print eval(arg + "_init()")
+        try:
+            print eval(arg + "_init()")
+        except:
+            pass
+
     print "TEXT"
     for arg in sys.argv[1:]:
-        print eval(arg + "()")
+        try:
+            print eval(arg + "()")
+        except:
+            pass
 
 if __name__ == "__main__":
     main()

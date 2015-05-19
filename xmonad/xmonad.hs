@@ -1,6 +1,7 @@
 import XMonad
 import XMonad.Hooks.DynamicLog
 import XMonad.Hooks.ManageDocks
+import XMonad.Hooks.EwmhDesktops
 import XMonad.Actions.CycleWindows
 import XMonad.Util.Run(spawnPipe)
 import XMonad.Util.EZConfig(additionalKeysP)
@@ -9,8 +10,9 @@ import XMonad.Layout.Spacing
 import XMonad.Layout.LayoutCombinators hiding ( (|||) )
 import XMonad.Layout.NoBorders
 import XMonad.Layout.Circle
-import XMonad.Hooks.EwmhDesktops
-
+import XMonad.Layout.Grid
+import qualified XMonad.Layout.Magnifier as Magnifier
+import qualified Data.Map as Map
 
 main = do
     dzenTop <- spawnPipe myDzenTopBar
@@ -56,20 +58,20 @@ myConkyTop = "conky -c ~/.xmonad/conky_top_rc | dzen2 -x '850' -w '366' -ta 'r'"
 myConkyBottom = "conky -c ~/.xmonad/conky_bottom_rc | dzen2 -y '752' -x '400' -w '966' -ta 'r'" ++ myDzenStyle
 -- myDzenConky  = "conky -c ~/.xmonad/conkyrc | dzen2 -x '656' -w '560' -ta 'r'" ++ myDzenStyle
 
--- myWorkspaces_img = [
---     "^i(/home/amol/.xmonad/dzen2_icons/workspaces/web.xbm)",
---     "^i(/home/amol/.xmonad/dzen2_icons/workspaces/term.xbm)",
---     "^i(/home/amol/.xmonad/dzen2_icons/workspaces/dev.xbm)",
---     "^i(/home/amol/.xmonad/dzen2_icons/workspaces/main.xbm)",
---     "^i(/home/amol/.xmonad/dzen2_icons/workspaces/media.xbm)",
---     "^i(/home/amol/.xmonad/dzen2_icons/workspaces/browse.xbm)",
---     "^i(/home/amol/.xmonad/dzen2_icons/workspaces/apps.xbm)",
---     "^i(/home/amol/.xmonad/dzen2_icons/workspaces/misc.xbm)",
---     "^i(/home/amol/.xmonad/dzen2_icons/workspaces/extra.xbm)"]
+myWorkspaces_img = [
+     "^i(/home/amol/.xmonad/dzen2_icons/workspaces/web.xbm)",
+     "^i(/home/amol/.xmonad/dzen2_icons/workspaces/term.xbm)",
+     "^i(/home/amol/.xmonad/dzen2_icons/workspaces/dev.xbm)",
+     "^i(/home/amol/.xmonad/dzen2_icons/workspaces/main.xbm)",
+     "^i(/home/amol/.xmonad/dzen2_icons/workspaces/media.xbm)",
+     "^i(/home/amol/.xmonad/dzen2_icons/workspaces/browse.xbm)",
+     "^i(/home/amol/.xmonad/dzen2_icons/workspaces/apps.xbm)",
+     "^i(/home/amol/.xmonad/dzen2_icons/workspaces/misc.xbm)",
+     "^i(/home/amol/.xmonad/dzen2_icons/workspaces/extra.xbm)"]
 
 
--- myWorkspaces = ["^ca(1, xdotool key super+" ++ (show i) ++ ")" ++ s ++ "^ca()" | (s, i) <- zip myWorkspaces_img [1..9]]
-myWorkspaces = ["^ca(1, xdotool key super+" ++ (show i) ++ ")" ++ (show i) ++ "^ca()" | i <- [1..9]]
+myWorkspaces = ["^ca(1, xdotool key super+" ++ (show i) ++ ")" ++ s ++ "^ca()" | (s, i) <- zip myWorkspaces_img [1..9]]
+-- myWorkspaces = ["^ca(1, xdotool key super+" ++ (show i) ++ ")" ++ (show i) ++ "^ca()" | i <- [1..9]]
 
 myManageHook = composeAll . concat $
    [ [ className =? "Firefox"             --> doShift (myWorkspaces !! 0) ]
@@ -84,8 +86,9 @@ myManageHook = composeAll . concat $
     , [ className =? "Gimp"               --> doFloat ]]
 
 customTile = (Tall 1 (2/100) (2/3))
+magnify = Magnifier.magnifiercz 1.0
 
-myLayoutHook = smartBorders $ smartSpacing 5 $ (customTile ||| Mirror customTile ||| Full ||| Circle)
+myLayoutHook = smartBorders $ smartSpacing 5 $ (customTile ||| Mirror customTile ||| Full ||| magnify Circle ||| magnify Grid)
 
 myTopDzenPP  = dzenPP
     {
@@ -94,7 +97,7 @@ myTopDzenPP  = dzenPP
     ppHiddenNoWindows = dzenColor darkBlack darkGray . wrap " " " ",
     ppUrgent  = dzenColor darkBlack lightGreen . wrap " " " ",
 
-    ppWsSep = "^fn(" ++ dzenFont 2 ++ ") ^fn(" ++ dzenFont 10 ++ ")",
+    -- ppWsSep = "^fn(" ++ dzenFont 2 ++ ") ^fn(" ++ dzenFont 10 ++ ")",
     ppSep     = "^fn(" ++ dzenFont 5 ++ ") ^fn(" ++ dzenFont 10 ++ ")",
 
     ppTitle   = dzenColor darkGray fgGray . wrap "  " "  ",
@@ -113,7 +116,9 @@ myLogHook top bottom = do
     dynamicLogWithPP $ myBottomDzenPP { ppOutput = hPutStrLn bottom }
 
 myKeys = [("M1-<Tab>"   , cycleRecentWindows [xK_Alt_L] xK_Tab xK_Tab ) -- classic alt-tab behaviour
-         , ("M-<Return>" , spawn "dmenu_run"                         ) -- app launcher
-         , ("M-e"        , spawn "marlin"                      ) -- launch file manager
-         , ("C-M1-l"     , spawn "/home/amol/.xmonad/lock.sh"              ) -- lock screen
+         , ("M-<Return>" , spawn "dmenu_run -b" ) -- app launcher
+         , ("M-e"        , spawn "marlin" ) -- launch file manager
+         , ("C-M1-l"     , spawn "/home/amol/.xmonad/lock.sh" ) -- lock screen
+         , ("M-S--", sendMessage Magnifier.MagnifyLess )
+         , ("M-S-=", sendMessage Magnifier.MagnifyMore )
          ]
