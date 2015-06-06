@@ -11,6 +11,7 @@ call vundle#begin()
 Plugin 'gmarik/Vundle.vim'
 
 " =========== Plugin: Operational plugins ===============
+Plugin 'tpope/vim-sensible'
 Plugin 'rust-lang/rust.vim'
 Plugin 'bling/vim-airline'
 " Plugin 'kien/ctrlp.vim'
@@ -18,6 +19,8 @@ Plugin 'bling/vim-airline'
 Plugin 'L9'
 Plugin 'FuzzyFinder'
 Plugin 'airblade/vim-gitgutter'
+Plugin 'Shougo/unite.vim'
+Plugin 'Shougo/vimfiler.vim'
 Plugin 'scrooloose/nerdtree'
 Plugin 'jistr/vim-nerdtree-tabs'
 Plugin 'Valloric/YouCompleteMe'
@@ -49,6 +52,7 @@ Plugin 'majutsushi/tagbar'
 " Plugin 'django.vim'
 Plugin 'sukima/xmledit'
 
+Plugin 'fatih/vim-go'
 " ============== GENERAL CONFIG ==============
 let mapleader = ","
 set timeoutlen=500
@@ -172,6 +176,15 @@ inoremap <C-w> <Esc><C-w>
 
 " ======= vim-airline ===========
 let g:airline_powerline_fonts=1
+
+" ======= VimFiler ==============
+let g:vimfiler_as_default_explorer = 1
+let g:vimfiler_tree_indentation = 2
+let g:vimfiler_tree_leaf_icon = ' '
+let g:vimfiler_tree_opened_icon = '▾'
+let g:vimfiler_tree_closed_icon = '▸'
+let g:vimfiler_file_icon = '-'
+let g:vimfiler_marked_file_icon = '*'
 :
 " ======= Nerdtree ==============
 let NERDTreeShowHidden=0
@@ -202,6 +215,7 @@ let g:ycm_key_list_previous_completion = ['<S-TAB>']
 let g:ycm_autoclose_preview_window_after_completion = 1
 let g:ycm_complete_in_comments = 1
 let g:ycm_register_as_syntastic_checker = 1
+let g:ycm_collect_identifiers_from_tags_files = 1
 let g:ycm_global_ycm_extra_conf = "/home/amol/dotfiles/vim/.ycm_extra_conf.py"
 
 

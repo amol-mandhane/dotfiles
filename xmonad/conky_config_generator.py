@@ -8,8 +8,9 @@ color3 = "\\#9D9D9D"
 color4 = "\\#444444"
 color5 = "\\#101010"
 color_green = "\\#66FF66"
-color_red = "\\#FF6666"
+color_red = "\\#FF0000"
 color_yellow = "\\#FFD727"
+color_mild_red = "\\#FF6666"
 
 
 def fg(c=None):
@@ -43,7 +44,7 @@ def cpu():
         ret = ""
         for d in cpus:
             ret += "${if_match ${template%d} >= 50}" % d
-            ret += fg(color_red)
+            ret += bg(color_red) + fg(color1) + " "
             ret += "${else}"
             ret += "${if_match ${template%d} >= 20}" % d
             ret += fg(color_yellow)
@@ -51,8 +52,8 @@ def cpu():
             ret += fg(color2)
             ret += "${endif}"
             ret += "${endif}"
-            ret += "${template%d}%% " % d
-            ret += fg() + "\\\n"
+            ret += "${template%d} " % d
+            ret += bg(color5) + fg() + "\\\n"
         return ret
     return " " + bg(color5) + fg(color4) + " CPU \\\n" + spacer + \
         " " + f(range(1, 5)) + fg() + bg() + "\\\n\\"
@@ -67,7 +68,7 @@ def temp():
     ret += bg(color5) + fg(color4)
     ret += " TEMP " + spacer
     ret += "${if_match ${template5} >= 60}"
-    ret += fg(color_red)
+    ret += bg(color_red) + fg(color1) + " "
     ret += "${else}"
     ret += "${if_match ${template5} >= 50}"
     ret += fg(color_yellow)
@@ -89,7 +90,7 @@ def mem():
     ret += bg(color5) + fg(color4)
     ret += " MEM " + spacer
     ret += "${if_match ${template6} >= 60}"
-    ret += fg(color_red)
+    ret += bg(color_red) + fg(color1) + " "
     ret += "${else}"
     ret += "${if_match ${template6} >= 40}"
     ret += fg(color_yellow)
@@ -111,7 +112,7 @@ def swap():
     ret += bg(color5) + fg(color4)
     ret += " SWAP " + spacer
     ret += "${if_match ${template7} >= 10}"
-    ret += fg(color_red)
+    ret += bg(color_red) + fg(color1) + " "
     ret += "${else}"
     ret += "${if_match ${template7} >= 2}"
     ret += fg(color_yellow)
@@ -148,7 +149,7 @@ def battery():
     ret += "${if_match \"${acpiacadapter}\" == \"on-line\"}"
     ret += bg(color_green) + " CHARGE "
     ret += "${else}"
-    ret += bg(color_red) + " BATTERY "
+    ret += bg(color_mild_red) + " BATTERY "
     ret += "${endif}" + spacer + bg(color5)
     ret += "${if_match ${template8} >= 75}"
     ret += fg(color_green)
@@ -156,7 +157,7 @@ def battery():
     ret += "${if_match ${template8} > 25}"
     ret += fg(color2)
     ret += "${else}"
-    ret += fg(color_red)
+    ret += bg(color_red) + fg(color1)
     ret += "${endif}"
     ret += "${endif}"
     ret += " ${template8}% "
@@ -253,6 +254,20 @@ def wnet():
     ret += " NET "
     ret += fg(color2)
     ret += " ${downspeed wlan0} ${upspeed wlan0} "
+    ret += bg() + fg() + "\\\n\\"
+    return ret
+
+
+def wnet_total_init():
+    return ""
+
+
+def wnet_total():
+    ret = " "
+    ret += bg(color5) + fg(color4)
+    ret += " NET "
+    ret += fg(color2)
+    ret += " ${totaldown wlan0} ${totalup wlan0} "
     ret += bg() + fg() + "\\\n\\"
     return ret
 

@@ -22,20 +22,20 @@ template8 ${battery_percent BAT1}
 TEXT
  ^bg(\#101010)^fg(\#444444) VOLUME ^fg(\#44AACC) ${exec pactl list sinks | grep "Volume: 0"| awk '{print $3}' | tail -1} ^bg(\#020202)^fg(\#444444)\
 \
- ^bg(\#101010)^fg(\#444444) NET ^fg(\#44AACC) ${downspeed wlan0} ${upspeed wlan0} ^bg(\#020202)^fg(\#444444)\
+ ^bg(\#101010)^fg(\#444444) NET ^fg(\#44AACC) ${totaldown wlan0} ${totalup wlan0} ^bg(\#020202)^fg(\#444444)\
 \
  ^bg(\#101010)^fg(\#444444) CPU \
- ${if_match ${template1} >= 50}^fg(\#FF6666)${else}${if_match ${template1} >= 20}^fg(\#FFD727)${else}^fg(\#44AACC)${endif}${endif}${template1}% ^fg(\#444444)\
-${if_match ${template2} >= 50}^fg(\#FF6666)${else}${if_match ${template2} >= 20}^fg(\#FFD727)${else}^fg(\#44AACC)${endif}${endif}${template2}% ^fg(\#444444)\
-${if_match ${template3} >= 50}^fg(\#FF6666)${else}${if_match ${template3} >= 20}^fg(\#FFD727)${else}^fg(\#44AACC)${endif}${endif}${template3}% ^fg(\#444444)\
-${if_match ${template4} >= 50}^fg(\#FF6666)${else}${if_match ${template4} >= 20}^fg(\#FFD727)${else}^fg(\#44AACC)${endif}${endif}${template4}% ^fg(\#444444)\
+ ${if_match ${template1} >= 50}^bg(\#FF0000)^fg(\#020202) ${else}${if_match ${template1} >= 20}^fg(\#FFD727)${else}^fg(\#44AACC)${endif}${endif}${template1} ^bg(\#101010)^fg(\#444444)\
+${if_match ${template2} >= 50}^bg(\#FF0000)^fg(\#020202) ${else}${if_match ${template2} >= 20}^fg(\#FFD727)${else}^fg(\#44AACC)${endif}${endif}${template2} ^bg(\#101010)^fg(\#444444)\
+${if_match ${template3} >= 50}^bg(\#FF0000)^fg(\#020202) ${else}${if_match ${template3} >= 20}^fg(\#FFD727)${else}^fg(\#44AACC)${endif}${endif}${template3} ^bg(\#101010)^fg(\#444444)\
+${if_match ${template4} >= 50}^bg(\#FF0000)^fg(\#020202) ${else}${if_match ${template4} >= 20}^fg(\#FFD727)${else}^fg(\#44AACC)${endif}${endif}${template4} ^bg(\#101010)^fg(\#444444)\
 ^fg(\#444444)^bg(\#020202)\
 \
- ^bg(\#101010)^fg(\#444444) TEMP ${if_match ${template5} >= 60}^fg(\#FF6666)${else}${if_match ${template5} >= 50}^fg(\#FFD727)${else}^fg(\#44AACC)${endif}${endif}${template5}°C ^bg(\#020202)^fg(\#444444)\
+ ^bg(\#101010)^fg(\#444444) TEMP ${if_match ${template5} >= 60}^bg(\#FF0000)^fg(\#020202) ${else}${if_match ${template5} >= 50}^fg(\#FFD727)${else}^fg(\#44AACC)${endif}${endif}${template5}°C ^bg(\#020202)^fg(\#444444)\
 \
- ^bg(\#101010)^fg(\#444444) MEM ${if_match ${template6} >= 60}^fg(\#FF6666)${else}${if_match ${template6} >= 40}^fg(\#FFD727)${else}^fg(\#44AACC)${endif}${endif}${template6}% ${mem} ^bg(\#020202)^fg(\#444444)\
+ ^bg(\#101010)^fg(\#444444) MEM ${if_match ${template6} >= 60}^bg(\#FF0000)^fg(\#020202) ${else}${if_match ${template6} >= 40}^fg(\#FFD727)${else}^fg(\#44AACC)${endif}${endif}${template6}% ${mem} ^bg(\#020202)^fg(\#444444)\
 \
- ^bg(\#101010)^fg(\#444444) SWAP ${if_match ${template7} >= 10}^fg(\#FF6666)${else}${if_match ${template7} >= 2}^fg(\#FFD727)${else}^fg(\#44AACC)${endif}${endif}${template7}% ^bg(\#020202)^fg(\#444444)\
+ ^bg(\#101010)^fg(\#444444) SWAP ${if_match ${template7} >= 10}^bg(\#FF0000)^fg(\#020202) ${else}${if_match ${template7} >= 2}^fg(\#FFD727)${else}^fg(\#44AACC)${endif}${endif}${template7}% ^bg(\#020202)^fg(\#444444)\
 \
- ^fg(\#020202)${if_match "${acpiacadapter}" == "on-line"}^bg(\#66FF66) CHARGE ${else}^bg(\#FF6666) BATTERY ${endif}^bg(\#101010)${if_match ${template8} >= 75}^fg(\#66FF66)${else}${if_match ${template8} > 25}^fg(\#44AACC)${else}^fg(\#FF6666)${endif}${endif} ${template8}% ^bg(\#020202)^fg(\#444444)\
+ ^fg(\#020202)${if_match "${acpiacadapter}" == "on-line"}^bg(\#66FF66) CHARGE ${else}^bg(\#FF6666) BATTERY ${endif}^bg(\#101010)${if_match ${template8} >= 75}^fg(\#66FF66)${else}${if_match ${template8} > 25}^fg(\#44AACC)${else}^bg(\#FF0000)^fg(\#020202)${endif}${endif} ${template8}% ^bg(\#020202)^fg(\#444444)\
 \
