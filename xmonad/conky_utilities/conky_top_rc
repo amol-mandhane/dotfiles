@@ -1,0 +1,16 @@
+background no
+out_to_console yes
+out_to_x no
+update_interval 1.0
+total_run_times 0
+use_spacer left
+pad_percents 2
+short_units yes
+
+
+
+TEXT
+^bg(\#101010)^fg(\#444444) UPTIME ^fg(\#9D9D9D)${uptime} ^bg(\#020202)^fg(\#444444)\
+\
+ ^bg(\#9D9D9D)^fg(\#020202) ${time %A} ^bg(\#020202) ^bg(\#101010)^fg(\#9D9D9D)^ca(1,/home/amol/.xmonad/conky_utilities/calendar.sh) ${time %Y.%m.}^fg(\#44AACC)${time %d} ^ca()^bg(\#020202) ^bg(\#101010)^fg(\#9D9D9D) ${time %I:%M:}^fg(\#66FF66)${time %S}^fg(\#444444) ${time %p} ^bg(\#020202)^fg(\#444444)\
+\

@@ -54,8 +54,8 @@ myDzenStyle  = " -e 'button2=;' -h '16' -fg '" ++ fgGray ++ "' -bg '" ++ darkBla
 myDzenTopBar = "dzen2 -w '850' -ta 'l'" ++ myDzenStyle
 myDzenBottomBar = "dzen2 -y '752' -w '400' -ta 'l'" ++ myDzenStyle
 
-myConkyTop = "conky -c ~/.xmonad/conky_top_rc | dzen2 -x '850' -w '366' -ta 'r'" ++ myDzenStyle
-myConkyBottom = "conky -c ~/.xmonad/conky_bottom_rc | dzen2 -y '752' -x '400' -w '966' -ta 'r'" ++ myDzenStyle
+myConkyTop = "conky -c ~/.xmonad/conky_utilities/conky_top_rc | dzen2 -x '850' -w '366' -ta 'r'" ++ myDzenStyle
+myConkyBottom = "conky -c ~/.xmonad/conky_utilities/conky_bottom_rc | dzen2 -y '752' -x '400' -w '966' -ta 'r'" ++ myDzenStyle
 -- myDzenConky  = "conky -c ~/.xmonad/conkyrc | dzen2 -x '656' -w '560' -ta 'r'" ++ myDzenStyle
 
 myWorkspaces_img = [
@@ -81,7 +81,7 @@ myManageHook = composeAll . concat $
     , [ className =? "Smplayer"           --> doShift (myWorkspaces !! 4) ]
     , [ className =? "Nautilus"           --> doShift (myWorkspaces !! 5) ]
     , [ className =? "Pcmanfm"            --> doShift (myWorkspaces !! 5) ]
-    , [ className =? "Marlin"             --> doShift (myWorkspaces !! 5) ]
+    , [ className =? "Nemo"               --> doShift (myWorkspaces !! 5) ]
     , [ className =? "Thunderbird"        --> doShift (myWorkspaces !! 8) ]
     , [ className =? "Gimp"               --> doFloat ]]
 
@@ -117,7 +117,7 @@ myLogHook top bottom = do
 
 myKeys = [("M1-<Tab>"   , cycleRecentWindows [xK_Alt_L] xK_Tab xK_Tab ) -- classic alt-tab behaviour
          , ("M-<Return>" , spawn "dmenu_run -b" ) -- app launcher
-         , ("M-e"        , spawn "marlin" ) -- launch file manager
+         , ("M-e"        , spawn "nemo --no-desktop" ) -- launch file manager
          , ("C-M1-l"     , spawn "/home/amol/.xmonad/lock.sh" ) -- lock screen
          , ("M-S--", sendMessage Magnifier.MagnifyLess )
          , ("M-S-=", sendMessage Magnifier.MagnifyMore )

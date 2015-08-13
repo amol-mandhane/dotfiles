@@ -7,6 +7,7 @@
     ~/.zshrc: zsh/zshrc
     ~/.antigen: zsh/antigen
     ~/.Xresources: urxvt/Xresources
+    ~/.emacs.d: emacs
 
 - shell:
   - [git submodule update --init --recursive dotbot, Installing/updating dotbot submodules]
