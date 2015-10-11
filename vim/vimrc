@@ -1,13 +1,16 @@
-" Autoreload .vimrc and .vim/vimrc
+" Autoreload .vimrc and .vim/vimrc {{{
 autocmd! BufWritePost .vimrc source %
 autocmd! BufWritePost vimrc source %
+" }}}
 
-" vundle settings
+" vundle settings {{{
 set nocompatible
 filetype off
 set rtp+=~/.vim/bundle/Vundle.vim
 call vundle#begin()
+" }}}
 
+" VIM Plugins {{{
 Plugin 'gmarik/Vundle.vim'
 
 " =========== Plugin: Operational plugins ===============
@@ -53,40 +56,54 @@ Plugin 'majutsushi/tagbar'
 Plugin 'sukima/xmledit'
 
 Plugin 'fatih/vim-go'
-" ============== GENERAL CONFIG ==============
+Plugin 'sjl/badwolf'
+" }}}
+
+" General settings {{{
 let mapleader = ","
 set timeoutlen=500
 set mouse=a
 set clipboard=unnamedplus
-set number                        " Line numbers
-set numberwidth=6
-set backspace=indent,eol,start    " Backspace in normal mode
-set autoread                      " Autoreload
-set history=700
-set undolevels=700
+set autoread               " Autoreload
 set hidden                 " set Vim like any other editor (butffers, etc)
 
+set modelines=1
+
+" }}}
+
+" GUI settings {{{
+set number                 " Line numbers
+set numberwidth=6
 set tw=79                  " width of document (used by gd)
 set colorcolumn=80
-set nowrap                 " don't automatically wrap on load
-set fo-=t                  " don't automatically wrap text when typing
-set linebreak              " Wrap lines at convenient points
-set scrolloff=2
-
-set laststatus=2           " Turn on vim-airline
-
 set list                   " show EOL
-autocmd BufWritePre * :%s/\s\+$//e      " Trim trailing whitespaces
+set showcmd
+set wildmenu            " visual autocomplete for command menu
+set lazyredraw          " redraw only when we need to.
 
 syntax on
 syntax sync minlines=256
 
-" ============= Turn Off Swap Files =========
-set noswapfile
-set nobackup
-set nowb
+set guifont=Inconsolata-dz\ for\ Powerline\ Medium\ 10
+set guioptions -=T
 
-" ================ Indentation ======================
+" }}}
+
+" Editor settings {{{
+set backspace=indent,eol,start    " Backspace in normal mode
+set history=700
+set undolevels=700
+
+set nowrap                 " don't automatically wrap on load
+set fo-=t                  " don't automatically wrap text when typing
+set linebreak              " Wrap lines at convenient points
+
+set scrolloff=2
+
+autocmd BufWritePre * :%s/\s\+$//e      " Trim trailing whitespaces
+" }}}
+
+" Indentation {{{
 set autoindent
 set smartindent
 set smarttab
@@ -97,45 +114,55 @@ set expandtab
 filetype plugin on
 filetype indent on
 
-" =============== Searching =========================
+" }}}
 
+" Swap backup {{{
+set noswapfile
+set nobackup
+set nowb
+" }}}
+
+" Searching {{{
 set hlsearch
 set incsearch
 set ignorecase
 set smartcase
 
-" ============== Color Scheme =======================
+" }}}
+
+" Color scheme {{{
 set t_Co=256
-let g:solarized_termcolors=256
-let g:solarized_bold=1
-let g:solarized_italic=1
-" set background=light
-colorscheme molokai
 
-if has('gui_running')
+let g:badwolf_darkgutter = 1
+let g:badwolf_tabline = 3
+colorscheme badwolf
+
+
+" if has('gui_running')
 "    colorscheme solarized
-endif
+" endif
+" }}}
 
-" =============== Highlighting =====================
+" Highlighting {{{
 set cursorline
 set cursorcolumn
+" }}}
 
-" au InsertEnter * silent execute "!gconftool-2 --type string --set /apps/gnome-terminal/profiles/Default/cursor_shape ibeam"
-" au InsertLeave * silent execute "!gconftool-2 --type string --set /apps/gnome-terminal/profiles/Default/cursor_shape block"
+" Cursor settings {{{
+au InsertEnter * silent execute "!gconftool-2 --type string --set /apps/gnome-terminal/profiles/Default/cursor_shape ibeam"
+au InsertLeave * silent execute "!gconftool-2 --type string --set /apps/gnome-terminal/profiles/Default/cursor_shape block"
 " au VimLeave * silent execute "!gconftool-2 --type string --set /apps/gnome-terminal/profiles/Default/cursor_shape underline"
 " au VimEnter * silent execute "!gconftool-2 --type string --set /apps/gnome-terminal/profiles/Default/cursor_shape block"
 
 " Cursor automove issue
-au InsertLeave * call cursor([getpos('.')[1], getpos('.')[2]+1])
+" au InsertEnter * call cursor(getpos('.')[1], getpos('.')[2]+1)
+" }}}
 
-set guifont=Inconsolata-dz\ for\ Powerline\ Medium\ 10
-set guioptions -=T
-
-" ============== Shortcuts ========================
+" Shortcuts functions {{{
 " General shortcut creation function
 function! CreateCommandShortcut(shortcut, command)
     exe 'nnoremap ' . a:shortcut . ' ' . a:command . '<Enter>'
-    exe 'inoremap ' . a:shortcut . ' <Esc>' . a:command . '<Enter>i'
+    exe 'inoremap ' . a:shortcut . ' <C-\><C-O>' . a:command . '<Enter>'
     exe 'vnoremap ' . a:shortcut . ' <Esc>' . a:command . '<Enter>'
 endfunction
 
@@ -148,7 +175,9 @@ function! CreateShortcut(shortcut, command, ...)
         exe 'vnoremap ' . a:shortcut . ' <Esc>' . a:command
     end
 endfunction
+" }}}
 
+" Shortcut Definitions {{{
 call CreateCommandShortcut('<C-s>', ':update')     " Ctrl-S save
 call CreateCommandShortcut('<C-z>', ':undo')       " Ctrl-Z undo
 call CreateCommandShortcut('<C-y>', ':redo')       " Ctrl-Y redo
@@ -157,12 +186,13 @@ call CreateCommandShortcut('<C-S-z>', ':redo')     " Ctrl-Shift-Z redo
 call CreateCommandShortcut('<C-S-k>', ':dl')       " Ctrl-Shift-K delete line
 
 call CreateCommandShortcut('<C-t>', ':tabnew')      " Ctrl-T new tab
-call CreateCommandShortcut('<C-q>', ':q')           " Ctrl-W close tab
+call CreateCommandShortcut('<C-q>', ':q')           " Ctrl-Q close tab
 call CreateCommandShortcut('<C-p>', ':FufFileWithFullCwd')
 
 call CreateCommandShortcut('<C-l>', ':nohl')        " Ctrl-L close search
 call CreateShortcut('<S-Home>', '<Esc>v^')
 call CreateShortcut('<S-End>', '<Esc>v$')
+
 " Decrement number. Increment by Ctrl-A
 nnoremap <C-d> <C-x>
 
@@ -170,14 +200,18 @@ vnoremap <C-x> d
 vnoremap <C-c> y
 vnoremap <C-v> p
 nnoremap <C-v> p
-inoremap <C-v> <Esc>pi
+inoremap <C-v> <C-\><C-o>p
 inoremap <C-w> <Esc><C-w>
-" =========== Plugin Configs ======================
+" }}}
 
-" ======= vim-airline ===========
+" Plugin Settings {{{
+
+" vim-airline {{{
 let g:airline_powerline_fonts=1
+set laststatus=2           " Turn on vim-airline
+" }}}
 
-" ======= VimFiler ==============
+" VimFiler {{{
 let g:vimfiler_as_default_explorer = 1
 let g:vimfiler_tree_indentation = 2
 let g:vimfiler_tree_leaf_icon = ' '
@@ -185,22 +219,28 @@ let g:vimfiler_tree_opened_icon = '▾'
 let g:vimfiler_tree_closed_icon = '▸'
 let g:vimfiler_file_icon = '-'
 let g:vimfiler_marked_file_icon = '*'
-:
-" ======= Nerdtree ==============
+
+" }}}
+
+" NerdTree {{{
 let NERDTreeShowHidden=0
 let g:NERDTreeChDirMode=2
 
 set fillchars+=vert:\ | let g:NERDTreeMirror=1
 
-" ======== nerdtree-tabs ========
+" nerdtree-tabs {{{
 let g:nerdtree_tabs_open_on_console_startup=1
+" }}}
+" }}}
 
-" ======== vim-indent-guides ====
+" vim-indent-guides {{{
 " let g:indent_guides_start_level=1
 " let g:indent_guides_guide_size=4
 let g:indent_guides_enable_on_vim_startup=1
 
-" ======== Syntastic ============
+" }}}
+
+" Syntastic {{{
 let g:syntastic_always_populate_loc_list = 1
 let g:syntastic_auto_loc_list = 1
 let g:syntastic_check_on_open = 1
@@ -208,8 +248,9 @@ let g:syntastic_check_on_wq = 0
 
 let g:syntastic_python_checkers = ['flake8']
 let g:syntastic_cpp_compiler_options = '-std=c++11'
+" }}}
 
-" ======== YouCompleteMe ========
+" YouCompleteMe {{{
 let g:ycm_key_list_select_completion = ['<TAB>']
 let g:ycm_key_list_previous_completion = ['<S-TAB>']
 let g:ycm_autoclose_preview_window_after_completion = 1
@@ -223,15 +264,25 @@ let g:jedi#popup_on_dot = 0
 let g:jedi#popup_select_first = 0
 let g:jedi#use_splits_not_buffers = "bottom"
 
-" ======= SnipMate ==============
-imap <C-i> <Plug>snipMateNextOrTrigger
+" }}}
 
-" ========= c.vim ===============
+" SnipMate {{{
+imap <C-i> <Plug>snipMateNextOrTrigger
+" }}}
+
+" c.vim {{{
 let g:C_UseTool_cmake = 'yes'
 let g:C_UseTool_doxygen = 'yes'
+" }}}
 
-" ============== Startup =======================
+" }}}
+
+" Startup {{{
 autocmd vimenter * NERDTree
 
 "autocmd BufWritePost *.h,*.cpp call Cpplint()
 call vundle#end()
+
+" }}}
+
+" vim:foldmethod=marker:foldlevel=0
