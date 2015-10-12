@@ -17,10 +17,10 @@ Plugin 'gmarik/Vundle.vim'
 Plugin 'tpope/vim-sensible'
 Plugin 'rust-lang/rust.vim'
 Plugin 'bling/vim-airline'
-" Plugin 'kien/ctrlp.vim'
+Plugin 'kien/ctrlp.vim'
 " Plugin 'Shougo/unite.vim'
 Plugin 'L9'
-Plugin 'FuzzyFinder'
+" Plugin 'FuzzyFinder'
 Plugin 'airblade/vim-gitgutter'
 Plugin 'Shougo/unite.vim'
 Plugin 'Shougo/vimfiler.vim'
@@ -57,6 +57,7 @@ Plugin 'sukima/xmledit'
 
 Plugin 'fatih/vim-go'
 Plugin 'sjl/badwolf'
+Plugin 'rking/ag.vim'
 " }}}
 
 " General settings {{{
@@ -86,6 +87,10 @@ syntax sync minlines=256
 
 set guifont=Inconsolata-dz\ for\ Powerline\ Medium\ 10
 set guioptions -=T
+
+set foldenable          " enable folding
+set foldlevelstart=10   " open most folds by default
+set foldnestmax=10      " 10 nested fold max
 
 " }}}
 
@@ -117,9 +122,11 @@ filetype indent on
 " }}}
 
 " Swap backup {{{
-set noswapfile
-set nobackup
-set nowb
+set backup
+set backupdir=~/.vim-tmp,~/.tmp,~/tmp,/var/tmp,/tmp
+set backupskip=/tmp/*,/private/tmp/*
+set directory=~/.vim-tmp,~/.tmp,~/tmp,/var/tmp,/tmp
+set writebackup
 " }}}
 
 " Searching {{{
@@ -158,6 +165,30 @@ au InsertLeave * silent execute "!gconftool-2 --type string --set /apps/gnome-te
 " au InsertEnter * call cursor(getpos('.')[1], getpos('.')[2]+1)
 " }}}
 
+" Vim sessions {{{
+function! MakeSession()
+  let b:sessiondir = $HOME . "/.vim/sessions" . getcwd()
+  if (filewritable(b:sessiondir) != 2)
+    exe 'silent !mkdir -p ' b:sessiondir
+    redraw!
+  endif
+  let b:filename = b:sessiondir . '/session.vim'
+  exe "mksession! " . b:filename
+endfunction
+
+function! LoadSession()
+  let b:sessiondir = $HOME . "/.vim/sessions" . getcwd()
+  let b:sessionfile = b:sessiondir . "/session.vim"
+  if (filereadable(b:sessionfile))
+    exe 'source ' b:sessionfile
+  else
+    echo "No session loaded."
+  endif
+endfunction
+au VimEnter * nested :call LoadSession()
+au VimLeave * :call MakeSession()
+" }}}
+
 " Shortcuts functions {{{
 " General shortcut creation function
 function! CreateCommandShortcut(shortcut, command)
@@ -187,7 +218,6 @@ call CreateCommandShortcut('<C-S-k>', ':dl')       " Ctrl-Shift-K delete line
 
 call CreateCommandShortcut('<C-t>', ':tabnew')      " Ctrl-T new tab
 call CreateCommandShortcut('<C-q>', ':q')           " Ctrl-Q close tab
-call CreateCommandShortcut('<C-p>', ':FufFileWithFullCwd')
 
 call CreateCommandShortcut('<C-l>', ':nohl')        " Ctrl-L close search
 call CreateShortcut('<S-Home>', '<Esc>v^')
@@ -202,6 +232,9 @@ vnoremap <C-v> p
 nnoremap <C-v> p
 inoremap <C-v> <C-\><C-o>p
 inoremap <C-w> <Esc><C-w>
+
+nnoremap <leader>u :GundoToggle<CR>
+nnoremap <leader>a :Ag
 " }}}
 
 " Plugin Settings {{{
@@ -209,6 +242,15 @@ inoremap <C-w> <Esc><C-w>
 " vim-airline {{{
 let g:airline_powerline_fonts=1
 set laststatus=2           " Turn on vim-airline
+" }}}
+
+" CtrlP {{{
+let g:ctrlp_match_window = 'bottom,order:ttb'
+let g:ctrlp_switch_buffer = 0
+let g:ctrlp_working_path_mode = 0
+if executable('ag')
+    let g:ctrlp_user_command = 'ag %s -l --nocolor --hidden -g ""'
+endif
 " }}}
 
 " VimFiler {{{
