@@ -40,7 +40,7 @@ Plugin 'Lokaltog/vim-easymotion'
 Plugin 'octol/vim-cpp-enhanced-highlight'
 
 Plugin 'MarcWeber/vim-addon-mw-utils'
-" Plugin 'tomtom/tlib_vim'
+Plugin 'tomtom/tlib_vim'
 Plugin 'garbas/vim-snipmate'
 " Plugin 'honza/vim-snippets'
 Plugin 'Raimondi/delimitMate'
@@ -128,7 +128,7 @@ set cursorcolumn
 " Cursor automove issue
 au InsertLeave * call cursor([getpos('.')[1], getpos('.')[2]+1])
 
-set guifont=Inconsolata-dz\ for\ Powerline\ Medium\ 10
+set guifont=Inconsolata-dz\ for\ Powerline:h11
 set guioptions -=T
 
 " ============== Shortcuts ========================
