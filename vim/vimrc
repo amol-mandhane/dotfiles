@@ -10,6 +10,10 @@ set rtp+=~/.vim/bundle/Vundle.vim
 call vundle#begin()
 " }}}
 
+" Machine specific settings {{{
+source ~/.machine_vimrc
+" }}}
+
 " VIM Plugins {{{
 Plugin 'gmarik/Vundle.vim'
 
@@ -60,10 +64,7 @@ Plugin 'sjl/badwolf'
 Plugin 'rking/ag.vim'
 Plugin 'szw/vim-tags'
 
-" }}}
-
-" google.vim {{{
-source /usr/share/vim/google/google.vim
+Plugin 'marijnh/tern_for_vim'
 " }}}
 
 " General settings {{{
@@ -75,6 +76,7 @@ set autoread               " Autoreload
 set hidden                 " set Vim like any other editor (butffers, etc)
 
 set modelines=1
+set switchbuf+=usetab,newtab
 
 " }}}
 
@@ -172,27 +174,27 @@ au InsertLeave * silent execute "!gconftool-2 --type string --set /apps/gnome-te
 " }}}
 
 " Vim sessions {{{
-function! MakeSession()
-  let b:sessiondir = $HOME . "/.vim/sessions" . getcwd()
-  if (filewritable(b:sessiondir) != 2)
-    exe 'silent !mkdir -p ' b:sessiondir
-    redraw!
-  endif
-  let b:filename = b:sessiondir . '/session.vim'
-  exe "mksession! " . b:filename
-endfunction
+"function! MakeSession()
+  "let b:sessiondir = $HOME . '/.vim/sessions' . getcwd()
+  "if (filewritable(b:sessiondir) != 2)
+    "exe 'silent !mkdir -p ' b:sessiondir
+    "redraw!
+  "endif
+  "let b:filename = b:sessiondir . '/session.vim'
+  "exe 'mksession! ' . b:filename
+"endfunction
 
-function! LoadSession()
-  let b:sessiondir = $HOME . "/.vim/sessions" . getcwd()
-  let b:sessionfile = b:sessiondir . "/session.vim"
-  if (filereadable(b:sessionfile))
-    exe 'source ' b:sessionfile
-  else
-    echo "No session loaded."
-  endif
-endfunction
-au VimEnter * nested :call LoadSession()
-au VimLeave * :call MakeSession()
+"function! LoadSession()
+  "let b:sessiondir = $HOME . '/.vim/sessions' . getcwd()
+  "let b:sessionfile = b:sessiondir . '/session.vim'
+  "if (filereadable(b:sessionfile))
+    "exe 'source ' b:sessionfile
+  "else
+    "echo 'No session loaded.'
+  "endif
+"endfunction
+"au VimEnter * nested :call LoadSession()
+"au VimLeave * :call MakeSession()
 " }}}
 
 " Shortcuts functions {{{
@@ -308,6 +310,8 @@ let g:syntastic_check_on_wq = 0
 
 let g:syntastic_python_checkers = ['flake8']
 let g:syntastic_cpp_compiler_options = '-std=c++11'
+
+let g:syntastic_javascript_checkers = ['jshint', 'jslint', 'gjslint']
 " }}}
 
 " YouCompleteMe {{{
@@ -340,13 +344,9 @@ let g:C_UseTool_doxygen = 'yes'
 let g:EclimCompletionMethod = 'omnifunc'
 " }}}
 
-" google.vim {{{
-" Blaze {{{
-Glug blaze plugin[mappings]='<leader>b'
-let g:blazevim_notify_after_blaze=1
+" Tern {{{
+let tern#is_show_argument_hints_enabled = 1
 " }}}
-" }}}
-
 " }}}
 
 " Startup {{{
