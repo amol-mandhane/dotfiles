@@ -216,9 +216,6 @@ endfunction
 
 " Shortcut Definitions {{{
 call CreateCommandShortcut('<C-s>', ':update')     " Ctrl-S save
-call CreateCommandShortcut('<C-z>', ':undo')       " Ctrl-Z undo
-call CreateCommandShortcut('<C-y>', ':redo')       " Ctrl-Y redo
-call CreateCommandShortcut('<C-S-z>', ':redo')     " Ctrl-Shift-Z redo
 
 call CreateCommandShortcut('<C-S-k>', ':dl')       " Ctrl-Shift-K delete line
 
@@ -226,13 +223,7 @@ call CreateCommandShortcut('<C-t>', ':tabnew')      " Ctrl-T new tab
 call CreateCommandShortcut('<C-q>', ':q')           " Ctrl-Q close tab
 
 call CreateCommandShortcut('<C-l>', ':nohl')        " Ctrl-L close search
-call CreateShortcut('<S-Home>', '<Esc>v^')
-call CreateShortcut('<S-End>', '<Esc>v$')
 
-" Decrement number. Increment by Ctrl-A
-nnoremap <C-d> <C-x>
-
-vnoremap <C-x> d
 vnoremap <C-c> y
 vnoremap <C-v> p
 nnoremap <C-v> p
@@ -246,8 +237,6 @@ nnoremap <silent> <Leader>tb :TagbarToggle<CR>
 nnoremap F :grep! "\b<C-R><C-W>\b"<CR>:cw<CR>
 nnoremap T :tag "\b<C-R><C-W>\b"<CR>:cw<CR>
 
-" XML Tag completion
-iabbrev <// </<C-X><C-O>
 " }}}
 
 " Hard mode {{{

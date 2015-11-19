@@ -4,3 +4,5 @@ xmonad/xmonad*
 !xmonad/xmonad.hs
 
 *.pyc
+
+eclim/
