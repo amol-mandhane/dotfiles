@@ -10,10 +10,6 @@ set rtp+=~/.vim/bundle/Vundle.vim
 call vundle#begin()
 " }}}
 
-" Machine specific settings {{{
-source ~/.machine_vimrc
-" }}}
-
 " VIM Plugins {{{
 Plugin 'gmarik/Vundle.vim'
 
@@ -65,6 +61,8 @@ Plugin 'rking/ag.vim'
 Plugin 'szw/vim-tags'
 
 Plugin 'marijnh/tern_for_vim'
+
+Plugin 'gregsexton/MatchTag'
 " }}}
 
 " General settings {{{
@@ -247,6 +245,9 @@ nnoremap <leader>p :CtrlPTag<CR>
 nnoremap <silent> <Leader>tb :TagbarToggle<CR>
 nnoremap F :grep! "\b<C-R><C-W>\b"<CR>:cw<CR>
 nnoremap T :tag "\b<C-R><C-W>\b"<CR>:cw<CR>
+
+" XML Tag completion
+iabbrev <// </<C-X><C-O>
 " }}}
 
 " Plugin Settings {{{
@@ -347,6 +348,15 @@ let g:EclimCompletionMethod = 'omnifunc'
 " Tern {{{
 let tern#is_show_argument_hints_enabled = 1
 " }}}
+" }}}
+
+" Machine specific settings {{{
+source ~/.machine_vimrc
+" }}}
+
+" Syntax specific settings {{{
+autocmd FileType html source ~/.vim/html.vimrc
+autocmd FileType html.ng source ~/.vim/html.vimrc
 " }}}
 
 " Startup {{{
