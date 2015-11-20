@@ -223,7 +223,6 @@ call CreateCommandShortcut('<M-q>', ':q')           " Ctrl-Q close tab
 
 call CreateCommandShortcut('<C-l>', ':nohl')        " Ctrl-L close search
 
-vnoremap <C-x> d
 vnoremap <C-c> y
 vnoremap <C-v> p
 nnoremap <C-v> p
@@ -237,8 +236,6 @@ nnoremap <silent> <Leader>tb :TagbarToggle<CR>
 nnoremap F :grep! "\b<C-R><C-W>\b"<CR>:cw<CR>
 nnoremap T :tag "\b<C-R><C-W>\b"<CR>:cw<CR>
 
-" XML Tag completion
-iabbrev <// </<C-X><C-O>
 " }}}
 
 " Hard mode {{{
