@@ -25,7 +25,7 @@ Plugin 'airblade/vim-gitgutter'
 Plugin 'Shougo/unite.vim'
 Plugin 'Shougo/vimfiler.vim'
 Plugin 'scrooloose/nerdtree'
-Plugin 'jistr/vim-nerdtree-tabs'
+" Plugin 'jistr/vim-nerdtree-tabs'
 Plugin 'Valloric/YouCompleteMe'
 Plugin 'tpope/vim-fugitive'
 Plugin 'scrooloose/syntastic'
@@ -63,6 +63,7 @@ Plugin 'szw/vim-tags'
 Plugin 'marijnh/tern_for_vim'
 
 Plugin 'gregsexton/MatchTag'
+Plugin 'moll/vim-bbye'
 " }}}
 
 " General settings {{{
@@ -216,21 +217,11 @@ endfunction
 
 " Shortcut Definitions {{{
 call CreateCommandShortcut('<C-s>', ':update')     " Ctrl-S save
-call CreateCommandShortcut('<C-z>', ':undo')       " Ctrl-Z undo
-call CreateCommandShortcut('<C-y>', ':redo')       " Ctrl-Y redo
-call CreateCommandShortcut('<C-S-z>', ':redo')     " Ctrl-Shift-Z redo
 
-call CreateCommandShortcut('<C-S-k>', ':dl')       " Ctrl-Shift-K delete line
-
-call CreateCommandShortcut('<C-t>', ':tabnew')      " Ctrl-T new tab
-call CreateCommandShortcut('<C-q>', ':q')           " Ctrl-Q close tab
+call CreateCommandShortcut('<C-q>', ':Bdelete')
+call CreateCommandShortcut('<M-q>', ':q')           " Ctrl-Q close tab
 
 call CreateCommandShortcut('<C-l>', ':nohl')        " Ctrl-L close search
-call CreateShortcut('<S-Home>', '<Esc>v^')
-call CreateShortcut('<S-End>', '<Esc>v$')
-
-" Decrement number. Increment by Ctrl-A
-nnoremap <C-d> <C-x>
 
 vnoremap <C-x> d
 vnoremap <C-c> y
@@ -265,6 +256,7 @@ noremap <Right> <NOP>
 
 " vim-airline {{{
 let g:airline_powerline_fonts=1
+let g:airline#extensions#tabline#enabled=1
 set laststatus=2           " Turn on vim-airline
 " }}}
 
@@ -303,7 +295,7 @@ let g:NERDTreeChDirMode=2
 set fillchars+=vert:\ | let g:NERDTreeMirror=1
 
 " nerdtree-tabs {{{
-let g:nerdtree_tabs_open_on_console_startup=1
+" let g:nerdtree_tabs_open_on_console_startup=1
 " }}}
 " }}}
 
@@ -372,9 +364,8 @@ autocmd FileType html.ng source ~/.vim/html.vimrc
 
 " Startup {{{
 " Since we store session, no need to call NERDTree on start.
-" autocmd vimenter * NERDTree
+autocmd vimenter * NERDTree
 
-"autocmd BufWritePost *.h,*.cpp call Cpplint()
 call vundle#end()
 
 " }}}
