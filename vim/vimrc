@@ -25,7 +25,7 @@ Plugin 'airblade/vim-gitgutter'
 Plugin 'Shougo/unite.vim'
 Plugin 'Shougo/vimfiler.vim'
 Plugin 'scrooloose/nerdtree'
-Plugin 'jistr/vim-nerdtree-tabs'
+" Plugin 'jistr/vim-nerdtree-tabs'
 Plugin 'Valloric/YouCompleteMe'
 Plugin 'tpope/vim-fugitive'
 Plugin 'scrooloose/syntastic'
@@ -60,10 +60,10 @@ Plugin 'sjl/badwolf'
 Plugin 'rking/ag.vim'
 Plugin 'szw/vim-tags'
 
-" }}}
+Plugin 'marijnh/tern_for_vim'
 
-" google.vim {{{
-source /usr/share/vim/google/google.vim
+Plugin 'gregsexton/MatchTag'
+Plugin 'moll/vim-bbye'
 " }}}
 
 " General settings {{{
@@ -75,6 +75,7 @@ set autoread               " Autoreload
 set hidden                 " set Vim like any other editor (butffers, etc)
 
 set modelines=1
+" set switchbuf+=usetab,newtab
 
 " }}}
 
@@ -150,6 +151,10 @@ let g:badwolf_darkgutter = 1
 let g:badwolf_tabline = 3
 colorscheme badwolf
 
+if has('x11')
+    highlight IndentGuidesEven ctermbg=236
+    highlight IndentGuidesOdd ctermbg=237
+endif
 
 " if has('gui_running')
 "    colorscheme solarized
@@ -172,27 +177,27 @@ au InsertLeave * silent execute "!gconftool-2 --type string --set /apps/gnome-te
 " }}}
 
 " Vim sessions {{{
-function! MakeSession()
-  let b:sessiondir = $HOME . "/.vim/sessions" . getcwd()
-  if (filewritable(b:sessiondir) != 2)
-    exe 'silent !mkdir -p ' b:sessiondir
-    redraw!
-  endif
-  let b:filename = b:sessiondir . '/session.vim'
-  exe "mksession! " . b:filename
-endfunction
+"function! MakeSession()
+  "let b:sessiondir = $HOME . '/.vim/sessions' . getcwd()
+  "if (filewritable(b:sessiondir) != 2)
+    "exe 'silent !mkdir -p ' b:sessiondir
+    "redraw!
+  "endif
+  "let b:filename = b:sessiondir . '/session.vim'
+  "exe 'mksession! ' . b:filename
+"endfunction
 
-function! LoadSession()
-  let b:sessiondir = $HOME . "/.vim/sessions" . getcwd()
-  let b:sessionfile = b:sessiondir . "/session.vim"
-  if (filereadable(b:sessionfile))
-    exe 'source ' b:sessionfile
-  else
-    echo "No session loaded."
-  endif
-endfunction
-au VimEnter * nested :call LoadSession()
-au VimLeave * :call MakeSession()
+"function! LoadSession()
+  "let b:sessiondir = $HOME . '/.vim/sessions' . getcwd()
+  "let b:sessionfile = b:sessiondir . '/session.vim'
+  "if (filereadable(b:sessionfile))
+    "exe 'source ' b:sessionfile
+  "else
+    "echo 'No session loaded.'
+  "endif
+"endfunction
+"au VimEnter * nested :call LoadSession()
+"au VimLeave * :call MakeSession()
 " }}}
 
 " Shortcuts functions {{{
@@ -216,28 +221,20 @@ endfunction
 
 " Shortcut Definitions {{{
 call CreateCommandShortcut('<C-s>', ':update')     " Ctrl-S save
-call CreateCommandShortcut('<C-z>', ':undo')       " Ctrl-Z undo
-call CreateCommandShortcut('<C-y>', ':redo')       " Ctrl-Y redo
-call CreateCommandShortcut('<C-S-z>', ':redo')     " Ctrl-Shift-Z redo
 
-call CreateCommandShortcut('<C-S-k>', ':dl')       " Ctrl-Shift-K delete line
-
-call CreateCommandShortcut('<C-t>', ':tabnew')      " Ctrl-T new tab
-call CreateCommandShortcut('<C-q>', ':q')           " Ctrl-Q close tab
+call CreateCommandShortcut('<C-q>', ':Bdelete')
+call CreateCommandShortcut('<M-q>', ':q')           " Ctrl-Q close tab
 
 call CreateCommandShortcut('<C-l>', ':nohl')        " Ctrl-L close search
-call CreateShortcut('<S-Home>', '<Esc>v^')
-call CreateShortcut('<S-End>', '<Esc>v$')
 
-" Decrement number. Increment by Ctrl-A
-nnoremap <C-d> <C-x>
-
-vnoremap <C-x> d
 vnoremap <C-c> y
 vnoremap <C-v> p
 nnoremap <C-v> p
 inoremap <C-v> <LEFT><C-\><C-o>p
 inoremap <C-w> <Esc><C-w>
+
+call CreateShortcut('<C-PageUp>', ':bnext<CR>')
+call CreateShortcut('<C-PageDown>', ':bprevious<CR>')
 
 nnoremap <leader>u :GundoToggle<CR>
 nnoremap <leader>a :Ag<SPACE>
@@ -245,12 +242,25 @@ nnoremap <leader>p :CtrlPTag<CR>
 nnoremap <silent> <Leader>tb :TagbarToggle<CR>
 nnoremap F :grep! "\b<C-R><C-W>\b"<CR>:cw<CR>
 nnoremap T :tag "\b<C-R><C-W>\b"<CR>:cw<CR>
+call CreateShortcut('<C-b>', ':CtrlPBuffer<CR>')
+" }}}
+
+" Hard mode {{{
+" inoremap <Up> <NOP>
+" inoremap <Down> <NOP>
+" inoremap <Left> <NOP>
+" inoremap <Right> <NOP>
+noremap <Up> <NOP>
+noremap <Down> <NOP>
+noremap <Left> <NOP>
+noremap <Right> <NOP>
 " }}}
 
 " Plugin Settings {{{
 
 " vim-airline {{{
 let g:airline_powerline_fonts=1
+let g:airline#extensions#tabline#enabled=1
 set laststatus=2           " Turn on vim-airline
 " }}}
 
@@ -289,7 +299,7 @@ let g:NERDTreeChDirMode=2
 set fillchars+=vert:\ | let g:NERDTreeMirror=1
 
 " nerdtree-tabs {{{
-let g:nerdtree_tabs_open_on_console_startup=1
+" let g:nerdtree_tabs_open_on_console_startup=1
 " }}}
 " }}}
 
@@ -308,6 +318,8 @@ let g:syntastic_check_on_wq = 0
 
 let g:syntastic_python_checkers = ['flake8']
 let g:syntastic_cpp_compiler_options = '-std=c++11'
+
+let g:syntastic_javascript_checkers = ['jshint', 'jslint', 'gjslint']
 " }}}
 
 " YouCompleteMe {{{
@@ -317,7 +329,7 @@ let g:ycm_autoclose_preview_window_after_completion = 1
 let g:ycm_complete_in_comments = 1
 let g:ycm_register_as_syntastic_checker = 1
 let g:ycm_collect_identifiers_from_tags_files = 1
-let g:ycm_global_ycm_extra_conf = "/home/amol/dotfiles/vim/.ycm_extra_conf.py"
+let g:ycm_global_ycm_extra_conf = "~/.vim/.ycm_extra_conf.py"
 
 
 let g:jedi#popup_on_dot = 0
@@ -340,20 +352,24 @@ let g:C_UseTool_doxygen = 'yes'
 let g:EclimCompletionMethod = 'omnifunc'
 " }}}
 
-" google.vim {{{
-" Blaze {{{
-Glug blaze plugin[mappings]='<leader>b'
-let g:blazevim_notify_after_blaze=1
+" Tern {{{
+let tern#is_show_argument_hints_enabled = 1
 " }}}
 " }}}
 
+" Machine specific settings {{{
+source ~/.machine_vimrc
+" }}}
+
+" Syntax specific settings {{{
+autocmd FileType html source ~/.vim/html.vimrc
+autocmd FileType html.ng source ~/.vim/html.vimrc
 " }}}
 
 " Startup {{{
 " Since we store session, no need to call NERDTree on start.
 " autocmd vimenter * NERDTree
 
-"autocmd BufWritePost *.h,*.cpp call Cpplint()
 call vundle#end()
 
 " }}}

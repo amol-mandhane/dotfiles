@@ -2,5 +2,12 @@
 xmonad/*.jpg
 xmonad/xmonad*
 !xmonad/xmonad.hs
+xmonad/conky_utilities/tomorrow_badge.py
 
 *.pyc
+
+vim/eclim/
+vim/plugin/eclim.vim
+vim/bundle/
+
+emacs/elpa/

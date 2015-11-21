@@ -53,8 +53,10 @@
 ;;(global-hl-line-mode 1)
 ;;(vline-global-mode 1)
 (require 'column-marker)
-
-
+(require 'fill-column-indicator)
+(setq fci-rule-column 80)
+(define-globalized-minor-mode global-fci-mode fci-mode (lambda () (fci-mode 1)))
+(global-fci-mode 1)
 
 ;; Font
 (set-default-font "Inconsolata-11")
@@ -79,7 +81,7 @@
 (setq auto-save-default nil)
 
 ; Undo levels
-(setq undo-limit 3600)
+(setq undo-limit 800)
 
 ;;;; Plugin config
 (require 'evil)
@@ -93,6 +95,18 @@
 ;; NeoTree
 (require 'neotree)
 (global-set-key [f8] 'neotree-toggle)
+(add-hook 'neotree-mode-hook
+    (lambda ()
+        (define-key evil-normal-state-local-map (kbd "TAB") 'neotree-enter)
+        (define-key evil-normal-state-local-map (kbd "SPC") 'neotree-enter)
+        (define-key evil-normal-state-local-map (kbd "q") 'neotree-hide)
+        (define-key evil-normal-state-local-map (kbd "RET") 'neotree-enter)
+        (define-key evil-normal-state-local-map (kbd "h") 'describe-mode)
+        (define-key evil-normal-state-local-map (kbd "c") 'neotree-change-root)
+        (define-key evil-normal-state-local-map (kbd "r") 'neotree-refresh)))
+(neotree-show)
+
+
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.

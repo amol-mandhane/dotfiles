@@ -39,9 +39,9 @@ def download_NASA_APOD_wallpaper(save_path, width=1366, height=768):
     os.system("cp \"" + save_path + "\" /home/amol/Pictures/Wallpaper.jpg")
     os.system("feh --bg-scale /home/amol/Pictures/Wallpaper.jpg")
     os.system("gsettings set com.canonical.unity-greeter background " +
-            "'/home/amol/Pictures/Wallpaper.jpg'")
+              "'/home/amol/Pictures/Wallpaper.jpg'")
     os.system("gsettings set org.gnome.desktop.background picture-uri " +
-            "'file:///home/amol/Pictures/Wallpaper.jpg'")
+              "'file:///home/amol/Pictures/Wallpaper.jpg'")
 
 
 if __name__ == "__main__":
