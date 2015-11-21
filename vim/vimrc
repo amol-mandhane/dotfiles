@@ -242,7 +242,6 @@ nnoremap <leader>p :CtrlPTag<CR>
 nnoremap <silent> <Leader>tb :TagbarToggle<CR>
 nnoremap F :grep! "\b<C-R><C-W>\b"<CR>:cw<CR>
 nnoremap T :tag "\b<C-R><C-W>\b"<CR>:cw<CR>
-call CreateShortcut('<C-b>', ':CtrlPBuffer<CR>')
 " }}}
 
 " Hard mode {{{
