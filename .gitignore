@@ -11,3 +11,4 @@ vim/plugin/eclim.vim
 vim/bundle/
 
 emacs/elpa/
+emacs/auto-save-list/
