@@ -91,7 +91,7 @@ syntax on
 syntax sync minlines=256
 
 set guifont=Inconsolata-dz\ for\ Powerline\ Medium\ 10
-set guioptions -=T
+set guioptions -=mrLT
 
 set foldenable          " enable folding
 set foldlevelstart=10   " open most folds by default
@@ -224,6 +224,8 @@ call CreateCommandShortcut('<C-q>', ':Bdelete')
 call CreateCommandShortcut('<M-q>', ':q')           " Ctrl-Q close tab
 
 call CreateCommandShortcut('<C-l>', ':nohl')        " Ctrl-L close search
+
+call CreateCommandShortcut('<C-n>', ':NERDTreeToggle')
 
 vnoremap <C-c> y
 vnoremap <C-v> p
