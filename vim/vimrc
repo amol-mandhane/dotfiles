@@ -91,7 +91,8 @@ syntax on
 syntax sync minlines=256
 
 set guifont=Inconsolata-dz\ for\ Powerline\ Medium\ 10
-set guioptions -=mrLT
+set guioptions-=T
+set guioptions-=mrL
 
 set foldenable          " enable folding
 set foldlevelstart=10   " open most folds by default

@@ -9,6 +9,7 @@ xmonad/conky_utilities/tomorrow_badge.py
 vim/eclim/
 vim/plugin/eclim.vim
 vim/bundle/
+.netrwhist
 
 emacs/elpa/
 emacs/auto-save-list/
