@@ -8,6 +8,7 @@
     ~/.antigen: zsh/antigen
     ~/.Xresources: urxvt/Xresources
     ~/.emacs.d: emacs
+    ~/.tmux.conf: tmux/tmux.conf
 
 - shell:
   - [git submodule update --init --recursive dotbot, Installing/updating dotbot submodules]
