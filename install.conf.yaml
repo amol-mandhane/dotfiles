@@ -9,6 +9,7 @@
     ~/.Xresources: urxvt/Xresources
     ~/.emacs.d: emacs
     ~/.tmux.conf: tmux/tmux.conf
+    ~/.config/powerline: powerline_config
 
 - shell:
   - [git submodule update --init --recursive dotbot, Installing/updating dotbot submodules]
