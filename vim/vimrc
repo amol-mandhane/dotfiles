@@ -173,7 +173,7 @@ if has('x11')
 endif
 
 if has('gui_running')
-  colorscheme solarized
+  colorscheme molokai
 endif
 
 " Highlight VCS conflict markers
@@ -443,6 +443,28 @@ let g:EclimCompletionMethod = 'omnifunc'
 " Tern {{{
 let tern#is_show_argument_hints_enabled = 1
 " }}}
+
+" Raindow Parantheses {{{
+let g:rbpt_colorpairs = [
+    \ ['brown',       'RoyalBlue3'],
+    \ ['Darkblue',    'SeaGreen3'],
+    \ ['darkgray',    'DarkOrchid3'],
+    \ ['darkgreen',   'firebrick3'],
+    \ ['darkcyan',    'RoyalBlue3'],
+    \ ['darkred',     'SeaGreen3'],
+    \ ['darkmagenta', 'DarkOrchid3'],
+    \ ['brown',       'firebrick3'],
+    \ ['gray',        'RoyalBlue3'],
+    \ ['black',       'SeaGreen3'],
+    \ ['darkmagenta', 'DarkOrchid3'],
+    \ ['Darkblue',    'firebrick3'],
+    \ ['darkgreen',   'RoyalBlue3'],
+    \ ['darkcyan',    'SeaGreen3'],
+    \ ['darkred',     'DarkOrchid3'],
+    \ ['red',         'firebrick3'],
+    \ ]
+let g:rbpt_max = 16
+" }}}
 " }}}
 
 " Machine specific settings {{{
@@ -458,7 +480,10 @@ autocmd FileType java source ~/.vim/java.vimrc
 " Startup {{{
 " Since we store session, no need to call NERDTree on start.
 " autocmd vimenter * NERDTree
-
+au VimEnter * RainbowParenthesesToggle
+au Syntax * RainbowParenthesesLoadRound
+au Syntax * RainbowParenthesesLoadSquare
+au Syntax * RainbowParenthesesLoadBraces
 call vundle#end()
 
 " }}}
