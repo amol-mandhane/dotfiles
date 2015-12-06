@@ -13,7 +13,8 @@ call vundle#begin()
 " VIM Plugins {{{
 Plugin 'gmarik/Vundle.vim'
 
-" =========== Plugin: Operational plugins ===============
+autocmd BufWritePre vimrc :g/PluginStart/+1,/PluginEnd/-1 sort ui
+
 " Plugin 'django.vim'
 " Plugin 'funorpain/vim-cpplint'
 " Plugin 'FuzzyFinder'
@@ -22,6 +23,7 @@ Plugin 'gmarik/Vundle.vim'
 " Plugin 'klen/python-mode'
 " Plugin 'Shougo/unite.vim'
 " Plugin 'tell-k/vim-autopep8'
+" PluginStart {{{
 Plugin 'airblade/vim-gitgutter'
 Plugin 'altercation/vim-colors-solarized'
 Plugin 'bling/vim-airline'
@@ -62,6 +64,7 @@ Plugin 'tomtom/tlib_vim'
 Plugin 'tpope/vim-fugitive'
 Plugin 'tpope/vim-surround'
 Plugin 'Valloric/YouCompleteMe'
+" }}} PluginEnd
 " }}}
 
 " General settings {{{
