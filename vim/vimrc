@@ -247,7 +247,7 @@ call CreateCommandShortcut('<C-s>', ':update')     " Ctrl-S save
 call CreateCommandShortcut('<C-q>', ':Bdelete')
 call CreateCommandShortcut('<M-q>', ':q')           " Ctrl-Q close tab
 
-call CreateCommandShortcut('<C-;>', ':nohl')        " Ctrl-L close search
+call CreateCommandShortcut('<C-h>', ':nohl')        " Ctrl-L close search
 
 call CreateCommandShortcut('<C-n>', ':NERDTreeToggle')
 
