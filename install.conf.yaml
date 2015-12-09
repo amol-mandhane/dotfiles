@@ -5,9 +5,10 @@
     ~/.vim: vim
     ~/.fonts: fonts
     ~/.zshrc: zsh/zshrc
-    ~/.antigen: zsh/antigen
+    ~/.zprofile: zsh/zprofile
+    ~/.zpreztorc: zsh/zpreztorc
+    ~/.zprezto: zsh/zprezto
     ~/.Xresources: urxvt/Xresources
-    ~/.emacs.d: emacs
     ~/.tmux.conf: tmux/tmux.conf
     ~/.config/powerline: powerline_config
 

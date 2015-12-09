@@ -1,0 +1,40 @@
+zstyle ':prezto:load' pmodule \
+  'environment' \
+  'terminal' \
+  'editor' \
+  'history' \
+  'history-substring-search' \
+  'directory' \
+  'spectrum' \
+  'utility' \
+  'completion' \
+  'homebrew' \
+  'osx' \
+  'ruby' \
+  'rails' \
+  'git' \
+  'node' \
+  'python' \
+  'haskell' \
+  'syntax-highlighting' \
+  'tmux' \
+  'utility' \
+  'prompt'
+
+# presto theme
+zstyle ':prezto:module:prompt' theme 'steeef'
+
+# Set syntax highlighters.
+# By default, only the main highlighter is enabled.
+zstyle ':prezto:module:syntax-highlighting' highlighters \
+  'main' \
+  'brackets' \
+  'pattern' \
+  'cursor' \
+  'root'
+
+# Set syntax highlighting styles.
+zstyle ':prezto:module:syntax-highlighting' styles \
+  'builtin' 'bg=blue' \
+  'command' 'bg=blue' \
+  'function' 'bg=blue'
