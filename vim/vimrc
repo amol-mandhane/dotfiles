@@ -15,14 +15,6 @@ Plugin 'gmarik/Vundle.vim'
 
 autocmd BufWritePre vimrc :g/PluginStart/+1,/PluginEnd/-1 sort ui
 
-" Plugin 'django.vim'
-" Plugin 'funorpain/vim-cpplint'
-" Plugin 'FuzzyFinder'
-" Plugin 'honza/vim-snippets'
-" Plugin 'jistr/vim-nerdtree-tabs'
-" Plugin 'klen/python-mode'
-" Plugin 'Shougo/unite.vim'
-" Plugin 'tell-k/vim-autopep8'
 " PluginStart {{{
 Plugin 'airblade/vim-gitgutter'
 Plugin 'altercation/vim-colors-solarized'
@@ -33,6 +25,7 @@ Plugin 'fatih/vim-go'
 Plugin 'garbas/vim-snipmate'
 Plugin 'godlygeek/tabular'
 Plugin 'gregsexton/MatchTag'
+Plugin 'honza/vim-snippets'
 Plugin 'jelera/vim-javascript-syntax'
 Plugin 'jmcantrell/vim-virtualenv'
 Plugin 'kien/ctrlp.vim'
@@ -54,8 +47,8 @@ Plugin 'rust-lang/rust.vim'
 Plugin 'scrooloose/nerdcommenter'
 Plugin 'scrooloose/nerdtree'
 Plugin 'scrooloose/syntastic'
-Plugin 'Shougo/unite.vim'
 Plugin 'Shougo/vimfiler.vim'
+Plugin 'SirVer/ultisnips'
 Plugin 'sjl/badwolf'
 Plugin 'sjl/gundo.vim'
 Plugin 'sukima/xmledit'
@@ -63,8 +56,12 @@ Plugin 'szw/vim-tags'
 Plugin 'tomtom/tlib_vim'
 Plugin 'tpope/vim-fugitive'
 Plugin 'tpope/vim-surround'
-Plugin 'Valloric/YouCompleteMe'
 " }}} PluginEnd
+
+if filereadable(expand('~/.corp.google'))
+else
+  Plugin 'Valloric/YouCompleteMe'
+endif
 " }}}
 
 " General settings {{{
@@ -189,8 +186,8 @@ set cursorcolumn
 " }}}
 
 " Cursor settings {{{
-au InsertEnter * silent execute "!gconftool-2 --type string --set /apps/gnome-terminal/profiles/Default/cursor_shape ibeam"
-au InsertLeave * silent execute "!gconftool-2 --type string --set /apps/gnome-terminal/profiles/Default/cursor_shape block"
+"au InsertEnter * silent execute "!gconftool-2 --type string --set /apps/gnome-terminal/profiles/Default/cursor_shape ibeam"
+"au InsertLeave * silent execute "!gconftool-2 --type string --set /apps/gnome-terminal/profiles/Default/cursor_shape block"
 " au VimLeave * silent execute "!gconftool-2 --type string --set /apps/gnome-terminal/profiles/Default/cursor_shape underline"
 " au VimEnter * silent execute "!gconftool-2 --type string --set /apps/gnome-terminal/profiles/Default/cursor_shape block"
 
@@ -344,6 +341,10 @@ noremap <Right> <NOP>
 nnoremap <leader>ev :vsplit $MYVIMRC<cr>
 " }}}
 
+" Machine specific settings {{{
+source ~/.machine_vimrc
+" }}}
+
 " Plugin Settings {{{
 
 " vim-airline {{{
@@ -433,6 +434,12 @@ let g:jedi#use_splits_not_buffers = "bottom"
 imap <C-i> <Plug>snipMateNextOrTrigger
 " }}}
 
+" UtilSnips {{{
+let g:UltiSnipsExpandTrigger = "<C-u>"
+let g:UltiSnipsJumpForwardTrigger = "<C-f>"
+let g:UltiSnipsJumpBackwardTrigger = "<C-b>"
+" }}}
+
 " c.vim {{{
 let g:C_UseTool_cmake = 'yes'
 let g:C_UseTool_doxygen = 'yes'
@@ -468,10 +475,6 @@ let g:rbpt_colorpairs = [
     \ ]
 let g:rbpt_max = 16
 " }}}
-" }}}
-
-" Machine specific settings {{{
-source ~/.machine_vimrc
 " }}}
 
 " Language specific settings {{{
