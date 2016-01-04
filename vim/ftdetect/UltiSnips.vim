@@ -1,1 +1,1 @@
-/usr/local/google/home/mandhane/.vim/bundle/ultisnips/ftdetect/UltiSnips.vim
+../bundle/ultisnips/ftdetect/UltiSnips.vim
