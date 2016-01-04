@@ -1,0 +1,1 @@
+/usr/local/google/home/mandhane/.vim/bundle/ultisnips/ftdetect/snippets.vim
