@@ -79,7 +79,8 @@ set modelines=1
 set shell=/bin/bash
 " set switchbuf+=usetab,newtab
 
-set number                 " Line numbers
+" set number                 " Line numbers
+set relativenumber
 set numberwidth=6
 set tw=79                  " width of document (used by gd)
 set colorcolumn=80
@@ -478,8 +479,7 @@ let g:rbpt_max = 16
 " }}}
 
 " Language specific settings {{{
-autocmd FileType html source ~/.vim/html.vimrc
-autocmd FileType ng.html source ~/.vim/html.vimrc
+autocmd FileType html,ng.html,jslayout source ~/.vim/html.vimrc
 autocmd FileType java source ~/.vim/java.vimrc
 " }}}
 
