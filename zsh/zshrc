@@ -11,3 +11,5 @@ stty -ixon
 source ~/.machine_zshrc
 
 export EDITOR='vim'
+
+compinit -u

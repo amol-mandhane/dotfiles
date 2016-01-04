@@ -1,9 +1,10 @@
+zstyle ':prezto:*:*' color 'yes'
+
 zstyle ':prezto:load' pmodule \
   'environment' \
   'terminal' \
   'editor' \
   'history' \
-  'history-substring-search' \
   'directory' \
   'spectrum' \
   'utility' \
@@ -15,9 +16,9 @@ zstyle ':prezto:load' pmodule \
   'git' \
   'python' \
   'haskell' \
-  'syntax-highlighting' \
   'tmux' \
-  'utility' \
+  'syntax-highlighting' \
+  'history-substring-search' \
   'prompt'
 
 # presto theme
