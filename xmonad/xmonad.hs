@@ -13,14 +13,12 @@ import XMonad.Layout.Circle
 import XMonad.Layout.Grid
 import qualified XMonad.Layout.Magnifier as Magnifier
 import qualified Data.Map as Map
-import qualified System.Directory as Directory
 
 main = do
     dzenTop <- spawnPipe myDzenTopBar
     dzenBottom <- spawnPipe myDzenBottomBar
     conkyTop <- spawnPipe myConkyTop
     conkyBottom <- spawnPipe myConkyBottom
-    homeDirectory <- Directory.getHomeDirectory
 
     trayer <- spawnPipe myTrayer
     startup <- spawnPipe "~/.xmonad/startup.sh"
@@ -31,8 +29,7 @@ main = do
         , layoutHook =  avoidStruts $ (myLayoutHook ||| layoutHook defaultConfig)
         , logHook = myLogHook dzenTop dzenBottom
         , modMask = mod4Mask     -- Rebind Mod to the Windows key
-        , workspaces = map
-            (replaceUtil '~' (init . tail . show $ homeDirectory)) myWorkspaces
+        , workspaces = myWorkspaces
         , focusFollowsMouse = False
         , normalBorderColor  = "#888888"
         , focusedBorderColor = "#0000ff"
@@ -61,19 +58,18 @@ myConkyTop = "conky -c ~/.xmonad/conky_utilities/conky_top_rc | dzen2 -x '850' -
 myConkyBottom = "conky -c ~/.xmonad/conky_utilities/conky_bottom_rc | dzen2 -y '752' -x '400' -w '966' -ta 'r'" ++ myDzenStyle
 -- myDzenConky  = "conky -c ~/.xmonad/conkyrc | dzen2 -x '656' -w '560' -ta 'r'" ++ myDzenStyle
 
-myWorkspaces_img = [
-     "^i(~/.xmonad/dzen2_icons/workspaces/web.xbm)",
-     "^i(~/.xmonad/dzen2_icons/workspaces/term.xbm)",
-     "^i(~/.xmonad/dzen2_icons/workspaces/dev.xbm)",
-     "^i(~/.xmonad/dzen2_icons/workspaces/main.xbm)",
-     "^i(~/.xmonad/dzen2_icons/workspaces/media.xbm)",
-     "^i(~/.xmonad/dzen2_icons/workspaces/browse.xbm)",
-     "^i(~/.xmonad/dzen2_icons/workspaces/apps.xbm)",
-     "^i(~/.xmonad/dzen2_icons/workspaces/misc.xbm)",
-     "^i(~/.xmonad/dzen2_icons/workspaces/extra.xbm)"]
+myWorkspacesImg = [
+    "^i(.xmonad/dzen2_icons/workspaces/web.xbm)",
+    "^i(.xmonad/dzen2_icons/workspaces/term.xbm)",
+    "^i(.xmonad/dzen2_icons/workspaces/dev.xbm)",
+    "^i(.xmonad/dzen2_icons/workspaces/main.xbm)",
+    "^i(.xmonad/dzen2_icons/workspaces/media.xbm)",
+    "^i(.xmonad/dzen2_icons/workspaces/browse.xbm)",
+    "^i(.xmonad/dzen2_icons/workspaces/apps.xbm)",
+    "^i(.xmonad/dzen2_icons/workspaces/misc.xbm)",
+    "^i(.xmonad/dzen2_icons/workspaces/extra.xbm)"]
 
-
-myWorkspaces = ["^ca(1, xdotool key super+" ++ (show i) ++ ")" ++ s ++ "^ca()" | (s, i) <- zip myWorkspaces_img [1..9]]
+myWorkspaces = ["^ca(1, xdotool key super+" ++ (show i) ++ ")" ++ s ++ "^ca()" | (s, i) <- zip myWorkspacesImg [1..9]]
 -- myWorkspaces = ["^ca(1, xdotool key super+" ++ (show i) ++ ")" ++ (show i) ++ "^ca()" | i <- [1..9]]
 
 myManageHook = composeAll . concat $
@@ -125,9 +121,3 @@ myKeys = [("M1-<Tab>"   , cycleRecentWindows [xK_Alt_L] xK_Tab xK_Tab ) -- class
          , ("M-S--", sendMessage Magnifier.MagnifyLess )
          , ("M-S-=", sendMessage Magnifier.MagnifyMore )
          ]
-
-
-replaceUtil :: Char -> String -> String -> String
-replaceUtil _ _ [] = []
-replaceUtil old new (c:cs) = (if c == old then new else [c]) ++ replaceUtil old new cs
-
