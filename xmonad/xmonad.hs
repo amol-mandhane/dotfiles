@@ -13,15 +13,17 @@ import XMonad.Layout.Circle
 import XMonad.Layout.Grid
 import qualified XMonad.Layout.Magnifier as Magnifier
 import qualified Data.Map as Map
+import qualified System.Directory as Directory
 
 main = do
     dzenTop <- spawnPipe myDzenTopBar
     dzenBottom <- spawnPipe myDzenBottomBar
     conkyTop <- spawnPipe myConkyTop
     conkyBottom <- spawnPipe myConkyBottom
+    homeDirectory <- Directory.getHomeDirectory
 
     trayer <- spawnPipe myTrayer
-    startup <- spawnPipe "/home/amol/.xmonad/startup.sh"
+    startup <- spawnPipe "~/.xmonad/startup.sh"
 
     xmonad $ ewmh defaultConfig
         { terminal = "gnome-terminal"
@@ -29,7 +31,8 @@ main = do
         , layoutHook =  avoidStruts $ (myLayoutHook ||| layoutHook defaultConfig)
         , logHook = myLogHook dzenTop dzenBottom
         , modMask = mod4Mask     -- Rebind Mod to the Windows key
-        , workspaces = myWorkspaces
+        , workspaces = map
+            (replaceUtil '~' (init . tail . show $ homeDirectory)) myWorkspaces
         , focusFollowsMouse = False
         , normalBorderColor  = "#888888"
         , focusedBorderColor = "#0000ff"
@@ -59,15 +62,15 @@ myConkyBottom = "conky -c ~/.xmonad/conky_utilities/conky_bottom_rc | dzen2 -y '
 -- myDzenConky  = "conky -c ~/.xmonad/conkyrc | dzen2 -x '656' -w '560' -ta 'r'" ++ myDzenStyle
 
 myWorkspaces_img = [
-     "^i(/home/amol/.xmonad/dzen2_icons/workspaces/web.xbm)",
-     "^i(/home/amol/.xmonad/dzen2_icons/workspaces/term.xbm)",
-     "^i(/home/amol/.xmonad/dzen2_icons/workspaces/dev.xbm)",
-     "^i(/home/amol/.xmonad/dzen2_icons/workspaces/main.xbm)",
-     "^i(/home/amol/.xmonad/dzen2_icons/workspaces/media.xbm)",
-     "^i(/home/amol/.xmonad/dzen2_icons/workspaces/browse.xbm)",
-     "^i(/home/amol/.xmonad/dzen2_icons/workspaces/apps.xbm)",
-     "^i(/home/amol/.xmonad/dzen2_icons/workspaces/misc.xbm)",
-     "^i(/home/amol/.xmonad/dzen2_icons/workspaces/extra.xbm)"]
+     "^i(~/.xmonad/dzen2_icons/workspaces/web.xbm)",
+     "^i(~/.xmonad/dzen2_icons/workspaces/term.xbm)",
+     "^i(~/.xmonad/dzen2_icons/workspaces/dev.xbm)",
+     "^i(~/.xmonad/dzen2_icons/workspaces/main.xbm)",
+     "^i(~/.xmonad/dzen2_icons/workspaces/media.xbm)",
+     "^i(~/.xmonad/dzen2_icons/workspaces/browse.xbm)",
+     "^i(~/.xmonad/dzen2_icons/workspaces/apps.xbm)",
+     "^i(~/.xmonad/dzen2_icons/workspaces/misc.xbm)",
+     "^i(~/.xmonad/dzen2_icons/workspaces/extra.xbm)"]
 
 
 myWorkspaces = ["^ca(1, xdotool key super+" ++ (show i) ++ ")" ++ s ++ "^ca()" | (s, i) <- zip myWorkspaces_img [1..9]]
@@ -118,7 +121,13 @@ myLogHook top bottom = do
 myKeys = [("M1-<Tab>"   , cycleRecentWindows [xK_Alt_L] xK_Tab xK_Tab ) -- classic alt-tab behaviour
          , ("M-<Return>" , spawn "dmenu_run -b" ) -- app launcher
          , ("M-e"        , spawn "nemo --no-desktop" ) -- launch file manager
-         , ("C-M1-l"     , spawn "/home/amol/.xmonad/lock.sh" ) -- lock screen
+         , ("C-M1-l"     , spawn "~/.xmonad/lock.sh" ) -- lock screen
          , ("M-S--", sendMessage Magnifier.MagnifyLess )
          , ("M-S-=", sendMessage Magnifier.MagnifyMore )
          ]
+
+
+replaceUtil :: Char -> String -> String -> String
+replaceUtil _ _ [] = []
+replaceUtil old new (c:cs) = (if c == old then new else [c]) ++ replaceUtil old new cs
+
