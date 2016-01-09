@@ -63,19 +63,18 @@ myConkyTop = "conky -c ~/.xmonad/conky_utilities/conky_top_rc | dzen2 -x '1240' 
 myConkyBottom = "conky -c ~/.xmonad/conky_utilities/conky_bottom_rc | dzen2 -y '1184' -x '400' -w '1520' -ta 'r'" ++ myDzenStyle
 -- myDzenConky  = "conky -c /usr/local/google/home/mandhane/.xmonad/conkyrc | dzen2 -x '656' -w '560' -ta 'r'" ++ myDzenStyle
 
-myWorkspaces_img = [
-     "^i(.xmonad/dzen2_icons/workspaces/web.xbm)",
-     "^i(.xmonad/dzen2_icons/workspaces/term.xbm)",
-     "^i(.xmonad/dzen2_icons/workspaces/dev.xbm)",
-     "^i(.xmonad/dzen2_icons/workspaces/main.xbm)",
-     "^i(.xmonad/dzen2_icons/workspaces/media.xbm)",
-     "^i(.xmonad/dzen2_icons/workspaces/browse.xbm)",
-     "^i(.xmonad/dzen2_icons/workspaces/apps.xbm)",
-     "^i(.xmonad/dzen2_icons/workspaces/misc.xbm)",
-     "^i(.xmonad/dzen2_icons/workspaces/extra.xbm)"]
+myWorkspacesImg = [
+    "^i(.xmonad/dzen2_icons/workspaces/web.xbm)",
+    "^i(.xmonad/dzen2_icons/workspaces/term.xbm)",
+    "^i(.xmonad/dzen2_icons/workspaces/dev.xbm)",
+    "^i(.xmonad/dzen2_icons/workspaces/main.xbm)",
+    "^i(.xmonad/dzen2_icons/workspaces/media.xbm)",
+    "^i(.xmonad/dzen2_icons/workspaces/browse.xbm)",
+    "^i(.xmonad/dzen2_icons/workspaces/apps.xbm)",
+    "^i(.xmonad/dzen2_icons/workspaces/misc.xbm)",
+    "^i(.xmonad/dzen2_icons/workspaces/extra.xbm)"]
 
-
-myWorkspaces = ["^ca(1, xdotool key super+" ++ (show i) ++ ")" ++ s ++ "^ca()" | (s, i) <- zip myWorkspaces_img [1..9]]
+myWorkspaces = ["^ca(1, xdotool key super+" ++ (show i) ++ ")" ++ s ++ "^ca()" | (s, i) <- zip myWorkspacesImg [1..9]]
 -- myWorkspaces = ["^ca(1, xdotool key super+" ++ (show i) ++ ")" ++ (show i) ++ "^ca()" | i <- [1..9]]
 
 myManageHook = composeAll . concat $
