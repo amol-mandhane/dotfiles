@@ -85,6 +85,8 @@ set relativenumber
 set numberwidth=6
 set tw=79                  " width of document (used by gd)
 set colorcolumn=80
+call matchadd('ErrorMsg', '\%>100v.\+')
+
 set list                   " show EOL
 set listchars=tab:▸\ ,eol:¬
 set showcmd
@@ -179,7 +181,7 @@ if has('gui_running')
 endif
 
 " Highlight VCS conflict markers
-match ErrorMsg '^\(<\|=\|>\)\{7\}\([^=].\+\)\?$'
+call matchadd('ErrorMsg', '^\(<\|=\|>\)\{7\}\([^=].\+\)\?$')
 " }}}
 
 " Highlighting {{{
@@ -490,7 +492,6 @@ let g:rbpt_max = 16
 
 " Language specific settings {{{
 autocmd FileType html,ng.html,jslayout source ~/.vim/html.vimrc
-autocmd FileType java source ~/.vim/java.vimrc
 " }}}
 
 " Startup {{{
