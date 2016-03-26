@@ -16,13 +16,26 @@
              '("melpa" . "http://melpa.milkbox.net/packages/") t)
 
 (defvar default-packages '(
+                   airline-themes
                    badwolf-theme
                    beacon
                    company
                    evil
                    magit
                    org
+                   powerline
                    which-key
+                   ; projectile
+                   ; helm
+                   ; ag
+                   ; flycheck
+                   ; ycmd
+                   ; neotree / dired
+                   ; surround
+                   ; bracket-highlight
+                   ; ace-jump / avy
+                   ; rainbow-parath
+                   ; company + langs
     ) "Default packages")
 
 (defun check-all-packages-ok ()
@@ -110,6 +123,8 @@
 (if window-system
     (load-theme 'badwolf t)
   (load-theme 'wombat t))
+(setq ns-use-srgb-colorspace nil)
+(set-default-font "Inconsolata-dz for Powerline 14")
 
 ;; Shortcuts
 
@@ -117,3 +132,10 @@
 
 ;; Machine specific config
 (load "~/.emacs.machine.el")
+
+;; Plugin settings
+(require 'powerline)
+(powerline-center-evil-theme)
+(require 'airline-themes)
+(load-theme 'airline-badwolf t)
+(setq powerline-default-separator 'arrow-fade)
