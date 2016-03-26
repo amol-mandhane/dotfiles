@@ -1,6 +1,9 @@
 (setq user-full-name "Amol Mandhane"
       user-mail-address "amol.mandhane@gmail.com")
 
+(add-to-list 'load-path "~/.emacs.d/modules")
+(add-to-list 'load-path "~/.emacs.d/third_party")
+
 ; Load clisp
 (require 'cl)
 
@@ -14,10 +17,12 @@
 
 (defvar default-packages '(
                    badwolf-theme
+                   beacon
                    company
                    evil
                    magit
                    org
+                   which-key
     ) "Default packages")
 
 (defun check-all-packages-ok ()
@@ -43,14 +48,50 @@
 (menu-bar-mode -1)
 (defalias 'yes-or-no-p 'y-or-n-p)
 
+(require 'line-numbering)
+
+(require 'beacon)
+(beacon-mode +1)
+
+(require 'fill-column-indicator)
+(setq fci-rule-column 81
+      fci-rule-width 1
+      fci-rule-color "dimgray")
+(define-globalized-minor-mode global-fci-mode fci-mode (lambda () (fci-mode 1)))
+(global-fci-mode +1)
+
+
+;; Key binding suggestions
+(require 'which-key)
+(which-key-mode +1)
+
+;; mode line settings
+(line-number-mode t)
+(column-number-mode t)
+(size-indication-mode t)
+
 ; General settings
 (setq tab-width 2
       indent-tabs-mode nil)
 (setq make-backup-files nil)
 
+(require 'whitespace)
+(setq whitespace-line-column 101)
+(setq whitespace-style (quote (face trailing tabs lines-tail newline)))
+(add-hook 'before-save-hook 'whitespace-cleanup)
+(global-whitespace-mode t)
+
+;; New line at the end
+(setq require-final-newline t)
+
+;; Auto reload
+(global-auto-revert-mode t)
+
 ; Default modes
 (require 'evil)
-(evil-mode 1)
+(evil-mode +1)
+
+(require 'org)
 
 ; Theme
 (if window-system
