@@ -37,7 +37,6 @@
     (when (not (package-installed-p pkg))
       (package-install pkg))))
 
-
 ; Start-up options
 (setq inhibit-splash-screen t
       initial-scratch-message nil)
@@ -58,8 +57,15 @@
       fci-rule-width 1
       fci-rule-color "dimgray")
 (define-globalized-minor-mode global-fci-mode fci-mode (lambda () (fci-mode 1)))
-(global-fci-mode +1)
+(global-fci-mode 1)
 
+(require 'visual-indentation-mode)
+(define-globalized-minor-mode
+  global-indent-guides
+  visual-indentation-mode (lambda () (visual-indentation-mode 1)))
+(global-indent-guides +1)
+
+(global-hl-line-mode +1)
 
 ;; Key binding suggestions
 (require 'which-key)
@@ -71,8 +77,8 @@
 (size-indication-mode t)
 
 ; General settings
-(setq tab-width 2
-      indent-tabs-mode nil)
+(require 'indentation)
+
 (setq make-backup-files nil)
 
 (require 'whitespace)
@@ -87,6 +93,13 @@
 ;; Auto reload
 (global-auto-revert-mode t)
 
+;; History
+(setq savehist-file "~/.emacs.d/tmp/history")
+(savehist-mode +1)
+
+;; Centering search results
+(add-hook 'isearch-mode-end-hook 'recenter-top-bottom)
+
 ; Default modes
 (require 'evil)
 (evil-mode +1)
@@ -97,3 +110,10 @@
 (if window-system
     (load-theme 'badwolf t)
   (load-theme 'wombat t))
+
+;; Shortcuts
+
+(global-set-key (kbd "C-q") 'kill-this-buffer)
+
+;; Machine specific config
+(load "~/.emacs.machine.el")
