@@ -124,7 +124,7 @@
     (load-theme 'badwolf t)
   (load-theme 'wombat t))
 (setq ns-use-srgb-colorspace nil)
-(set-default-font "Inconsolata-dz for Powerline 14")
+(set-default-font "Inconsolata-12")
 
 ;; Shortcuts
 
