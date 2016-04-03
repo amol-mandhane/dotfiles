@@ -1,3 +1,11 @@
+;;; emacs-config --- Configuration for Emacs editor
+
+;;; Commentary:
+;;  This file contains packages and their settings to be loaded in Emacs.  This
+;;  is still a work-in-progress
+
+;;; Code:
+
 (setq user-full-name "Amol Mandhane"
       user-mail-address "amol.mandhane@gmail.com")
 
@@ -17,30 +25,32 @@
 
 (defvar default-packages '(
                            ag
+                           ; airline-themes
                            avy
                            badwolf-theme
                            beacon
                            company
+                           diff-hl
                            evil
                            exec-path-from-shell
                            flx-ido
+                           flycheck
                            helm
                            helm-projectile
                            magit
+                           nyan-mode
                            org
                            powerline
                            projectile
                            spaceline
                            which-key
-                           ; airline-themes
-                           ; flycheck
                            ; ycmd
                            ; neotree / dired
                            ; surround
                            ; bracket-highlight
                            ; rainbow-parath
                            ; company + langs
-                           ) "Default packages")
+                           ) "Default packages to be installed at Emacs startup.")
 
 (defun check-all-packages-ok ()
   (loop for pkg in default-packages
@@ -151,15 +161,20 @@
 (require 'spaceline-config)
 (spaceline-spacemacs-theme)
 (setq powerline-default-separator 'slant)
+(nyan-mode +1)
 ; (spaceline-toggle-evil-state-on)
 
 ;; Projectile
 (projectile-global-mode)
 (setq projectile-indexing-method 'alien)
 (setq projectile-enable-caching t)
+(setq projectile-cache-file "~/.emacs.d/tmp/projectile.cache")
+(setq projectile-known-projects-file "~/.emacs.d/tmp/projectile-bookmarks.eld")
 
 ;; Helm
 (global-set-key (kbd "M-x") 'helm-M-x)
+(define-key evil-normal-state-map (kbd "C-p") 'helm-projectile)
+(define-key evil-insert-state-map (kbd "C-p") 'helm-projectile)
 
 ;; Ido + Flx-ido
 (require 'flx-ido)
@@ -169,3 +184,25 @@
 ;; disable ido faces to see flx highlights.
 (setq ido-enable-flex-matching t)
 (setq ido-use-faces nil)
+(setq ido-save-directory-list-file "~/.emacs.d/tmp/ido.last")
+
+;; Avy
+(require 'avy)
+(define-key evil-normal-state-map (kbd "SPC SPC") 'evil-avy-goto-word-or-subword-1)
+(setq avy-background t)
+
+;; diff-hl
+(require 'diff-hl)
+(define-globalized-minor-mode
+  global-diff-hl-mode
+  diff-hl-mode (lambda () (diff-hl-mode 1)))
+(global-diff-hl-mode +1)
+(diff-hl-margin-mode +1)
+(diff-hl-flydiff-mode +1)
+(setq diff-hl-margin-side 'right)
+
+; FlyCheck
+(global-flycheck-mode)
+
+(provide 'init)
+;;; init.el ends here
