@@ -16,24 +16,28 @@
              '("melpa" . "http://melpa.milkbox.net/packages/") t)
 
 (defvar default-packages '(
-                           airline-themes
+                           ag
+                           avy
                            badwolf-theme
                            beacon
                            company
                            evil
+                           exec-path-from-shell
+                           flx-ido
+                           helm
+                           helm-projectile
                            magit
                            org
                            powerline
+                           projectile
+                           spaceline
                            which-key
-                           ; projectile
-                           ; helm
-                           ; ag
+                           ; airline-themes
                            ; flycheck
                            ; ycmd
                            ; neotree / dired
                            ; surround
                            ; bracket-highlight
-                           ; ace-jump / avy
                            ; rainbow-parath
                            ; company + langs
                            ) "Default packages")
@@ -49,6 +53,9 @@
   (dolist (pkg default-packages)
     (when (not (package-installed-p pkg))
       (package-install pkg))))
+
+;; Set up PATH
+(exec-path-from-shell-initialize)
 
 ; Start-up options
 (setq inhibit-splash-screen t
@@ -134,10 +141,31 @@
 (load "~/.emacs.machine.el")
 
 ;; Plugin settings
-(require 'powerline)
-(powerline-center-evil-theme)
+; (require 'powerline)
+; (powerline-center-evil-theme)
 
 ;; Airline theme
-(require 'airline-themes)
-(load-theme 'airline-badwolf t)
-(setq powerline-default-separator 'arrow-fade)
+; (require 'airline-themes)
+; (load-theme 'airline-badwolf t)
+; (setq powerline-default-separator 'arrow-fade)
+(require 'spaceline-config)
+(spaceline-spacemacs-theme)
+(setq powerline-default-separator 'slant)
+; (spaceline-toggle-evil-state-on)
+
+;; Projectile
+(projectile-global-mode)
+(setq projectile-indexing-method 'alien)
+(setq projectile-enable-caching t)
+
+;; Helm
+(global-set-key (kbd "M-x") 'helm-M-x)
+
+;; Ido + Flx-ido
+(require 'flx-ido)
+(ido-mode 1)
+(ido-everywhere 1)
+(flx-ido-mode 1)
+;; disable ido faces to see flx highlights.
+(setq ido-enable-flex-matching t)
+(setq ido-use-faces nil)
