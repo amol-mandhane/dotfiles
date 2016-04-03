@@ -16,27 +16,27 @@
              '("melpa" . "http://melpa.milkbox.net/packages/") t)
 
 (defvar default-packages '(
-                   airline-themes
-                   badwolf-theme
-                   beacon
-                   company
-                   evil
-                   magit
-                   org
-                   powerline
-                   which-key
-                   ; projectile
-                   ; helm
-                   ; ag
-                   ; flycheck
-                   ; ycmd
-                   ; neotree / dired
-                   ; surround
-                   ; bracket-highlight
-                   ; ace-jump / avy
-                   ; rainbow-parath
-                   ; company + langs
-    ) "Default packages")
+                           airline-themes
+                           badwolf-theme
+                           beacon
+                           company
+                           evil
+                           magit
+                           org
+                           powerline
+                           which-key
+                           ; projectile
+                           ; helm
+                           ; ag
+                           ; flycheck
+                           ; ycmd
+                           ; neotree / dired
+                           ; surround
+                           ; bracket-highlight
+                           ; ace-jump / avy
+                           ; rainbow-parath
+                           ; company + langs
+                           ) "Default packages")
 
 (defun check-all-packages-ok ()
   (loop for pkg in default-packages
@@ -136,6 +136,8 @@
 ;; Plugin settings
 (require 'powerline)
 (powerline-center-evil-theme)
+
+;; Airline theme
 (require 'airline-themes)
 (load-theme 'airline-badwolf t)
 (setq powerline-default-separator 'arrow-fade)
