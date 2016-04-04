@@ -38,17 +38,16 @@
                            helm
                            helm-projectile
                            magit
+                           neotree
                            nyan-mode
                            org
                            powerline
                            projectile
+                           rainbow-delimiters
+                           smartparens
                            spaceline
                            which-key
                            ; ycmd
-                           ; neotree / dired
-                           ; surround
-                           ; bracket-highlight
-                           ; rainbow-parath
                            ; company + langs
                            ) "Default packages to be installed at Emacs startup.")
 
@@ -111,6 +110,17 @@
 
 (setq make-backup-files nil)
 
+(show-paren-mode +1)
+(define-globalized-minor-mode
+  global-rainbow-delimiters-mode
+  rainbow-delimiters-mode (lambda () (rainbow-delimiters-mode 1)))
+(global-rainbow-delimiters-mode +1)
+(require 'smartparens-config)
+(define-globalized-minor-mode
+  global-smartparens-mode
+  smartparens-mode (lambda () (smartparens-mode 1)))
+(global-smartparens-mode +1)
+
 (require 'whitespace)
 (setq whitespace-line-column 101)
 (setq whitespace-style (quote (face trailing tabs lines-tail newline)))
@@ -160,8 +170,11 @@
 ; (setq powerline-default-separator 'arrow-fade)
 (require 'spaceline-config)
 (spaceline-spacemacs-theme)
-(setq powerline-default-separator 'slant)
+(setq powerline-default-separator 'bar)
+(spaceline-toggle-minor-modes-off)
+(spaceline-toggle-buffer-position-off)
 (nyan-mode +1)
+(set-face-background 'powerline-active2 "grey30")
 ; (spaceline-toggle-evil-state-on)
 
 ;; Projectile
@@ -188,7 +201,7 @@
 
 ;; Avy
 (require 'avy)
-(define-key evil-normal-state-map (kbd "SPC SPC") 'evil-avy-goto-word-or-subword-1)
+(define-key evil-normal-state-map (kbd ", ,") 'evil-avy-goto-word-or-subword-1)
 (setq avy-background t)
 
 ;; diff-hl
@@ -206,3 +219,13 @@
 
 (provide 'init)
 ;;; init.el ends here
+
+(require 'neotree)
+(global-set-key (kbd "<f8>") 'neotree-toggle)
+(setq projectile-switch-project-action 'neotree-projectile-action)
+(add-hook 'neotree-mode-hook
+          (lambda ()
+            (define-key evil-normal-state-local-map (kbd "TAB") 'neotree-enter)
+            (define-key evil-normal-state-local-map (kbd "SPC") 'neotree-enter)
+            (define-key evil-normal-state-local-map (kbd "q") 'neotree-hide)
+            (define-key evil-normal-state-local-map (kbd "RET") 'neotree-enter)))
