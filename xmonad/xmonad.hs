@@ -56,11 +56,11 @@ myTrayer = "trayer --edge top --align right --SetDockType true --SetPartialStrut
 
 
 myDzenStyle  = " -e 'button2=;' -h '16' -fg '" ++ fgGray ++ "' -bg '" ++ darkBlack ++ "' -fn '" ++ dzenFont 10 ++ "'"
-myDzenTopBar = "dzen2 -w '1240' -ta 'l'" ++ myDzenStyle
-myDzenBottomBar = "dzen2 -y '1184' -w '400' -ta 'l'" ++ myDzenStyle
+myDzenTopBar = "dzen2 -w '850' -ta 'l'" ++ myDzenStyle
+myDzenBottomBar = "dzen2 -y '752' -w '400' -ta 'l'" ++ myDzenStyle
 
-myConkyTop = "conky -c ~/.xmonad/conky_utilities/conky_top_rc | dzen2 -x '1240' -w '470' -ta 'r'" ++ myDzenStyle
-myConkyBottom = "conky -c ~/.xmonad/conky_utilities/conky_bottom_rc | dzen2 -y '1184' -x '400' -w '1520' -ta 'r'" ++ myDzenStyle
+myConkyTop = "conky -c ~/.xmonad/conky_utilities/conky_top_rc | dzen2 -x '850' -w '366' -ta 'r'" ++ myDzenStyle
+myConkyBottom = "conky -c ~/.xmonad/conky_utilities/conky_bottom_rc | dzen2 -y '1184' -x '400' -w '966' -ta 'r'" ++ myDzenStyle
 -- myDzenConky  = "conky -c /usr/local/google/home/mandhane/.xmonad/conkyrc | dzen2 -x '656' -w '560' -ta 'r'" ++ myDzenStyle
 
 myWorkspacesImg = [
