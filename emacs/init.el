@@ -38,6 +38,7 @@
                            flx-ido
                            flycheck
                            flymake-google-cpplint
+                           flycheck-ycmd
                            google-c-style
                            helm
                            helm-projectile
@@ -53,7 +54,7 @@
                            spaceline
                            which-key
                            yasnippet
-                           ; ycmd
+                           ycmd
                            ; company + langs
                            ) "Default packages to be installed at Emacs startup.")
 
@@ -308,6 +309,16 @@
   (add-to-list 'ac-sources 'ac-source-semantic))
 (add-hook 'c-mode-hook 'semantic-init)
 (add-hook 'c++-mode-hook 'semantic-init)
+
+;; YCM
+(require 'ycmd)
+(set-variable 'ycmd-server-command '("python" "/opt/ycmd/ycmd"))
+(set-variable 'ycmd-global-config (expand-file-name "~/.emacs.d/.ycm_extra_conf.py"))
+(add-hook 'after-init-hook #'global-ycmd-mode)
+(require 'auto-complete-ycmd)
+
+(require 'flycheck-ycmd)
+(add-hook 'ycmd-mode-hook #'flycheck-ycmd-setup)
 
 ; YASnippet
 (require 'yasnippet)
