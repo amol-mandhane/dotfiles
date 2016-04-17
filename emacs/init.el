@@ -85,7 +85,7 @@
 (require 'line-numbering)
 
 (require 'beacon)
-(beacon-mode +1)
+(add-hook 'window-setup-hook 'beacon-mode)
 
 (require 'fill-column-indicator)
 (setq fci-rule-column 81
@@ -93,6 +93,26 @@
       fci-rule-color "dimgray")
 (define-globalized-minor-mode global-fci-mode fci-mode (lambda () (fci-mode 1)))
 (global-fci-mode 1)
+
+(defun sanityinc/fci-enabled-p () (symbol-value 'fci-mode))
+
+(defvar sanityinc/fci-mode-suppressed nil)
+(make-variable-buffer-local 'sanityinc/fci-mode-suppressed)
+
+(defadvice popup-create (before suppress-fci-mode activate)
+  "Suspend fci-mode while popups are visible"
+  (let ((fci-enabled (sanityinc/fci-enabled-p)))
+    (when fci-enabled
+      (setq sanityinc/fci-mode-suppressed fci-enabled)
+      (turn-off-fci-mode))))
+
+(defadvice popup-delete (after restore-fci-mode activate)
+  "Restore fci-mode when all popups have closed"
+  (when (and sanityinc/fci-mode-suppressed
+             (null popup-instances))
+    (setq sanityinc/fci-mode-suppressed nil)
+    (turn-on-fci-mode)))
+
 
 (require 'visual-indentation-mode)
 (define-globalized-minor-mode
