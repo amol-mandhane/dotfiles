@@ -169,15 +169,12 @@ set t_Co=256
 
 let g:badwolf_darkgutter = 1
 let g:badwolf_tabline = 3
-colorscheme badwolf
+colorscheme gruvbox
+set background=dark
 
 if has('x11')
     highlight IndentGuidesEven ctermbg=236
     highlight IndentGuidesOdd ctermbg=237
-endif
-
-if has('gui_running')
-  colorscheme molokai
 endif
 
 " Highlight VCS conflict markers
