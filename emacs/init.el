@@ -26,6 +26,8 @@
 (defvar default-packages '(
                            ag
                            ; airline-themes
+                           auto-complete
+                           auto-complete-c-headers
                            avy
                            badwolf-theme
                            beacon
@@ -35,8 +37,11 @@
                            exec-path-from-shell
                            flx-ido
                            flycheck
+                           flymake-google-cpplint
+                           google-c-style
                            helm
                            helm-projectile
+                           iedit
                            magit
                            neotree
                            nyan-mode
@@ -47,6 +52,7 @@
                            smartparens
                            spaceline
                            which-key
+                           yasnippet
                            ; ycmd
                            ; company + langs
                            ) "Default packages to be installed at Emacs startup.")
@@ -217,9 +223,6 @@
 ; FlyCheck
 (global-flycheck-mode)
 
-(provide 'init)
-;;; init.el ends here
-
 (require 'neotree)
 (global-set-key (kbd "<f8>") 'neotree-toggle)
 (setq projectile-switch-project-action 'neotree-projectile-action)
@@ -229,3 +232,60 @@
             (define-key evil-normal-state-local-map (kbd "SPC") 'neotree-enter)
             (define-key evil-normal-state-local-map (kbd "q") 'neotree-hide)
             (define-key evil-normal-state-local-map (kbd "RET") 'neotree-enter)))
+
+; AutoComplete
+(require 'auto-complete)
+(require 'auto-complete-config)
+(setq ac-comphist-file (expand-file-name "~/.emacs.d/tmp/ac-comphist.dat"))
+(ac-config-default)
+
+; AutoComplete C headers
+(defun ac-c-headers-init ()
+  (require 'auto-complete-c-headers)
+  (add-to-list 'ac-sources 'ac-source-c-headers)
+  (add-to-list 'achead:include-directories '"/usr/include")
+  (add-to-list 'achead:include-directories '"/usr/local/include")
+  (add-to-list 'achead:include-directories '"/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include/c++/v1")
+  (add-to-list 'achead:include-directories '"/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/7.0.0/include")
+  (add-to-list 'achead:include-directories '"/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include")
+)
+(add-hook 'c++-mode-hook 'ac-c-headers-init)
+(add-hook 'c-mode-hook 'ac-c-headers-init)
+
+; google-cpplint
+(defun flymake-google-init ()
+  (require 'flymake-google-cpplint)
+  (custom-set-variables '(flymake-google-cpplint-command "/usr/local/bin/cpplint"))
+  (flymake-google-cpplint-load)
+)
+(add-hook 'c++-mode-hook 'flymake-google-init)
+(add-hook 'c-mode-hook 'flymake-google-init)
+
+; google-c-style
+(require 'google-c-style)
+(add-hook 'c-mode-common-hook 'google-set-c-style)
+(add-hook 'c-mode-common-hook 'google-make-newline-indent)
+
+; Semantic mode
+(add-to-list 'semantic-default-submodes 'global-semanticdb-minor-mode)
+(add-to-list 'semantic-default-submodes 'global-semantic-mru-bookmark-mode)
+(add-to-list 'semantic-default-submodes 'global-semantic-idle-scheduler-mode)
+(add-to-list 'semantic-default-submodes 'global-semantic-idle-summary-mode)
+(add-to-list 'semantic-default-submodes 'global-semantic-stickyfunc-mode)
+(add-to-list 'semantic-default-submodes 'global-semantic-idle-completions-mode)
+(add-to-list 'semantic-default-submodes 'global-semantic-decoration-mode)
+(add-to-list 'semantic-default-submodes 'global-semantic-highlight-func-mode)
+(add-to-list 'semantic-default-submodes 'global-semantic-show-unmatched-syntax-mode)
+
+(defun semantic-init ()
+  (semantic-mode t)
+  (add-to-list 'ac-sources 'ac-source-semantic))
+(add-hook 'c-mode-hook 'semantic-init)
+(add-hook 'c++-mode-hook 'semantic-init)
+
+; YASnippet
+(require 'yasnippet)
+(yas-global-mode +1)
+
+(provide 'init)
+;;; init.el ends here
