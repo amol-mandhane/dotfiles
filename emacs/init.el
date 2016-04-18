@@ -136,6 +136,12 @@
 (require 'indentation)
 
 (setq make-backup-files nil)
+(add-to-list 'backup-directory-alist '("." . "~/.saves") :append)
+(setq backup-by-copying t
+      delete-old-versions t
+      kept-new-versions 6
+      kept-old-versions 2
+      version-control t)
 
 (show-paren-mode +1)
 (define-globalized-minor-mode
