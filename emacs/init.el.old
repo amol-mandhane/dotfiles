@@ -1,0 +1,207 @@
+;;; emacs-config --- Configuration for Emacs editor
+
+;;; Commentary:
+;;  This file contains packages and their settings to be loaded in Emacs.  This
+;;  is still a work-in-progress
+
+;;; Code:
+
+
+
+
+(require 'visual-indentation-mode)
+(define-globalized-minor-mode
+  global-indent-guides
+  visual-indentation-mode (lambda () (visual-indentation-mode 1)))
+(global-indent-guides +1)
+
+(global-hl-line-mode +1)
+
+;; mode line settings
+(line-number-mode t)
+(column-number-mode t)
+(size-indication-mode t)
+
+; General settings
+(require 'indentation)
+
+
+(show-paren-mode +1)
+(define-globalized-minor-mode
+  global-rainbow-delimiters-mode
+  rainbow-delimiters-mode (lambda () (rainbow-delimiters-mode 1)))
+(global-rainbow-delimiters-mode +1)
+(require 'smartparens-config)
+(define-globalized-minor-mode
+  global-smartparens-mode
+  smartparens-mode (lambda () (smartparens-mode 1)))
+(global-smartparens-mode +1)
+
+
+
+;; History
+(setq savehist-file "~/.emacs.d/tmp/history")
+(savehist-mode +1)
+
+;; Centering search results
+(add-hook 'isearch-mode-end-hook 'recenter-top-bottom)
+
+; Default modes
+(require 'evil)
+(evil-mode +1)
+
+(require 'org)
+
+; Theme
+(if window-system
+    (load-theme 'badwolf t)
+  (load-theme 'wombat t))
+(setq ns-use-srgb-colorspace nil)
+(set-default-font "Inconsolata-12")
+
+;; Shortcuts
+
+(global-set-key (kbd "C-q") 'kill-this-buffer)
+
+;; Machine specific config
+(load "~/.emacs.machine.el")
+
+;; Plugin settings
+; (require 'powerline)
+; (powerline-center-evil-theme)
+
+;; Airline theme
+; (require 'airline-themes)
+; (load-theme 'airline-badwolf t)
+; (setq powerline-default-separator 'arrow-fade)
+(require 'spaceline-config)
+(spaceline-spacemacs-theme)
+(setq powerline-default-separator 'bar)
+(spaceline-toggle-minor-modes-off)
+(spaceline-toggle-buffer-position-off)
+(nyan-mode +1)
+(set-face-background 'powerline-active2 "grey30")
+; (spaceline-toggle-evil-state-on)
+
+;; Projectile
+(projectile-global-mode)
+(setq projectile-indexing-method 'alien)
+(setq projectile-enable-caching t)
+(setq projectile-cache-file "~/.emacs.d/tmp/projectile.cache")
+(setq projectile-known-projects-file "~/.emacs.d/tmp/projectile-bookmarks.eld")
+
+;; Helm
+(global-set-key (kbd "M-x") 'helm-M-x)
+(define-key evil-normal-state-map (kbd "C-p") 'helm-projectile)
+(define-key evil-insert-state-map (kbd "C-p") 'helm-projectile)
+
+;; Ido + Flx-ido
+(require 'flx-ido)
+(ido-mode 1)
+(ido-everywhere 1)
+(flx-ido-mode 1)
+;; disable ido faces to see flx highlights.
+(setq ido-enable-flex-matching t)
+(setq ido-use-faces nil)
+(setq ido-save-directory-list-file "~/.emacs.d/tmp/ido.last")
+
+;; Avy
+(require 'avy)
+(define-key evil-normal-state-map (kbd ", ,") 'evil-avy-goto-word-or-subword-1)
+(setq avy-background t)
+
+;; diff-hl
+(require 'diff-hl)
+(define-globalized-minor-mode
+  global-diff-hl-mode
+  diff-hl-mode (lambda () (diff-hl-mode 1)))
+(global-diff-hl-mode +1)
+(diff-hl-margin-mode +1)
+(diff-hl-flydiff-mode +1)
+(setq diff-hl-margin-side 'right)
+
+; FlyCheck
+(global-flycheck-mode)
+
+(require 'neotree)
+(global-set-key (kbd "<f8>") 'neotree-toggle)
+(setq projectile-switch-project-action 'neotree-projectile-action)
+(add-hook 'neotree-mode-hook
+          (lambda ()
+            (define-key evil-normal-state-local-map (kbd "TAB") 'neotree-enter)
+            (define-key evil-normal-state-local-map (kbd "SPC") 'neotree-enter)
+            (define-key evil-normal-state-local-map (kbd "q") 'neotree-hide)
+            (define-key evil-normal-state-local-map (kbd "RET") 'neotree-enter)))
+
+; AutoComplete
+(require 'auto-complete)
+(require 'auto-complete-config)
+(setq ac-comphist-file (expand-file-name "~/.emacs.d/tmp/ac-comphist.dat"))
+(ac-config-default)
+
+; AutoComplete C headers
+(defun ac-c-headers-init ()
+  (require 'auto-complete-c-headers)
+  (add-to-list 'ac-sources 'ac-source-c-headers)
+  (add-to-list 'achead:include-directories '"/usr/include")
+  (add-to-list 'achead:include-directories '"/usr/local/include")
+  (add-to-list 'achead:include-directories '"/usr/include/c++/4.8")
+  (add-to-list 'achead:include-directories '"/usr/include/x86_64-linux-gnu/c++/4.8")
+  (add-to-list 'achead:include-directories '"/usr/include/c++/4.8/backward")
+  (add-to-list 'achead:include-directories '"/usr/lib/gcc/x86_64-linux-gnu/4.8/include")
+  (add-to-list 'achead:include-directories '"/usr/lib/gcc/x86_64-linux-gnu/4.8/include-fixed")
+  (add-to-list 'achead:include-directories '"/usr/include/x86_64-linux-gnu")
+  (add-to-list 'achead:include-directories '"/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include/c++/v1")
+  (add-to-list 'achead:include-directories '"/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/7.0.0/include")
+  (add-to-list 'achead:include-directories '"/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include")
+)
+(add-hook 'c++-mode-hook 'ac-c-headers-init)
+(add-hook 'c-mode-hook 'ac-c-headers-init)
+
+; google-cpplint
+(defun flymake-google-init ()
+  (require 'flymake-google-cpplint)
+  (custom-set-variables '(flymake-google-cpplint-command "/usr/local/bin/cpplint"))
+  (flymake-google-cpplint-load)
+)
+(add-hook 'c++-mode-hook 'flymake-google-init)
+(add-hook 'c-mode-hook 'flymake-google-init)
+
+; google-c-style
+(require 'google-c-style)
+(add-hook 'c-mode-common-hook 'google-set-c-style)
+(add-hook 'c-mode-common-hook 'google-make-newline-indent)
+
+; Semantic mode
+(add-to-list 'semantic-default-submodes 'global-semanticdb-minor-mode)
+(add-to-list 'semantic-default-submodes 'global-semantic-mru-bookmark-mode)
+(add-to-list 'semantic-default-submodes 'global-semantic-idle-scheduler-mode)
+(add-to-list 'semantic-default-submodes 'global-semantic-idle-summary-mode)
+(add-to-list 'semantic-default-submodes 'global-semantic-stickyfunc-mode)
+(add-to-list 'semantic-default-submodes 'global-semantic-idle-completions-mode)
+(add-to-list 'semantic-default-submodes 'global-semantic-decoration-mode)
+(add-to-list 'semantic-default-submodes 'global-semantic-highlight-func-mode)
+(add-to-list 'semantic-default-submodes 'global-semantic-show-unmatched-syntax-mode)
+
+(defun semantic-init ()
+  (semantic-mode t)
+  (add-to-list 'ac-sources 'ac-source-semantic))
+(add-hook 'c-mode-hook 'semantic-init)
+(add-hook 'c++-mode-hook 'semantic-init)
+
+;; YCM
+(require 'ycmd)
+(set-variable 'ycmd-server-command '("python" "/opt/ycmd/ycmd"))
+(set-variable 'ycmd-global-config (expand-file-name "~/.emacs.d/.ycm_extra_conf.py"))
+(add-hook 'after-init-hook #'global-ycmd-mode)
+(require 'auto-complete-ycmd)
+
+(require 'flycheck-ycmd)
+(add-hook 'ycmd-mode-hook #'flycheck-ycmd-setup)
+
+; YASnippet
+(require 'yasnippet)
+(yas-global-mode +1)
+
+(provide 'init)
+;;; init.el ends here

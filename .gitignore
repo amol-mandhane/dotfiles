@@ -17,3 +17,6 @@ emacs/elpa/
 emacs/auto-save-list/
 emacs/tmp/
 emacs/semanticdb/
+
+# Auto-generated file
+emacs/emacs.el

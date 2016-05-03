@@ -1,0 +1,336 @@
+#+TITLE: Emacs Configuration
+
+* Setup Identity and Environment
+
+** Identity
+   
+#+BEGIN_SRC emacs-lisp
+(setq user-full-name "Amol Mandhane"
+      user-mail-address "amol.mandhane@gmail.com")
+#+END_SRC
+
+** Environment
+   
+#+BEGIN_SRC emacs-lisp
+(add-to-list 'load-path "~/.emacs.d/modules")
+(add-to-list 'load-path "~/.emacs.d/third_party")
+#+END_SRC
+   
+** Load clisp
+   
+#+BEGIN_SRC emacs-lisp
+(require 'cl)
+#+END_SRC
+
+* Package Management
+
+** Setup
+   
+Initialize package management
+
+#+BEGIN_SRC emacs-lisp
+(require 'package)
+(package-initialize)
+(setq package-archives '(("gnu" . "https://elpa.gnu.org/packages/")
+                         ("marmalade" . "https://marmalade-repo.org/packages/")
+                         ("melpa" . "https://melpa.org/packages/")
+                         ("org" . "http://orgmode.org/elpa/")))
+#+END_SRC
+
+** Package List
+  
+List of current default packages
+
+|----------------------+--------------------------------------|
+| avy                  | EasyMotion for emacs                 |
+| beacon               | Cursor line highlight while movement |
+| evil                 | VI layer for emacs                   |
+| exec-path-from-shell | Sets shell PATH                      |
+| flycheck             | Syntax and style checks on the fly   |
+| gruvbox-theme        | Gruvbox theme for emacs              |
+| helm                 | Emacs' dashboard                     |
+| helm-projectile      | Projectile interface for helm        |
+| magit                | Git layer of emacs                   |
+| projectile           | Project management                   |
+| rainbow-delimiters   | Multi-coloured paratheses            |
+| smartparens          | Better brackets                      |
+| which-key            | Interactive shortcut guide           |
+|----------------------+--------------------------------------|
+
+#+BEGIN_SRC emacs-lisp
+(defvar config/default-packages '(
+  avy
+  beacon
+  evil
+  exec-path-from-shell
+  flycheck
+  gruvbox-theme
+  helm
+  helm-projectile
+  magit
+  projectile
+  rainbow-delimiters
+  smartparens
+  which-key
+) "Default packages to be installed at Emacs startup.")
+#+END_SRC
+
+More packages to add
+
+|-------------------------+---------------------------------------------------------------|
+| company                 | Company auto-completion engine                                |
+| ycmd                    | YouCompleteMe completion engine [[https://github.com/Valloric/ycmd][Github link]]                   |
+| auto-complete           | (will deprecate in favour of company)                         |
+| auto-complete-c-headers | (find company replacement)                                    |
+| badwolf-theme           | Current theme. Also lookup ample, gruvbox and tomorrow themes |
+| diff-hl                 | Gitgutter for emacs                                           |
+| flymake-google-cpplint  | cpplint with flymake                                          |
+| flycheck-ycmd           | YouCompleteMe integration for flycheck                        |
+| google-c-style          | Google C style autoformatter                                  |
+| neotree                 | File manager                                                  |
+| nyan-mode               | Bottom bar to show buffer position                            |
+| powerline               | Better modeline                                               |
+| yasnippet               | snippets                                                      |
+|-------------------------+---------------------------------------------------------------|
+
+** Package Installation
+
+Loop over the default packages defined above and check if all of them are installed. Install any package which is currently not installed.
+
+#+BEGIN_SRC emacs-lisp
+(defun config/check-all-packages-ok ()
+  (loop for pkg in config/default-packages
+        when (not (package-installed-p pkg)) do (return nil)
+        finally (return t)))
+
+(unless (config/check-all-packages-ok)
+  (message "%s" "Refreshing package database...")
+  (package-refresh-contents)
+  (dolist (pkg config/default-packages)
+    (when (not (package-installed-p pkg))
+      (package-install pkg))))
+#+END_SRC
+* Startup Settings
+
+Set up PATH variable for the shell.
+#+BEGIN_SRC emacs-lisp
+(exec-path-from-shell-initialize)
+#+END_SRC
+
+Disable the splash screen and the scratch message.
+#+BEGIN_SRC emacs-lisp
+(setq inhibit-splash-screen t)
+(setq initial-scratch-message nil)
+#+END_SRC
+* UI Settings
+  
+** Interface
+
+Disable UI clutter that takes up screen real estate.
+#+BEGIN_SRC emacs-lisp
+(scroll-bar-mode -1)
+(tool-bar-mode -1)
+(menu-bar-mode -1)
+#+END_SRC
+
+Enable line numbering using custom plugin defined in a [[file:~/.emacs.d/modules/line-numbering.el][module]].
+#+BEGIN_SRC emacs-lisp
+(require 'line-numbering)
+#+END_SRC
+** 80 Column Rule
+
+Create a vertical line at 80 characters in every mode. This uses a [[file:third_party/fill-column-indicator.el][third-party module]].
+#+BEGIN_SRC emacs-lisp
+(require 'fill-column-indicator)
+(setq fci-rule-column 81
+      fci-rule-width 1
+      fci-rule-color "dimgray")
+(define-globalized-minor-mode global-fci-mode fci-mode (lambda () (fci-mode 1)))
+(global-fci-mode 1)
+#+END_SRC
+
+80 column rule creates conflicts with autocompletion UI. Following code fixes it.
+#+BEGIN_SRC emacs-lisp
+(defun config/fci-enabled-p () (symbol-value 'fci-mode))
+
+(defvar config/fci-mode-suppressed nil)
+(make-variable-buffer-local 'config/fci-mode-suppressed)
+
+(defadvice popup-create (before suppress-fci-mode activate)
+  "Suspend fci-mode while popups are visible"
+  (let ((fci-enabled (config/fci-enabled-p)))
+    (when fci-enabled
+      (setq config/fci-mode-suppressed fci-enabled)
+      (turn-off-fci-mode))))
+
+(defadvice popup-delete (after restore-fci-mode activate)
+  "Restore fci-mode when all popups have closed"
+  (when (and config/fci-mode-suppressed
+             (null popup-instances))
+    (setq config/fci-mode-suppressed nil)
+    (turn-on-fci-mode)))
+#+END_SRC
+
+** Indent guides
+
+Show indent guides like vim. This uses a [[file:third_party/visual-indentation-mode.el][third-party module]].
+#+BEGIN_SRC emacs-lisp
+(require 'visual-indentation-mode)
+(define-globalized-minor-mode
+  global-indent-guides
+  visual-indentation-mode (lambda () (visual-indentation-mode 1)))
+(global-indent-guides +1)
+#+END_SRC
+** Beacon
+#+BEGIN_SRC emacs-lisp
+(require 'beacon)
+(add-hook 'window-setup-hook 'beacon-mode)
+#+END_SRC
+** Mode line
+
+Add some config to the mode line
+#+BEGIN_SRC emacs-lisp
+(line-number-mode t)
+(column-number-mode t)
+(size-indication-mode t)
+#+END_SRC
+
+** Editing
+
+Highlight current line
+#+BEGIN_SRC emacs-lisp
+(global-hl-line-mode +1)
+#+END_SRC
+
+*** Brackets
+
+Bracket matching
+#+BEGIN_SRC emacs-lisp
+(show-paren-mode +1)
+#+END_SRC
+
+Rainbow bracket coloring
+#+BEGIN_SRC emacs-lisp
+(define-globalized-minor-mode
+  global-rainbow-delimiters-mode
+  rainbow-delimiters-mode (lambda () (rainbow-delimiters-mode 1)))
+(global-rainbow-delimiters-mode +1)
+#+END_SRC
+
+** Theme and Font
+
+Set Gruvbox theme
+#+BEGIN_SRC emacs-lisp
+(if window-system
+    (load-theme 'gruvbox t)
+  (load-theme 'wombat t))
+;; (setq ns-use-srgb-colorspace nil)
+#+END_SRC
+
+Set font
+#+BEGIN_SRC emacs-lisp
+(set-default-font "Inconsolata-14")
+#+END_SRC
+
+* Editor Behaviour Settings
+
+** General settings
+
+Set Y/N aliases for Yes/No
+#+BEGIN_SRC emacs-lisp
+(defalias 'yes-or-no-p 'y-or-n-p)
+#+END_SRC
+
+Auto-reload files
+#+BEGIN_SRC emacs-lisp
+(global-auto-revert-mode t)
+#+END_SRC
+
+** Whitespace management
+
+- Highlight trailing and illegal whitespace characters
+- Highlight lines longer than 100 characters
+- Auto-cleanup trailing whitespace before saving file
+#+BEGIN_SRC emacs-lisp
+(require 'whitespace)
+(setq whitespace-line-column 101)
+(setq whitespace-style (quote (face trailing tabs lines-tail newline)))
+(add-hook 'before-save-hook 'whitespace-cleanup)
+(global-whitespace-mode t)
+#+END_SRC
+
+Require newline at the end of the file
+#+BEGIN_SRC emacs-lisp
+(setq require-final-newline t)
+#+END_SRC
+
+** =which-key= setup
+#+BEGIN_SRC emacs-lisp
+(require 'which-key)
+(which-key-mode +1)
+#+END_SRC
+
+** Backup settings
+
+(setq make-backup-files nil)
+(add-to-list 'backup-directory-alist '("." . "~/.saves") :append)
+(setq backup-by-copying t
+      delete-old-versions t
+      kept-new-versions 6
+      kept-old-versions 2
+      version-control t)
+
+** Emacs command history
+
+Save emacs command history
+#+BEGIN_SRC emacs-lisp
+(setq savehist-file "~/.emacs.d/tmp/history")
+(savehist-mode +1)
+#+END_SRC
+
+** Indentation
+
+Set up indentation for different modes.
+#+BEGIN_SRC emacs-lisp
+(defvar indent-spaces 2 "Number of spaces for the indentation.")
+
+(setq-default indent-tabs-mode nil)
+(setq-default tab-width indent-spaces)
+  ;; java/c/c++
+(setq c-basic-offset indent-spaces)
+(setq python-indent indent-spaces)
+(setq coffee-tab-width indent-spaces) ; coffeescript
+(setq javascript-indent-level indent-spaces) ; javascript-mode
+(setq js-indent-level indent-spaces) ; js-mode
+(setq js2-basic-offset indent-spaces) ; js2-mode, in latest js2-mode, it's alias of js-indent-level
+(setq web-mode-markup-indent-offset indent-spaces) ; web-mode, html tag in html file
+(setq web-mode-css-indent-offset indent-spaces) ; web-mode, css in html file
+(setq web-mode-code-indent-offset indent-spaces) ; web-mode, js code in html file
+(setq css-indent-offset indent-spaces) ; css-mode
+#+END_SRC
+
+** Smart Parentheses
+
+Enable smart parentheses everywhere
+#+BEGIN_SRC emacs-lisp
+(require 'smartparens-config)
+(define-globalized-minor-mode
+  global-smartparens-mode
+  smartparens-mode (lambda () (smartparens-mode 1)))
+(global-smartparens-mode +1)
+#+END_SRC
+
+** Search
+
+Center the search result in the window
+#+BEGIN_SRC emacs-lisp
+(add-hook 'isearch-mode-end-hook 'recenter-top-bottom)
+#+END_SRC
+
+* EVIL Mode
+
+Setup evil mode
+#+BEGIN_SRC emacs-lisp
+(require 'evil)
+(evil-mode +1)
+#+END_SRC
