@@ -6,61 +6,6 @@
 
 ;;; Code:
 
-
-
-
-(require 'visual-indentation-mode)
-(define-globalized-minor-mode
-  global-indent-guides
-  visual-indentation-mode (lambda () (visual-indentation-mode 1)))
-(global-indent-guides +1)
-
-(global-hl-line-mode +1)
-
-;; mode line settings
-(line-number-mode t)
-(column-number-mode t)
-(size-indication-mode t)
-
-; General settings
-(require 'indentation)
-
-
-(show-paren-mode +1)
-(define-globalized-minor-mode
-  global-rainbow-delimiters-mode
-  rainbow-delimiters-mode (lambda () (rainbow-delimiters-mode 1)))
-(global-rainbow-delimiters-mode +1)
-(require 'smartparens-config)
-(define-globalized-minor-mode
-  global-smartparens-mode
-  smartparens-mode (lambda () (smartparens-mode 1)))
-(global-smartparens-mode +1)
-
-
-
-;; History
-(setq savehist-file "~/.emacs.d/tmp/history")
-(savehist-mode +1)
-
-;; Centering search results
-(add-hook 'isearch-mode-end-hook 'recenter-top-bottom)
-
-; Default modes
-(require 'evil)
-(evil-mode +1)
-
-(require 'org)
-
-; Theme
-(if window-system
-    (load-theme 'badwolf t)
-  (load-theme 'wombat t))
-(setq ns-use-srgb-colorspace nil)
-(set-default-font "Inconsolata-12")
-
-;; Shortcuts
-
 (global-set-key (kbd "C-q") 'kill-this-buffer)
 
 ;; Machine specific config

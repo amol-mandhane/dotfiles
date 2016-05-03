@@ -54,6 +54,7 @@ List of current default packages
 | projectile           | Project management                   |
 | rainbow-delimiters   | Multi-coloured paratheses            |
 | smartparens          | Better brackets                      |
+| spaceline            | Modeline of [[http://spacemacs.org][Spacemacs]]                |
 | which-key            | Interactive shortcut guide           |
 |----------------------+--------------------------------------|
 
@@ -70,6 +71,7 @@ List of current default packages
   magit
   projectile
   rainbow-delimiters
+  spaceline
   smartparens
   which-key
 ) "Default packages to be installed at Emacs startup.")
@@ -194,6 +196,14 @@ Add some config to the mode line
 (column-number-mode t)
 (size-indication-mode t)
 #+END_SRC
+
+*** Spaceline
+#+BEGIN_SRC emacs-lisp
+(require 'spaceline-config)
+(spaceline-spacemacs-theme)
+(setq powerline-default-separator 'bar)
+#+END_SRC
+
 
 ** Editing
 
