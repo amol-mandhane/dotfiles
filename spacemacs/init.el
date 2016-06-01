@@ -51,7 +51,6 @@ values."
      ;; version-control
      python
      semantic
-     themes-megapack
      version-control
      xkcd
      yaml
