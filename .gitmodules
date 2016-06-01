@@ -4,3 +4,6 @@
 [submodule "zsh_zprezto"]
 	path = zsh/zprezto
 	url = https://github.com/sorin-ionescu/prezto
+[submodule "emacs"]
+	path = emacs
+	url = https://github.com/syl20bnr/spacemacs.git

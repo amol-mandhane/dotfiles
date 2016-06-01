@@ -2,6 +2,8 @@
 
 - link:
     ~/.xmonad: xmonad
+    ~/.emacs.d: emacs
+    ~/.spacemacs.d: spacemacs
     ~/.vim: vim
     ~/.fonts: fonts
     ~/.zshrc: zsh/zshrc
