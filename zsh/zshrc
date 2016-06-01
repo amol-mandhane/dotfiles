@@ -13,3 +13,6 @@ source ~/.machine_zshrc
 export EDITOR='vim'
 
 compinit -u
+
+export GOPATH=$HOME/gopackages
+export PATH=$PATH:$GOPATH/bin
