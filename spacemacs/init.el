@@ -274,6 +274,8 @@ you should place your code here."
   (add-to-list 'auto-mode-alist '("\\.org.text\\'" . org-mode))
   (require 'ycmd)
   (set-variable 'ycmd-server-command '("python" "/opt/ycmd/ycmd"))
+
+  (load-file "~/.emacs.machine.el")
   )
 
 ;; Do not write anything past this comment. This is where Emacs will

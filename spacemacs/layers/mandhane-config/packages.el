@@ -63,6 +63,7 @@ Each entry is either:
 (defun mandhane-config/init-beacon ()
   (use-package beacon
     :defer t
+    :diminish beacon-mode
     :init
     (progn (add-hook 'window-setup-hook 'beacon-mode))))
 
