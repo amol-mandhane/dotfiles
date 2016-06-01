@@ -3,7 +3,6 @@
 - link:
     ~/.xmonad: xmonad
     ~/.vim: vim
-    ~/.emacs.d: emacs
     ~/.fonts: fonts
     ~/.zshrc: zsh/zshrc
     ~/.zprofile: zsh/zprofile

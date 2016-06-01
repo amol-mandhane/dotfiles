@@ -12,11 +12,3 @@ vim/eclim/
 vim/plugin/eclim.vim
 vim/bundle/
 .netrwhist
-
-emacs/elpa/
-emacs/auto-save-list/
-emacs/tmp/
-emacs/semanticdb/
-
-# Auto-generated file
-emacs/emacs.el
