@@ -17,4 +17,5 @@
 - shell:
   - [git submodule update --init --recursive dotbot, Installing/updating dotbot submodules]
   - [git submodule update --init --recursive zsh/zprezto, Installing/updating zsh submodules]
+  - [git submodule update --init --recursive emacs, Installing Spacemacs]
   - [fc-cache -vf ~/.fonts/, Updating local fonts]
