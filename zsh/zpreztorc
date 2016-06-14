@@ -3,26 +3,16 @@ zstyle ':prezto:*:*' color 'yes'
 zstyle ':prezto:load' pmodule \
   'environment' \
   'autosuggestions' \
-  'terminal' \
-  'editor' \
+  'emacs' \
   'history' \
-  'directory' \
-  'spectrum' \
   'utility' \
   'completion' \
-  'homebrew' \
-  'osx' \
-  'ruby' \
-  'rails' \
   'git' \
-  'python' \
-  'haskell' \
-  'tmux' \
   'syntax-highlighting' \
   'history-substring-search' \
   'prompt'
 
-# presto theme
+# prezto theme
 zstyle ':prezto:module:prompt' theme 'steeef'
 
 # Set syntax highlighters.
