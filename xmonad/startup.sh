@@ -1,15 +1,10 @@
-#if [ -x /usr/bin/gnome-power-manager ] ; then
+if [ -x /usr/bin/gnome-power-manager ] ; then
    gnome-power-manager &
-#fi
+fi
 
-#if [ -x /usr/bin/gnome-settings-daemon ] ; then
-   gnome-settings-daemon &
-#fi
+unity-settings-daemon &
 
 nm-applet &
-jupiter &
-# dropbox start &
-# gnome-sound-applet &
 feh --bg-scale /home/amol/.xmonad/Wallpaper.jpg &
 
 # xautolock -time 5 -locker /home/amol/.xmonad/lock.sh &
