@@ -126,4 +126,7 @@ myKeys = [("M1-<Tab>"   , cycleRecentWindows [xK_Alt_L] xK_Tab xK_Tab ) -- class
          , ("C-M1-l"     , spawn "~/.xmonad/lock.sh" ) -- lock screen
          , ("M-S--", sendMessage Magnifier.MagnifyLess )
          , ("M-S-=", sendMessage Magnifier.MagnifyMore )
+         , ("<XF86AudioMute>", spawn "amixer -q sset Master toggle")
+         , ("<XF86AudioRaiseVolume>", spawn "amixer -q sset Master 2%+")
+         , ("<XF86AudioLowerVolume>", spawn "amixer -q sset Master 2%-")
          ]

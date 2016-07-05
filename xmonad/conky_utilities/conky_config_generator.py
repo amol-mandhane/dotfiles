@@ -24,7 +24,6 @@ def bg(c=None):
         c = color1
     return "^bg(%s)" % c
 
-
 # spacer =
 # "^fn(Clean:size=2)" + bg(color1) + " ^fn(Clean:size=10)" + bg(color5)
 spacer = ""
@@ -174,8 +173,8 @@ def volume():
     ret += bg(color5) + fg(color4)
     ret += " VOLUME " + spacer
     ret += fg(color2)
-    ret += " ${exec pactl list sinks | grep \"Volume: 0\"" + \
-        "| awk '{print $3}' | tail -1} "
+    ret += " ${exec amixer get Master | grep \"%\" | head -n 1 | " + \
+           "cut -d' ' -f7,8 | tr -d '[]'"
     ret += bg() + fg() + "\\\n\\"
     return ret
 
@@ -295,6 +294,7 @@ short_units yes
             print eval(arg + "()")
         except:
             pass
+
 
 if __name__ == "__main__":
     main()

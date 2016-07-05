@@ -22,7 +22,7 @@ template8 ${battery_percent BAT1}
 TEXT
 ^bg(\#101010)^fg(\#444444) BADGE ^fg(\#9D9D9D)${exec ~/.xmonad/conky_utilities/tomorrow_badge.py} ^bg(\#020202)^fg(\#444444)\
 \
- ^bg(\#101010)^fg(\#444444) VOLUME ^fg(\#44AACC) ${exec pactl list sinks | grep "Volume: 0"| awk '{print $3}' | tail -1} ^bg(\#020202)^fg(\#444444)\
+ ^bg(\#101010)^fg(\#444444) VOLUME ^fg(\#44AACC) ${exec amixer get Master | grep "%" | head -n 1 | cut -d' ' -f7,8 | tr -d '[]'} ^bg(\#020202)^fg(\#444444)\
 \
  ^bg(\#101010)^fg(\#444444) NET ^fg(\#44AACC) ${totaldown wlan0} ${totalup wlan0} ^bg(\#020202)^fg(\#444444)\
 \
@@ -41,4 +41,3 @@ ${if_match ${template4} >= 50}^bg(\#FF0000)^fg(\#020202) ${else}${if_match ${tem
 \
  ^fg(\#020202)${if_match "${acpiacadapter}" == "on-line"}^bg(\#66FF66) CHARGE ${else}^bg(\#FF6666) BATTERY ${endif}^bg(\#101010)${if_match ${template8} >= 75}^fg(\#66FF66)${else}${if_match ${template8} > 25}^fg(\#44AACC)${else}^bg(\#FF0000)^fg(\#020202)${endif}${endif} ${template8}% ^bg(\#020202)^fg(\#444444)\
 \
-
