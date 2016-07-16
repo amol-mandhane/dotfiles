@@ -34,8 +34,7 @@
      markdown
      org
      protobuf
-     (python :variables
-             python-enable-yapf-format-on-save t)
+     python
      semantic
      shell
      shell-scripts
@@ -67,7 +66,7 @@ values."
    dotspacemacs-startup-lists '(recents projects)
    dotspacemacs-startup-recent-list-size 5
    dotspacemacs-scratch-mode 'text-mode
-   dotspacemacs-themes '(sanityinc-tomorrow-eighties
+   dotspacemacs-themes '(subatomic
                          spacemacs-light
                          spacemacs-dark
                          solarized-light
