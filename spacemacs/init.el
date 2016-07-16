@@ -67,7 +67,7 @@ values."
    dotspacemacs-startup-lists '(recents projects)
    dotspacemacs-startup-recent-list-size 5
    dotspacemacs-scratch-mode 'text-mode
-   dotspacemacs-themes '(naquadah
+   dotspacemacs-themes '(sanityinc-tomorrow-eighties
                          spacemacs-light
                          spacemacs-dark
                          solarized-light

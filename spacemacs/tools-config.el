@@ -6,6 +6,7 @@
 ;; Fix auto-complete
 (require 'auto-complete)
 (ac-flyspell-workaround)
+(setq ac-ignore-case 'smart)
 
 ;; $EDITOR config for emacs shell.
 (define-key (current-global-map)
