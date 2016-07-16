@@ -4,4 +4,7 @@
 ;; TextMate style newline characters
 (setq vi-tilde-fringe-bitmap-array [0 0 0 3 3 255 0 0])
 
+;; I learn a lot of new things from menu bar.
+(menu-bar-mode 1)
+
 (provide 'visual-enhancements)

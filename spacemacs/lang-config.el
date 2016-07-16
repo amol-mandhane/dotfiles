@@ -4,6 +4,6 @@
 
 ;; company with eclim sucks. Use auto-complete.
 (add-to-list 'ac-modes 'java-mode)
-(setq company-global-modes (not java-mode))
+(setq company-global-modes '(not java-mode))
 
 (provide 'lang-config)
