@@ -67,7 +67,7 @@ values."
    dotspacemacs-startup-lists '(recents projects)
    dotspacemacs-startup-recent-list-size 5
    dotspacemacs-scratch-mode 'text-mode
-   dotspacemacs-themes '(anti-zenburn
+   dotspacemacs-themes '(naquadah
                          spacemacs-light
                          spacemacs-dark
                          solarized-light
@@ -101,17 +101,17 @@ values."
    dotspacemacs-which-key-delay 0.4
    dotspacemacs-which-key-position 'bottom
    dotspacemacs-loading-progress-bar t
-   dotspacemacs-fullscreen-at-startup t
+   dotspacemacs-fullscreen-at-startup nil
    dotspacemacs-fullscreen-use-non-native nil
-   dotspacemacs-maximized-at-startup nil
+   dotspacemacs-maximized-at-startup t
    dotspacemacs-active-transparency 90
    dotspacemacs-inactive-transparency 90
    dotspacemacs-mode-line-unicode-symbols nil
    dotspacemacs-smooth-scrolling t
    dotspacemacs-line-numbers 'relative
-   dotspacemacs-smartparens-strict-mode t
+   dotspacemacs-smartparens-strict-mode nil
    dotspacemacs-highlight-delimiters 'all
-   dotspacemacs-persistent-server t
+   dotspacemacs-persistent-server nil
    dotspacemacs-search-tools '("ag" "pt" "ack" "grep")
    dotspacemacs-default-package-repository nil
    dotspacemacs-whitespace-cleanup 'trailing
@@ -133,23 +133,12 @@ layers configuration.
 This is the place where most of your configurations should be done. Unless it is
 explicitly specified that a variable should be set before a package is loaded,
 you should place your code here."
-  (setq ns-use-srgb-colorspace nil)
-  (setq vi-tilde-fringe-bitmap-array [0 0 0 3 3 255 0 0])
 
-  (add-to-list 'auto-mode-alist '("\\.org.text\\'" . org-mode))
-
-  (require 'ycmd)
-  (set-variable 'ycmd-server-command '("python" "/opt/ycmd/ycmd"))
-
-  (add-hook 'java-mode-hook (lambda () (setq fill-column 100)))
-  (define-key (current-global-map)
-    [remap async-shell-command] 'with-editor-async-shell-command)
-  (define-key (current-global-map)
-    [remap shell-command] 'with-editor-shell-command)
+  (add-to-list 'load-path "~/.spacemacs.d/")
+  (require 'visual-enhancements)
+  (require 'org-config)
+  (require 'tools-config)
+  (require 'lang-config)
 
   (load-file "~/.emacs.machine.el")
-
-  (add-to-list 'semantic-default-submodes 'global-semantic-stickyfunc-mode)
-  (semantic-mode 1)
-  (require 'stickyfunc-enhance)
   )
