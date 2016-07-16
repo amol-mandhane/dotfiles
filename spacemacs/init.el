@@ -134,7 +134,7 @@ explicitly specified that a variable should be set before a package is loaded,
 you should place your code here."
 
   (add-to-list 'load-path "~/.spacemacs.d/")
-  (require 'visual-enhancements)
+  (require 'interface-enhancements)
   (require 'org-config)
   (require 'tools-config)
   (require 'lang-config)
