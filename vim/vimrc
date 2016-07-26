@@ -60,7 +60,7 @@ Plugin 'vim-airline/vim-airline-themes'
 " }}} PluginEnd
 
 
-if filereadable(expand('~/.corp.google'))
+if filereadable(expand('~/.google-office'))
 else
   Plugin 'Valloric/YouCompleteMe'
 endif
@@ -349,9 +349,6 @@ source ~/.machine_vimrc
 
 " Plugin Settings {{{
 
-" TODO(mandhane): Configure CTags/GTags/GoogleTags to automatically work
-" with vim.
-
 " vim-airline {{{
 let g:airline_powerline_fonts=1
 let g:airline#extensions#tabline#enabled=1
@@ -428,7 +425,7 @@ let g:ycm_complete_in_comments = 1
 let g:ycm_register_as_syntastic_checker = 1
 let g:ycm_collect_identifiers_from_tags_files = 1
 
-if filereadable(expand('~/.corp.google'))
+if filereadable(expand('~/.google-office'))
 else
   let g:ycm_global_ycm_extra_conf = "~/.vim/.ycm_extra_conf.py"
 endif
