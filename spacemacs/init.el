@@ -60,12 +60,12 @@ values."
    dotspacemacs-elpa-https t
    dotspacemacs-elpa-timeout 5
    dotspacemacs-check-for-update t
-   dotspacemacs-editing-style 'vim
+   dotspacemacs-editing-style 'hybrid
    dotspacemacs-verbose-loading nil
    dotspacemacs-startup-banner nil
    dotspacemacs-startup-lists '(recents projects)
    dotspacemacs-startup-recent-list-size 5
-   dotspacemacs-scratch-mode 'text-mode
+   dotspacemacs-scratch-mode 'org-mode
    dotspacemacs-themes '(subatomic
                          spacemacs-light
                          spacemacs-dark
@@ -137,6 +137,7 @@ you should place your code here."
   (require 'interface-enhancements)
   (require 'org-config)
   (require 'tools-config)
+  (require 'editor-config)
   (require 'lang-config)
 
   (load-file "~/.emacs.machine.el")

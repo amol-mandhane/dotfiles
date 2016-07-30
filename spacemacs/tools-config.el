@@ -2,7 +2,6 @@
 (require 'ycmd)
 (set-variable 'ycmd-server-command '("python" "/opt/ycmd/ycmd"))
 
-
 ;; Fix auto-complete
 (require 'auto-complete)
 (ac-flyspell-workaround)
