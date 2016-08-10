@@ -11,7 +11,11 @@ stty -ixon
 
 source ~/.machine_zshrc
 
-export EDITOR='vim'
+if [[ -z $EMACS ]]; then
+    export EDITOR='vim'
+else
+    export EDITOR='emacsclient -n'
+fi
 
 compinit -u
 
