@@ -170,7 +170,7 @@ set t_Co=256
 
 let g:badwolf_darkgutter = 1
 let g:badwolf_tabline = 3
-colorscheme gruvbox
+colorscheme badwolf
 set background=dark
 
 if has('x11')
