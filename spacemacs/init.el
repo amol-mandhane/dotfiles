@@ -69,7 +69,7 @@ values."
    dotspacemacs-startup-lists '(recents projects)
    dotspacemacs-startup-recent-list-size 5
    dotspacemacs-scratch-mode 'org-mode
-   dotspacemacs-themes '(subatomic
+   dotspacemacs-themes '(flatland
                          spacemacs-light
                          spacemacs-dark
                          solarized-light
