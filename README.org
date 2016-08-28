@@ -1,0 +1,15 @@
+* Dotfiles
+Common configurations across all the machines. Uses [[https://github.com/anishathalye/dotbot][dotbot]] for installation.
+
+** Machine specific configurations
+*NOTE  to  future self*  -  Machine  specific configurations  aren't  publically
+version controlled with  Github for many reasons.  Try to keep them  as small as
+possible. You can find the machine specific configurations at following paths.
+
+|---------+---------------------|
+| *emacs* | ~/.emacs.machine.el |
+|---------+---------------------|
+| *vim*   | ~/.machine_vimrc    |
+|---------+---------------------|
+| *zsh*   | ~/.machine_zshrc    |
+|---------+---------------------|
