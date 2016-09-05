@@ -61,7 +61,6 @@ myDzenBottomBar = "dzen2 -y '752' -w '400' -ta 'l'" ++ myDzenStyle
 
 myConkyTop = "conky -c ~/.xmonad/conky_utilities/conky_top_rc | dzen2 -x '850' -w '366' -ta 'r'" ++ myDzenStyle
 myConkyBottom = "conky -c ~/.xmonad/conky_utilities/conky_bottom_rc | dzen2 -y '1184' -x '400' -w '966' -ta 'r'" ++ myDzenStyle
--- myDzenConky  = "conky -c /usr/local/google/home/mandhane/.xmonad/conkyrc | dzen2 -x '656' -w '560' -ta 'r'" ++ myDzenStyle
 
 myWorkspacesImg = [
     "^i(.xmonad/dzen2_icons/workspaces/web.xbm)",
@@ -75,19 +74,14 @@ myWorkspacesImg = [
     "^i(.xmonad/dzen2_icons/workspaces/extra.xbm)"]
 
 myWorkspaces = ["^ca(1, xdotool key super+" ++ (show i) ++ ")" ++ s ++ "^ca()" | (s, i) <- zip myWorkspacesImg [1..9]]
--- myWorkspaces = ["^ca(1, xdotool key super+" ++ (show i) ++ ")" ++ (show i) ++ "^ca()" | i <- [1..9]]
 
 myManageHook = composeAll . concat $
    [ [ className =? "Firefox"             --> doShift (myWorkspaces !! 0) ]
     , [ className =? "Google-chrome"      --> doShift (myWorkspaces !! 0) ]
-    , [ className =? "Sublime_text"       --> doShift (myWorkspaces !! 2) ]
-    , [ className =? "Gvim"               --> doShift (myWorkspaces !! 2) ]
-    , [ className =? "Vlc"                --> doShift (myWorkspaces !! 4) ]
-    , [ className =? "Smplayer"           --> doShift (myWorkspaces !! 4) ]
+    , [ className =? "smplayer"           --> doShift (myWorkspaces !! 4) ]
+    , [ className =? "mpv"                --> doShift (myWorkspaces !! 4) ]
     , [ className =? "Nautilus"           --> doShift (myWorkspaces !! 5) ]
-    , [ className =? "Pcmanfm"            --> doShift (myWorkspaces !! 5) ]
     , [ className =? "Nemo"               --> doShift (myWorkspaces !! 5) ]
-    , [ className =? "Thunderbird"        --> doShift (myWorkspaces !! 8) ]
     , [ className =? "Gimp"               --> doFloat ]]
 
 customTile = (Tall 1 (2/100) (2/3))
@@ -95,26 +89,24 @@ magnify = Magnifier.magnifiercz 1.0
 
 myLayoutHook = smartBorders $ smartSpacing 5 $ (customTile ||| Mirror customTile ||| Full ||| magnify Circle ||| magnify Grid)
 
-myTopDzenPP  = dzenPP
-    {
+myTopDzenPP  = dzenPP {
     ppCurrent = dzenColor darkBlack lightBlue . wrap " " " ",
     ppHidden  = dzenColor darkGray fgGray. wrap " " " ",
     ppHiddenNoWindows = dzenColor darkBlack darkGray . wrap " " " ",
     ppUrgent  = dzenColor darkBlack lightGreen . wrap " " " ",
 
-    -- ppWsSep = "^fn(" ++ dzenFont 2 ++ ") ^fn(" ++ dzenFont 10 ++ ")",
     ppSep     = "^fn(" ++ dzenFont 5 ++ ") ^fn(" ++ dzenFont 10 ++ ")",
 
     ppTitle   = dzenColor darkGray fgGray . wrap "  " "  ",
 
-    ppOrder   = \(ws:l:t:w) -> [ws, t]
-    }
-myBottomDzenPP = dzenPP
-    {
+    ppOrder   = \(ws:_:t:_) -> [ws, t]
+}
+
+myBottomDzenPP = dzenPP {
     ppLayout  = dzenColor fgGray darkGray . wrap " " " ",
     ppSep     = "^fn(" ++ dzenFont 5 ++ ") ^fn(" ++ dzenFont 10 ++ ")",
-    ppOrder = \(ws:l:t:w) -> l:w
-    }
+    ppOrder = \(_:l:_:w) -> l:w
+}
 
 myLogHook top bottom = do
     dynamicLogWithPP $ myTopDzenPP { ppOutput = hPutStrLn top }
