@@ -23,6 +23,7 @@
             c-c++-default-mode-for-headers 'c++-mode
             c-c++-enable-clang-support t)
      common-lisp
+     deft
      emacs-lisp
      git
      go
