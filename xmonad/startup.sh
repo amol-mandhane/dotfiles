@@ -5,13 +5,14 @@ fi
 unity-settings-daemon &
 
 nm-applet &
-feh --bg-scale /home/amol/.xmonad/Wallpaper.jpg &
+feh --bg-scale ~/.xmonad/Wallpaper.jpg &
 
-# xautolock -time 5 -locker /home/amol/.xmonad/lock.sh &
-
-# xmodmap -e "keycode 117 = End"
-# xmodmap -e "keycode 115 = Prior"
-# xmodmap -e "keycode 112 = Next"
+if [ -x `which xmodmap` ] ; then
+    if [ -x `which setxkbmap` ] ; then
+        setxkbmap -option ctrl:swapcaps
+        xmodmap -e "keycode 37 ="
+    fi
+fi
 
 synclient AreaBottomEdge=1600
 synclient AreaTopEdge=400
@@ -19,4 +20,3 @@ synclient AreaLeftEdge=700
 synclient AreaRightEdge=3350
 
 xbacklight -set 25
-
