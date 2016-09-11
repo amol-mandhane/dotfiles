@@ -185,5 +185,8 @@ endif
 " }}}
 
 " Language specific settings {{{
-autocmd FileType html,ng.html,jslayout source ~/.vim/html.vimrc
+autocmd FileType html,ng.html,jslayout imap <C-e> <Esc><C-y>,i
+autocmd FileType html,ng.html,jslayout inoremap </ </<C-x><C-o>
+
+autocmd FileType html,ng.html,jslayout set omnifunc=htmlcomplete#CompleteTags
 " }}}

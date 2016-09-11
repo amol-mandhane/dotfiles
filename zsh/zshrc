@@ -6,10 +6,7 @@ HISTSIZE=1000
 SAVEHIST=1000
 HISTFILE=~/.zsh_history
 
-
 stty -ixon
-
-source ~/.machine_zshrc
 
 if [[ -z $EMACS ]]; then
     export EDITOR='vim'
@@ -18,6 +15,4 @@ else
 fi
 
 compinit -u
-
-export GOPATH=$HOME/gopackages
-export PATH=$PATH:$GOPATH/bin
+source ~/.machine_zshrc
