@@ -112,7 +112,7 @@ values."
    dotspacemacs-mode-line-unicode-symbols nil
    dotspacemacs-smooth-scrolling t
    dotspacemacs-line-numbers 'relative
-   dotspacemacs-smartparens-strict-mode nil
+   dotspacemacs-smartparens-strict-mode t
    dotspacemacs-highlight-delimiters 'all
    dotspacemacs-persistent-server nil
    dotspacemacs-search-tools '("ag" "pt" "ack" "grep")
@@ -137,12 +137,8 @@ This is the place where most of your configurations should be done. Unless it is
 explicitly specified that a variable should be set before a package is loaded,
 you should place your code here."
 
-  (add-to-list 'load-path "~/.spacemacs.d/")
-  (require 'interface-enhancements)
-  (require 'org-config)
-  (require 'tools-config)
-  (require 'editor-config)
-  (require 'lang-config)
+  (require 'ob-tangle)
+  (org-babel-load-file (expand-file-name "~/.spacemacs.d/user-config.org"))
 
   (load-file "~/.emacs.machine.el")
   )
