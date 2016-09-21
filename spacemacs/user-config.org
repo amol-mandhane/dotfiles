@@ -73,6 +73,11 @@ Set current emacs as $EDITOR for emacs shell commands.
   [remap async-shell-command] 'with-editor-async-shell-command)
 (define-key (current-global-map)
   [remap shell-command] 'with-editor-shell-command)
+
+(add-hook 'shell-mode-hook 'with-editor-export-editor)
+(add-hook 'term-exec-hook 'with-editor-export-editor)
+(add-hook 'eshell-mode-hook 'with-editor-export-editor)
+(add-hook 'shell-mode-hook 'with-editor-export-git-editor)
 #+END_SRC
 
 * Semantic mode

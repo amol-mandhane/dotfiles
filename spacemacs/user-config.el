@@ -23,6 +23,11 @@
 (define-key (current-global-map)
   [remap shell-command] 'with-editor-shell-command)
 
+(add-hook 'shell-mode-hook 'with-editor-export-editor)
+(add-hook 'term-exec-hook 'with-editor-export-editor)
+(add-hook 'eshell-mode-hook 'with-editor-export-editor)
+(add-hook 'shell-mode-hook 'with-editor-export-git-editor)
+
 (add-to-list 'semantic-default-submodes 'global-semantic-stickyfunc-mode)
 (add-to-list 'semantic-default-submodes 'global-semantic-decoration-mode)
 (add-to-list 'semantic-default-submodes 'global-semantic-highlight-func-mode)
