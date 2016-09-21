@@ -50,7 +50,7 @@
      yaml
      ycmd
      )
-   dotspacemacs-additional-packages '()
+   dotspacemacs-additional-packages '(litable)
    dotspacemacs-excluded-packages '()
    dotspacemacs-delete-orphan-packages t))
 
