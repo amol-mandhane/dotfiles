@@ -32,10 +32,19 @@ space either. Keep it on.
 #+END_SRC
 
 * Editor enhancements
+** Newline at EOF
 Require newline at end of file.
 
 #+BEGIN_SRC emacs-lisp
 (setq require-final-newline t)
+#+END_SRC
+
+** Disable Additions by =CUSTOM=
+Don't pollute my version controlled config. I don't use =custom= for permanent
+customizations anyway.
+
+#+BEGIN_SRC emacs-lisp
+(setq custom-file "/dev/null")
 #+END_SRC
 
 * Helm

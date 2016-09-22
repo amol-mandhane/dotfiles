@@ -8,6 +8,8 @@
 
 (setq require-final-newline t)
 
+(setq custom-file "/dev/null")
+
 (setq helm-mode-fuzzy-match t)
 (setq helm-completion-in-region-fuzzy-match t)
 
