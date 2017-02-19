@@ -1,19 +1,17 @@
-if [ -x /usr/bin/gnome-power-manager ] ; then
-   gnome-power-manager &
-fi
+mate-power-manager &
 
-unity-settings-daemon &
+mate-settings-daemon &
 
 nm-applet &
-feh --bg-scale ~/.xmonad/Wallpaper.jpg &
 
-setxkbmap -option ctrl:swapcaps
-xmodmap -e "keycode 37 ="
+setxkbmap -option ctrl:nocaps
 
 synclient AreaBottomEdge=1600
 synclient AreaTopEdge=400
 synclient AreaLeftEdge=700
 synclient AreaRightEdge=3350
+
+xinput --set-prop 14 "Synaptics Finger" 25 60 0
 
 xbacklight -set 25
 

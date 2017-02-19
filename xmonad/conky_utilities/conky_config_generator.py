@@ -145,7 +145,7 @@ def battery_init():
 def battery():
     ret = " "
     ret += fg(color1)
-    ret += "${if_match \"${acpiacadapter}\" == \"on-line\"}"
+    ret += "${if_match \"${acpiacadapter ACAD}\" == \"on-line\"}"
     ret += bg(color_green) + " CHARGE "
     ret += "${else}"
     ret += bg(color_mild_red) + " BATTERY "
