@@ -1,9 +1,6 @@
-[submodule "dotbot"]
-	path = dotbot
-	url = https://github.com/anishathalye/dotbot
-[submodule "zsh_zprezto"]
-	path = zsh/zprezto
-	url = https://github.com/sorin-ionescu/prezto
-[submodule "emacs"]
-	path = emacs
+[submodule "emacs/.emacs.d"]
+	path = emacs/.emacs.d
 	url = https://github.com/syl20bnr/spacemacs.git
+[submodule "zsh/.zprezto"]
+	path = zsh/.zprezto
+	url = https://github.com/sorin-ionescu/prezto

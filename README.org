@@ -1,5 +1,5 @@
 * Dotfiles
-Common configurations across all the machines. Uses [[https://github.com/anishathalye/dotbot][dotbot]] for installation.
+Common configurations across all the machines. Uses GNU Stow for installation.
 
 ** Machine specific configurations
 *NOTE  to  future self*  -  Machine  specific configurations  aren't  publically
