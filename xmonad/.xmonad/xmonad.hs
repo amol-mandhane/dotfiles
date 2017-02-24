@@ -203,11 +203,11 @@ main = do
     dzenTop <- spawnPipe dzenTopLeftBarCommand
     dzenBottom <- spawnPipe dzenBottomLeftBarCommand
 
-    conkyTop <- spawnPipe conkyTopRightCommand
-    conkyBottom <- spawnPipe conkyBottomRightCommand
+    _ <- spawnPipe conkyTopRightCommand
+    _ <- spawnPipe conkyBottomRightCommand
 
-    trayer <- spawnPipe trayerCommand
-    startup <- spawnPipe "~/.xmonad/startup.sh"
+    _ <- spawnPipe trayerCommand
+    _ <- spawnPipe "~/.xmonad/startup.sh"
 
     X.xmonad $ EwmhDesktops.ewmh X.defaultConfig
         { X.terminal = "gnome-terminal"
