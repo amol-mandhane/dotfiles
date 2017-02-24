@@ -1,124 +1,229 @@
-import XMonad
-import XMonad.Hooks.DynamicLog
-import XMonad.Hooks.ManageDocks
-import XMonad.Hooks.EwmhDesktops
-import XMonad.Actions.CycleWindows
-import XMonad.Util.Run(spawnPipe)
-import XMonad.Util.EZConfig(additionalKeysP)
-import System.IO
-import XMonad.Layout.Spacing
-import XMonad.Layout.LayoutCombinators hiding ( (|||) )
-import XMonad.Layout.NoBorders
-import XMonad.Layout.Circle
-import XMonad.Layout.Grid
-import qualified XMonad.Layout.Magnifier as Magnifier
-import qualified Data.Map as Map
-import XMonad.Hooks.SetWMName
-import XMonad.Hooks.ICCCMFocus
-
-main = do
-    dzenTop <- spawnPipe myDzenTopBar
-    dzenBottom <- spawnPipe myDzenBottomBar
-    conkyTop <- spawnPipe myConkyTop
-    conkyBottom <- spawnPipe myConkyBottom
-
-    trayer <- spawnPipe myTrayer
-    startup <- spawnPipe "~/.xmonad/startup.sh"
-
-    xmonad $ ewmh defaultConfig
-        { terminal = "gnome-terminal"
-        , manageHook = myManageHook <+> manageDocks <+> manageHook defaultConfig
-        , layoutHook =  avoidStruts $ (myLayoutHook ||| layoutHook defaultConfig)
-        , logHook = do
-            takeTopFocus
-            myLogHook dzenTop dzenBottom
-        , modMask = mod4Mask     -- Rebind Mod to the Windows key
-        , workspaces = myWorkspaces
-        , focusFollowsMouse = False
-        , normalBorderColor  = "#888888"
-        , focusedBorderColor = "#008888"
-        , borderWidth = 1
-        , startupHook = setWMName "LG3D"
-        } `additionalKeysP` myKeys
-
+import qualified Data.Map                     as Map
+import qualified System.IO                    as SysIO
+import           Text.Printf                  (printf)
+import qualified XMonad                       as X
+import qualified XMonad.Actions.CycleWindows  as CycleWindows
+import qualified XMonad.Hooks.DynamicLog      as DLog
+import qualified XMonad.Hooks.EwmhDesktops    as EwmhDesktops
+import qualified XMonad.Hooks.ManageDocks     as ManageDocks
+import qualified XMonad.Hooks.SetWMName       as SetWMName
+import qualified XMonad.Layout.Circle         as LayoutCircle
+import qualified XMonad.Layout.Grid           as LayoutGrid
+import qualified XMonad.Layout.LayoutModifier as LayoutModifier
+import qualified XMonad.Layout.Magnifier      as LayoutMagnifier
+import qualified XMonad.Layout.NoBorders      as LayoutNoBorders
+import qualified XMonad.Layout.Spacing        as LayoutSpacing
+import           XMonad.Util.EZConfig         (additionalKeysP)
+import           XMonad.Util.Run              (spawnPipe)
+import qualified XMonadConfig                 as XMonadConfig
 
 -- Colors
+darkBlack :: String
+lightBlue :: String
+midBlue :: String
+fgGray :: String
+midGray :: String
+darkGray :: String
+lightGreen :: String
+
 darkBlack  = "#020202"
 lightBlue  = "#44AACC"
+midBlue = "#008888"
 fgGray     = "#9D9D9D"
-midGray    = "#444444"
+midGray    = "#888888"
 darkGray   = "#101010"
 lightGreen = "#66FF66"
 
+
+-- Display bars config
+-- Trayer
+trayerCommand :: String
+trayerCommand = "trayer " ++
+  "--edge top --align right " ++
+  "--SetDockType true --SetPartialStrut true --expand true " ++
+  "--transparent true --alpha 0 --tint 0x020202 " ++
+  "--width 11 --height 16"
+
+dzenFont :: Int -> String
 dzenFont sz = "Clean:size=" ++ (show sz)
 
-myTrayer = "trayer --edge top --align right --SetDockType true --SetPartialStrut true --expand true --width 11 --transparent true --alpha 0 --tint 0x020202 --height 16"
+-- Dzen
+dzenBarStyle :: String
+dzenBarStyle = " -e 'button2=;' " ++
+  (printf "-h '%d' " XMonadConfig.dzenBarHeight) ++
+  (printf "-fg '%s' " fgGray) ++
+  (printf "-bg '%s' " darkBlack) ++
+  (printf "-fn '%s' " $ dzenFont 10)
 
+dzenTopLeftBarCommand :: String
+dzenTopLeftBarCommand = printf format width dzenBarStyle
+  where
+    format = "dzen2 -w '%d' -ta 'l' %s"
+    width = XMonadConfig.dzenTopLeftBarWidth
 
-myDzenStyle  = " -e 'button2=;' -h '16' -fg '" ++ fgGray ++ "' -bg '" ++ darkBlack ++ "' -fn '" ++ dzenFont 10 ++ "'"
-myDzenTopBar = "dzen2 -w '850' -ta 'l'" ++ myDzenStyle
-myDzenBottomBar = "dzen2 -y '752' -w '400' -ta 'l'" ++ myDzenStyle
+dzenBottomLeftBarCommand :: String
+dzenBottomLeftBarCommand = printf format topOffset width dzenBarStyle
+  where
+    format = "dzen2 -y '%d' -w '%d' -ta 'l' %s"
+    width = XMonadConfig.dzenBottomLeftBarWidth
+    topOffset = XMonadConfig.screenHeight - XMonadConfig.dzenBarHeight
 
-myConkyTop = "conky -c ~/.xmonad/conky_utilities/conky_top_rc | dzen2 -x '850' -w '366' -ta 'r'" ++ myDzenStyle
-myConkyBottom = "conky -c ~/.xmonad/conky_utilities/conky_bottom_rc | dzen2 -y '1184' -x '400' -w '966' -ta 'r'" ++ myDzenStyle
+-- Additional dzen bars with conky information
+conkyTopRightCommand :: String
+conkyTopRightCommand = "conky -c ~/.xmonad/conky/conky_top_rc | " ++ dzenPipe
+  where
+    horizontalOffset = XMonadConfig.dzenTopLeftBarWidth
+    width =
+      XMonadConfig.screenWidth
+        - horizontalOffset
+        - XMonadConfig.trayerEstimatedWidth
+    dzenPipe =
+      printf
+        "dzen2 -x '%d' -w '%d' -ta 'r' %s"
+         horizontalOffset
+         width
+         dzenBarStyle
 
-myWorkspacesImg = [
-    "^i(.xmonad/dzen2_icons/workspaces/web.xbm)",
-    "^i(.xmonad/dzen2_icons/workspaces/term.xbm)",
-    "^i(.xmonad/dzen2_icons/workspaces/dev.xbm)",
-    "^i(.xmonad/dzen2_icons/workspaces/main.xbm)",
-    "^i(.xmonad/dzen2_icons/workspaces/media.xbm)",
-    "^i(.xmonad/dzen2_icons/workspaces/browse.xbm)",
-    "^i(.xmonad/dzen2_icons/workspaces/apps.xbm)",
-    "^i(.xmonad/dzen2_icons/workspaces/misc.xbm)",
-    "^i(.xmonad/dzen2_icons/workspaces/extra.xbm)"]
+conkyBottomRightCommand :: String
+conkyBottomRightCommand =
+  "conky -c ~/.xmonad/conky/conky_bottom_rc | " ++ dzenPipe
+  where
+    horizontalOffset = XMonadConfig.dzenBottomLeftBarWidth
+    verticalOffset = XMonadConfig.screenHeight - XMonadConfig.dzenBarHeight
+    width = XMonadConfig.screenWidth - horizontalOffset
+    dzenPipe =
+      printf
+        "dzen2 -x '%d' -y '%d' -w '%d' -ta 'r' %s"
+        horizontalOffset
+        verticalOffset
+        width
+        dzenBarStyle
 
-myWorkspaces = ["^ca(1, xdotool key super+" ++ (show i) ++ ")" ++ s ++ "^ca()" | (s, i) <- zip myWorkspacesImg [1..9]]
+-- Workspace config
+workspaceBitmapIcons :: [String]
+workspaceBitmapIcons = [
+    ".xmonad/dzen2_icons/workspaces/web.xbm",
+    ".xmonad/dzen2_icons/workspaces/term.xbm",
+    ".xmonad/dzen2_icons/workspaces/dev.xbm",
+    ".xmonad/dzen2_icons/workspaces/main.xbm",
+    ".xmonad/dzen2_icons/workspaces/media.xbm",
+    ".xmonad/dzen2_icons/workspaces/browse.xbm",
+    ".xmonad/dzen2_icons/workspaces/apps.xbm",
+    ".xmonad/dzen2_icons/workspaces/misc.xbm",
+    ".xmonad/dzen2_icons/workspaces/extra.xbm"]
 
-myManageHook = composeAll . concat $
-   [ [ className =? "Firefox"             --> doShift (myWorkspaces !! 0) ]
-    , [ className =? "Google-chrome"      --> doShift (myWorkspaces !! 0) ]
-    , [ className =? "smplayer"           --> doShift (myWorkspaces !! 4) ]
-    , [ className =? "mpv"                --> doShift (myWorkspaces !! 4) ]
-    , [ className =? "Nautilus"           --> doShift (myWorkspaces !! 5) ]
-    , [ className =? "Nemo"               --> doShift (myWorkspaces !! 5) ]
-    , [ className =? "Gimp"               --> doFloat ]]
+workspaceList :: [String]
+workspaceList = ["^i(" ++ icon ++ ")"| icon <- workspaceBitmapIcons]
 
-customTile = (Tall 1 (2/100) (2/3))
-magnify = Magnifier.magnifiercz 1.0
+-- Move specific windows to their workspaces automatically
+windowShiftSpec :: String -> Int -> X.ManageHook
+windowShiftSpec className workspaceId =
+  X.className X.=? className X.-->
+    X.doShift (workspaceList !! workspaceId)
 
-myLayoutHook = smartBorders $ smartSpacing 5 $ (customTile ||| Mirror customTile ||| Full ||| magnify Circle ||| magnify Grid)
+windowRelocatorManageHook :: X.ManageHook
+windowRelocatorManageHook = X.composeAll [
+  windowShiftSpec "Firefox"       0,
+  windowShiftSpec "Google-chrome" 0,
+  windowShiftSpec "smplayer"      4,
+  windowShiftSpec "mpv"           4,
+  windowShiftSpec "Nautilus"      5,
+  windowShiftSpec "Nemo"          5,
+  X.className X.=? "Gimp" X.--> X.doFloat
+  ]
 
-myTopDzenPP  = dzenPP {
-    ppCurrent = dzenColor darkBlack lightBlue . wrap " " " ",
-    ppHidden  = dzenColor darkGray fgGray. wrap " " " ",
-    ppHiddenNoWindows = dzenColor darkBlack darkGray . wrap " " " ",
-    ppUrgent  = dzenColor darkBlack lightGreen . wrap " " " ",
+-- Layout management
+twoThirdRatioTiling :: X.Tall a
+twoThirdRatioTiling = X.Tall 1 (2/100) (2/3)
 
-    ppSep     = "^fn(" ++ dzenFont 5 ++ ") ^fn(" ++ dzenFont 10 ++ ")",
+magnify :: l a -> LayoutModifier.ModifiedLayout LayoutMagnifier.Magnifier l a
+magnify = LayoutMagnifier.magnifiercz 1.0
 
-    ppTitle   = dzenColor darkGray fgGray . wrap "  " "  ",
+customLayouts =
+  LayoutNoBorders.smartBorders $
+    LayoutSpacing.smartSpacing 5 $
+      (twoThirdRatioTiling X.|||
+       X.Mirror twoThirdRatioTiling X.|||
+       X.Full X.|||
+       magnify LayoutCircle.Circle X.|||
+       magnify LayoutGrid.Grid)
 
-    ppOrder   = \(ws:_:t:_) -> [ws, t]
+-- Dzen XMonad log bars format config
+dzenTopLog :: DLog.PP
+dzenTopLog  = DLog.dzenPP {
+  DLog.ppCurrent = (DLog.dzenColor darkBlack lightBlue).(DLog.wrap " " " "),
+  DLog.ppHidden  = (DLog.dzenColor darkGray fgGray). (DLog.wrap " " " "),
+
+  DLog.ppHiddenNoWindows = (DLog.dzenColor darkBlack darkGray).(DLog.wrap " " " "),
+  DLog.ppUrgent  = (DLog.dzenColor darkBlack lightGreen).(DLog.wrap " " " "),
+
+  DLog.ppSep     = "^fn(" ++ dzenFont 5 ++ ") ^fn(" ++ dzenFont 10 ++ ")",
+
+  DLog.ppTitle   = (DLog.dzenColor darkGray fgGray) . (DLog.wrap "  " "  "),
+
+  DLog.ppOrder   = \(ws:_:t:_) -> [ws, t]
 }
 
-myBottomDzenPP = dzenPP {
-    ppLayout  = dzenColor fgGray darkGray . wrap " " " ",
-    ppSep     = "^fn(" ++ dzenFont 5 ++ ") ^fn(" ++ dzenFont 10 ++ ")",
-    ppOrder = \(_:l:_:w) -> l:w
+dzenBottomLog :: DLog.PP
+dzenBottomLog = DLog.dzenPP {
+    DLog.ppLayout  = (DLog.dzenColor fgGray darkGray) . (DLog.wrap " " " "),
+    DLog.ppSep     = "^fn(" ++ dzenFont 5 ++ ") ^fn(" ++ dzenFont 10 ++ ")",
+    DLog.ppOrder = \(_:l:_:w) -> l:w
 }
 
-myLogHook top bottom = do
-    dynamicLogWithPP $ myTopDzenPP { ppOutput = hPutStrLn top }
-    dynamicLogWithPP $ myBottomDzenPP { ppOutput = hPutStrLn bottom }
+dzenLogHook :: SysIO.Handle -> SysIO.Handle -> X.X ()
+dzenLogHook top bottom = do
+    DLog.dynamicLogWithPP $ dzenTopLog { DLog.ppOutput = SysIO.hPutStrLn top }
+    DLog.dynamicLogWithPP $ dzenBottomLog { DLog.ppOutput = SysIO.hPutStrLn bottom }
 
-myKeys = [("M1-<Tab>"   , cycleRecentWindows [xK_Alt_L] xK_Tab xK_Tab ) -- classic alt-tab behaviour
-         , ("M-<Return>" , spawn "dmenu_run -b" ) -- app launcher
-         , ("M-e"        , spawn "nemo --no-desktop" ) -- launch file manager
-         , ("C-M1-l"     , spawn "~/.xmonad/lock.sh" ) -- lock screen
-         , ("M-S--", sendMessage Magnifier.MagnifyLess )
-         , ("M-S-=", sendMessage Magnifier.MagnifyMore )
-         , ("<XF86AudioMute>", spawn "amixer -q sset Master toggle")
-         , ("<XF86AudioRaiseVolume>", spawn "amixer -q sset Master 2%+")
-         , ("<XF86AudioLowerVolume>", spawn "amixer -q sset Master 2%-")
-         ]
+-- Shortcuts
+customKeymap :: [(String, X.X())]
+customKeymap = [
+  -- Alt-TAB
+  ("M1-<Tab>", CycleWindows.cycleRecentWindows [X.xK_Alt_L] X.xK_Tab X.xK_Tab),
+  -- Dmenu on S-RET
+  ("M-<Return>", X.spawn "dmenu_run -b"),
+  -- S-e file browser
+  ("M-e", X.spawn "nemo --no-desktop" ),
+  -- Ctrl-Alt-L lock screen
+  ("C-M1-l"     , X.spawn "~/.xmonad/lock.sh"),
+
+  -- S-Shift-+\- Magnifier
+  ("M-S--", X.sendMessage LayoutMagnifier.MagnifyLess),
+  ("M-S-=", X.sendMessage LayoutMagnifier.MagnifyMore),
+
+  -- Keyboard Volume buttons
+  ("<XF86AudioMute>", X.spawn "amixer -q sset Master toggle"),
+  ("<XF86AudioRaiseVolume>", X.spawn "amixer -q sset Master 1%+"),
+  ("<XF86AudioLowerVolume>", X.spawn "amixer -q sset Master 1%-")
+  ]
+
+main :: IO ()
+main = do
+    dzenTop <- spawnPipe dzenTopLeftBarCommand
+    dzenBottom <- spawnPipe dzenBottomLeftBarCommand
+
+    conkyTop <- spawnPipe conkyTopRightCommand
+    conkyBottom <- spawnPipe conkyBottomRightCommand
+
+    trayer <- spawnPipe trayerCommand
+    startup <- spawnPipe "~/.xmonad/startup.sh"
+
+    X.xmonad $ EwmhDesktops.ewmh X.defaultConfig
+        { X.terminal = "gnome-terminal"
+        , X.manageHook =
+            windowRelocatorManageHook X.<+>
+            ManageDocks.manageDocks X.<+>
+            X.manageHook X.defaultConfig
+        , X.layoutHook =
+            ManageDocks.avoidStruts $
+            (customLayouts X.||| X.layoutHook X.defaultConfig)
+        , X.logHook = dzenLogHook dzenTop dzenBottom
+        , X.modMask = X.mod4Mask     -- Rebind Mod to the Windows key
+        , X.workspaces = workspaceList
+        , X.focusFollowsMouse = False
+        , X.normalBorderColor  = midGray
+        , X.focusedBorderColor = midBlue
+        , X.borderWidth = 1
+        , X.startupHook = SetWMName.setWMName "LG3D"
+        } `additionalKeysP` customKeymap

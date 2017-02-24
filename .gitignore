@@ -7,6 +7,8 @@ xmonad/.xmonad/xmonad*
 xmonad/.xmonad/conky_utilities/tomorrow_badge.py
 
 *.pyc
+*.o
+*.hi
 
 vim/.vim/bundle/
 .netrwhist

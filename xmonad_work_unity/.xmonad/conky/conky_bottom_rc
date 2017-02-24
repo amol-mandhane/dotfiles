@@ -1,0 +1,33 @@
+background no
+out_to_console yes
+out_to_x no
+update_interval 1.0
+total_run_times 0
+use_spacer left
+pad_percents 2
+short_units yes
+
+
+TEXT
+ ^bg(\#101010)^fg(\#444444) VOLUME ^fg(\#44AACC) ${exec amixer get Master | grep "%" | head -n 1 | cut -d' ' -f7,8 | tr -d '[]'} ^bg(\#020202)^fg(\#444444)\
+\
+ ^bg(\#101010)^fg(\#444444) CPU \
+ ${if_match ${cpu cpu1} >= 50}^bg(\#FF0000)^fg(\#020202) ${else}${if_match ${cpu cpu1} >= 20}^fg(\#FFD727)${else}^fg(\#44AACC)${endif}${endif}${cpu cpu1} ^bg(\#101010)^fg(\#444444)\
+${if_match ${cpu cpu2} >= 50}^bg(\#FF0000)^fg(\#020202) ${else}${if_match ${cpu cpu2} >= 20}^fg(\#FFD727)${else}^fg(\#44AACC)${endif}${endif}${cpu cpu2} ^bg(\#101010)^fg(\#444444)\
+${if_match ${cpu cpu3} >= 50}^bg(\#FF0000)^fg(\#020202) ${else}${if_match ${cpu cpu3} >= 20}^fg(\#FFD727)${else}^fg(\#44AACC)${endif}${endif}${cpu cpu3} ^bg(\#101010)^fg(\#444444)\
+${if_match ${cpu cpu4} >= 50}^bg(\#FF0000)^fg(\#020202) ${else}${if_match ${cpu cpu4} >= 20}^fg(\#FFD727)${else}^fg(\#44AACC)${endif}${endif}${cpu cpu4} ^bg(\#101010)^fg(\#444444)\
+${if_match ${cpu cpu5} >= 50}^bg(\#FF0000)^fg(\#020202) ${else}${if_match ${cpu cpu5} >= 20}^fg(\#FFD727)${else}^fg(\#44AACC)${endif}${endif}${cpu cpu5} ^bg(\#101010)^fg(\#444444)\
+${if_match ${cpu cpu6} >= 50}^bg(\#FF0000)^fg(\#020202) ${else}${if_match ${cpu cpu6} >= 20}^fg(\#FFD727)${else}^fg(\#44AACC)${endif}${endif}${cpu cpu6} ^bg(\#101010)^fg(\#444444)\
+${if_match ${cpu cpu7} >= 50}^bg(\#FF0000)^fg(\#020202) ${else}${if_match ${cpu cpu7} >= 20}^fg(\#FFD727)${else}^fg(\#44AACC)${endif}${endif}${cpu cpu7} ^bg(\#101010)^fg(\#444444)\
+${if_match ${cpu cpu8} >= 50}^bg(\#FF0000)^fg(\#020202) ${else}${if_match ${cpu cpu8} >= 20}^fg(\#FFD727)${else}^fg(\#44AACC)${endif}${endif}${cpu cpu8} ^bg(\#101010)^fg(\#444444)\
+${if_match ${cpu cpu9} >= 50}^bg(\#FF0000)^fg(\#020202) ${else}${if_match ${cpu cpu9} >= 20}^fg(\#FFD727)${else}^fg(\#44AACC)${endif}${endif}${cpu cpu9} ^bg(\#101010)^fg(\#444444)\
+${if_match ${cpu cpu10} >= 50}^bg(\#FF0000)^fg(\#020202) ${else}${if_match ${cpu cpu10} >= 20}^fg(\#FFD727)${else}^fg(\#44AACC)${endif}${endif}${cpu cpu10} ^bg(\#101010)^fg(\#444444)\
+${if_match ${cpu cpu11} >= 50}^bg(\#FF0000)^fg(\#020202) ${else}${if_match ${cpu cpu11} >= 20}^fg(\#FFD727)${else}^fg(\#44AACC)${endif}${endif}${cpu cpu11} ^bg(\#101010)^fg(\#444444)\
+${if_match ${cpu cpu12} >= 50}^bg(\#FF0000)^fg(\#020202) ${else}${if_match ${cpu cpu12} >= 20}^fg(\#FFD727)${else}^fg(\#44AACC)${endif}${endif}${cpu cpu12} ^bg(\#101010)^fg(\#444444)\
+^fg(\#444444)^bg(\#020202)\
+\
+ ^bg(\#101010)^fg(\#444444) MEM ${if_match ${memperc} >= 60}^bg(\#FF0000)^fg(\#020202) ${else}${if_match ${memperc} >= 40}^fg(\#FFD727)${else}^fg(\#44AACC)${endif}${endif}${memperc}% ${mem} ^bg(\#020202)^fg(\#444444)\
+\
+ ^bg(\#101010)^fg(\#444444) SWAP ${if_match ${swapperc} >= 10}^bg(\#FF0000)^fg(\#020202) ${else}${if_match ${swapperc} >= 2}^fg(\#FFD727)${else}^fg(\#44AACC)${endif}${endif}${swapperc}% ^bg(\#020202)^fg(\#444444)\
+\
+
