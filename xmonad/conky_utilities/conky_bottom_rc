@@ -39,5 +39,5 @@ ${if_match ${template4} >= 50}^bg(\#FF0000)^fg(\#020202) ${else}${if_match ${tem
 \
  ^bg(\#101010)^fg(\#444444) SWAP ${if_match ${template7} >= 10}^bg(\#FF0000)^fg(\#020202) ${else}${if_match ${template7} >= 2}^fg(\#FFD727)${else}^fg(\#44AACC)${endif}${endif}${template7}% ^bg(\#020202)^fg(\#444444)\
 \
- ^fg(\#020202)${if_match "${acpiacadapter}" == "on-line"}^bg(\#66FF66) CHARGE ${else}^bg(\#FF6666) BATTERY ${endif}^bg(\#101010)${if_match ${template8} >= 75}^fg(\#66FF66)${else}${if_match ${template8} > 25}^fg(\#44AACC)${else}^bg(\#FF0000)^fg(\#020202)${endif}${endif} ${template8}% ^bg(\#020202)^fg(\#444444)\
+ ^fg(\#020202)${if_match "${acpiacadapter ACAD}" == "on-line"}^bg(\#66FF66) CHARGE ${else}^bg(\#FF6666) BATTERY ${endif}^bg(\#101010)${if_match ${template8} >= 75}^fg(\#66FF66)${else}${if_match ${template8} > 25}^fg(\#44AACC)${else}^bg(\#FF0000)^fg(\#020202)${endif}${endif} ${template8}% ^bg(\#020202)^fg(\#444444)\
 \
