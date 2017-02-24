@@ -8,7 +8,7 @@ fi
 trap "rm -f ${LOCKFILE}; exit" INT TERM EXIT
 echo $$ > ${LOCKFILE}
 
-(python /home/amol/.xmonad/conky_utilities/dzen_calendar.py; sleep 5) | dzen2 \
+(python ~/.xmonad/conky_utilities/dzen_calendar.py; sleep 5) | dzen2 \
 -e 'onstart=uncollapse;button1=exit;button3=exit;button2=exit' \
 -x "904" -y "20" -w "420" -l "16" -sa 'l' -ta 'l' \
 -fg '#BBBBBB' \

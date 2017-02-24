@@ -200,7 +200,7 @@ def timestamp_init():
 def timestamp():
     ret = " "
     ret += bg(color3) + fg(color1)
-    ret += "^ca(1,/home/amol/.xmonad/conky_utilities/calendar.sh) " +\
+    ret += "^ca(1,~/.xmonad/conky_utilities/calendar.sh) " +\
         "${time %a %b %d %Y %l:%M:%S %p} ^ca()"
     ret += bg() + fg() + "\\\n\\"
     return ret
@@ -215,7 +215,7 @@ def time():
     ret += bg(color3) + fg(color1)
     ret += " ${time %A} "
     ret += bg() + " " + bg(color5) + fg(color3)
-    ret += "^ca(1,/home/amol/.xmonad/conky_utilities/calendar.sh) "
+    ret += "^ca(1,~/.xmonad/conky_utilities/calendar.sh) "
     ret += "${time %Y.%m.}"
     ret += fg(color2)
     ret += "${time %d} ^ca()"
