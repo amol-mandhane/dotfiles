@@ -28,7 +28,7 @@ lightGreen :: String
 
 darkBlack  = "#020202"
 lightBlue  = "#44AACC"
-midBlue = "#008888"
+midBlue    = "#008888"
 fgGray     = "#9D9D9D"
 midGray    = "#888888"
 darkGray   = "#101010"
@@ -45,7 +45,7 @@ trayerCommand = "trayer " ++
   "--width 11 --height 16"
 
 dzenFont :: Int -> String
-dzenFont sz = "Clean:size=" ++ (show sz)
+dzenFont sz = "M+1m:Light:size=" ++ (show sz)
 
 -- Dzen
 dzenBarStyle :: String
@@ -53,7 +53,7 @@ dzenBarStyle = " -e 'button2=;' " ++
   (printf "-h '%d' " XMonadConfig.dzenBarHeight) ++
   (printf "-fg '%s' " fgGray) ++
   (printf "-bg '%s' " darkBlack) ++
-  (printf "-fn '%s' " $ dzenFont 10)
+  (printf "-fn '%s' " $ dzenFont 9)
 
 dzenTopLeftBarCommand :: String
 dzenTopLeftBarCommand = printf format width dzenBarStyle
