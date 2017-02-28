@@ -99,21 +99,8 @@ conkyBottomRightCommand =
         width
         dzenBarStyle
 
--- Workspace config
-workspaceBitmapIcons :: [String]
-workspaceBitmapIcons = [
-    ".xmonad/dzen2_icons/workspaces/web.xbm",
-    ".xmonad/dzen2_icons/workspaces/term.xbm",
-    ".xmonad/dzen2_icons/workspaces/dev.xbm",
-    ".xmonad/dzen2_icons/workspaces/main.xbm",
-    ".xmonad/dzen2_icons/workspaces/media.xbm",
-    ".xmonad/dzen2_icons/workspaces/browse.xbm",
-    ".xmonad/dzen2_icons/workspaces/apps.xbm",
-    ".xmonad/dzen2_icons/workspaces/misc.xbm",
-    ".xmonad/dzen2_icons/workspaces/extra.xbm"]
-
 workspaceList :: [String]
-workspaceList = ["^i(" ++ icon ++ ")"| icon <- workspaceBitmapIcons]
+workspaceList = ["WEB", "EMACS", "TERM", "MISC", "VID", "FILE", "7", "8", "9"]
 
 -- Move specific windows to their workspaces automatically
 windowShiftSpec :: String -> Int -> X.ManageHook
