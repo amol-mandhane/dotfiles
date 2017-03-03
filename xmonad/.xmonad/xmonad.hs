@@ -45,7 +45,7 @@ trayerCommand = "trayer " ++
   "--width 11 --height 16"
 
 dzenFont :: Int -> String
-dzenFont sz = "M+1m:Light:size=" ++ (show sz)
+dzenFont sz = "M+1m:size=" ++ (show sz)
 
 -- Dzen
 dzenBarStyle :: String
