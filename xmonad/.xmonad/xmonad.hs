@@ -171,8 +171,8 @@ customKeymap = [
   ("M1-<Tab>", CycleWindows.cycleRecentWindows [X.xK_Alt_L] X.xK_Tab X.xK_Tab),
   -- Dmenu on S-RET
   ("M-<Return>", X.spawn "dmenu_run -b"),
-  -- S-e file browser
-  ("M-e", X.spawn "nemo --no-desktop" ),
+  -- S-f file browser
+  ("M-f", X.spawn "nemo --no-desktop" ),
   -- Ctrl-Alt-L lock screen
   ("C-M1-l"     , X.spawn "~/.xmonad/lock.sh"),
 
