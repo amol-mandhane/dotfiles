@@ -4,14 +4,14 @@ module XMonadConfig (
   dzenBarHeight,
   dzenTopLeftBarWidth,
   dzenBottomLeftBarWidth,
-  trayerEstimatedWidth,
+  trayerWidthPixel,
 ) where
 
 screenWidth :: Int
-screenWidth = 1920
+screenWidth = 2560
 
 screenHeight :: Int
-screenHeight = 1200
+screenHeight = 1440
 
 dzenBarHeight :: Int
 dzenBarHeight = 16
@@ -22,5 +22,5 @@ dzenTopLeftBarWidth = 1240
 dzenBottomLeftBarWidth :: Int
 dzenBottomLeftBarWidth = 400
 
-trayerEstimatedWidth :: Int
-trayerEstimatedWidth = 210
+trayerWidthPixel :: Int
+trayerWidthPixel = 128

@@ -42,7 +42,8 @@ trayerCommand = "trayer " ++
   "--edge top --align right " ++
   "--SetDockType true --SetPartialStrut true --expand true " ++
   "--transparent true --alpha 0 --tint 0x020202 " ++
-  "--width 11 --height 16"
+  "--widthtype pixel --width " ++ (show XMonadConfig.trayerWidthPixel) ++
+  " --height 16"
 
 dzenFont :: Int -> String
 dzenFont sz = "M+1m:size=" ++ (show sz)
@@ -76,7 +77,7 @@ conkyTopRightCommand = "conky -c ~/.xmonad/conky/conky_top_rc | " ++ dzenPipe
     width =
       XMonadConfig.screenWidth
         - horizontalOffset
-        - XMonadConfig.trayerEstimatedWidth
+        - XMonadConfig.trayerWidthPixel
     dzenPipe =
       printf
         "dzen2 -x '%d' -w '%d' -ta 'r' %s"
