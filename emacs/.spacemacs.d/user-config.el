@@ -44,6 +44,8 @@
 
 (add-hook 'java-mode-hook (lambda () (setq fill-column 100)))
 
+(add-to-list 'flycheck-ghc-search-path (expand-file-name "~/.xmonad/lib"))
+
 (setq org-agenda-files '("~/org-plan"))
 
 (add-to-list 'auto-mode-alist '("\\.org.text\\'" . org-mode))

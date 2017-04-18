@@ -132,9 +132,7 @@ Java has big words. Use 100 character limit.
 * Haskell
 Using XMonad's custom config file.
 #+BEGIN_SRC emacs-lisp
-  (add-hook 'haskell-mode
-            (lambda ()
-              (setq flycheck-ghc-search-path '((expand-file-name "~/.xmonad/lib")))))
+(add-to-list 'flycheck-ghc-search-path (expand-file-name "~/.xmonad/lib"))
 #+END_SRC
 * Org mode
 ** Agenda
