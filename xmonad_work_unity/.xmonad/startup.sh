@@ -1,4 +1,4 @@
-unity-settings-daemon &
+xsettingsd &
 
 nm-applet &
 feh --bg-scale ~/.xmonad/Wallpaper.jpg &
