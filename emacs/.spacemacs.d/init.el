@@ -12,8 +12,7 @@
    dotspacemacs-configuration-layers
    '(
      (auto-completion :variables
-                      auto-completion-enable-help-tooltip t
-                      auto-completion-enable-snippets-in-popup t)
+                      auto-completion-enable-help-tooltip t)
      (c-c++ :variables
             c-c++-default-mode-for-headers 'c++-mode
             c-c++-enable-clang-support t)

@@ -214,4 +214,6 @@ main = do
         , X.focusedBorderColor = midBlue
         , X.borderWidth = 1
         , X.startupHook = SetWMName.setWMName "LG3D"
+        -- For some applications LG3D doesn't work. To fix,
+        -- export _JAVA_AWT_WM_NONREPARENTING=1
         } `additionalKeysP` customKeymap

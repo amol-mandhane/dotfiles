@@ -2,8 +2,8 @@ zstyle ':prezto:*:*' color 'yes'
 
 zstyle ':prezto:load' pmodule \
   'environment' \
+  'command-not-found' \
   'autosuggestions' \
-  'emacs' \
   'history' \
   'utility' \
   'completion' \
