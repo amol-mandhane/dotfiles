@@ -12,3 +12,13 @@ xmonad/.xmonad/conky_utilities/tomorrow_badge.py
 
 vim/.vim/bundle/
 .netrwhist
+
+# Emacs
+# Emacs generates a bunch of files in .emacs.d directory which do not need
+# to be tracked. Instead of blacklisting all of them, whitelist selected
+# config files.
+emacs.wip/.emacs.d/*
+!emacs.wip/.emacs.d/lisp/*.el
+!emacs.wip/init.el
+!emacs.wip/.emacs.d/config.el
+!emacs.wip/.emacs.d/config.org
