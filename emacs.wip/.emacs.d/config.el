@@ -5,7 +5,7 @@
 (require 'package)
 (package-initialize)
 (setq package-archives '(("gnu" . "https://elpa.gnu.org/packages/")
-                         ("marmalade" . "http://marmalade-repo.org/packages/")
+                         ;; ("marmalade" . "http://marmalade-repo.org/packages/")
                          ("melpa" . "https://melpa.org/packages/")
                          ("org" . "http://orgmode.org/elpa/")))
 
@@ -15,72 +15,7 @@
 
 (add-to-list 'load-path (expand-file-name "~/.emacs.d/lisp"))
 
-(setq delete-old-versions -1 )          ; delete excess backup versions silently
-(setq version-control t )               ; use version control
-(setq vc-make-backup-files t )          ; make backups file even when in version controlled dir
-(setq backup-directory-alist `(("." . "~/.emacs.d/backups")) ) ; which directory to put backups file
-(setq vc-follow-symlinks t )                                   ; don't ask for confirmation when opening symlinked file
-(setq auto-save-file-name-transforms '((".*" "~/.emacs.d/auto-save-list/" t)) ) ;transform backups file name
-(setq inhibit-startup-screen t )        ; inhibit useless and old-school startup screen
-(setq ring-bell-function 'ignore )      ; silent bell when you make a mistake
-(setq coding-system-for-read 'utf-8 )   ; use utf-8 by default
-(setq coding-system-for-write 'utf-8 )
-(setq sentence-end-double-space nil)    ; sentence SHOULD end with only a point.
-(setq default-fill-column 80)           ; toggle wrapping text at the 80th character
-(setq initial-scratch-message "Welcome in Emacs") ; print a default message in the empty scratch buffer opened at startup
-
-(scroll-bar-mode -1)
-(tool-bar-mode -1)
-
-(global-linum-mode t)
-
-(line-number-mode t)
-(column-number-mode t)
-(size-indication-mode t)
-(global-hl-line-mode t)
-
-(defalias 'yes-or-no-p 'y-or-n-p)
-(global-auto-revert-mode t)
-
-(setq ns-use-srgb-colorspace nil)
-
-(setq require-final-newline t)
-
-(set-default-font "Inconsolata-16")
-
-(setq cursor-type 'bar)
-
-(add-hook 'before-save-hook 'delete-trailing-whitespace)
-
-(use-package which-key
-  :ensure t
-  :diminish which-key-mode
-  :init (which-key-mode t)
-  :config
-    (setq which-key-sort-order 'which-key-key-order-alpha
-      which-key-side-window-max-width 0.33
-      which-key-idle-delay 0.05))
-
-(use-package zenburn-theme
-  :ensure t
-  :init (load-theme 'zenburn t))
-
-(use-package company
-  :ensure t
-  :diminish (company-mode . " Ξ")
-  :init (global-company-mode t))
-
-; (use-package spaceline
-;   :ensure t
-;   :config
-;     (require 'spaceline-config)
-;     (spaceline-emacs-theme))
-
-(use-package smart-mode-line
-  :ensure t
-  :config
-    (sml/setup))
-
+(global-unset-key (kbd "C-."))
 (require 'keybinding)
 
 (use-package smex
@@ -139,10 +74,83 @@
       ("C-c M-x" . execute-extended-command)
       ("C-x C-f" . counsel-find-file))))
 
+(setq delete-old-versions -1 )          ; delete excess backup versions silently
+(setq version-control t )               ; use version control
+(setq vc-make-backup-files t )          ; make backups file even when in version controlled dir
+(setq backup-directory-alist `(("." . "~/.emacs.d/backups")) ) ; which directory to put backups file
+(setq vc-follow-symlinks t )                                   ; don't ask for confirmation when opening symlinked file
+(setq auto-save-file-name-transforms '((".*" "~/.emacs.d/auto-save-list/" t)) ) ;transform backups file name
+(setq inhibit-startup-screen t )        ; inhibit useless and old-school startup screen
+(setq ring-bell-function 'ignore )      ; silent bell when you make a mistake
+(setq coding-system-for-read 'utf-8 )   ; use utf-8 by default
+(setq coding-system-for-write 'utf-8 )
+(setq sentence-end-double-space nil)    ; sentence SHOULD end with only a point.
+(setq default-fill-column 80)           ; toggle wrapping text at the 80th character
+(setq initial-scratch-message "Welcome in Emacs") ; print a default message in the empty scratch buffer opened at startup
+
+(scroll-bar-mode -1)
+(tool-bar-mode -1)
+
+(global-linum-mode t)
+
+(line-number-mode t)
+(column-number-mode t)
+(size-indication-mode t)
+(global-hl-line-mode t)
+
+(defalias 'yes-or-no-p 'y-or-n-p)
+(global-auto-revert-mode t)
+
+(setq ns-use-srgb-colorspace nil)
+
+(setq require-final-newline t)
+
+(set-default-font "Inconsolata-16")
+
+(setq cursor-type 'bar)
+(blink-cursor-mode 0)
+
+(add-hook 'before-save-hook 'delete-trailing-whitespace)
+
+(use-package which-key
+  :ensure t
+  :diminish which-key-mode
+  :init (which-key-mode t)
+  :config
+    (setq which-key-sort-order 'which-key-key-order-alpha
+      which-key-side-window-max-width 0.33
+      which-key-idle-delay 0.05))
+
+(use-package zenburn-theme
+  :ensure t
+  :init (load-theme 'zenburn t))
+
+(use-package company
+  :ensure t
+  :diminish (company-mode . " Ξ")
+  :init (global-company-mode t))
+
+; (use-package spaceline
+;   :ensure t
+;   :config
+;     (require 'spaceline-config)
+;     (spaceline-emacs-theme))
+
+(use-package smart-mode-line
+  :ensure t
+  :config
+    (sml/setup))
+
 (use-package flycheck
   :ensure t
-  :diminish (flycheck-mode . " x")
-  :init (global-flycheck-mode t))
+  :diminish (flycheck-mode . " !")
+  :config
+  (progn
+    (global-flycheck-mode t)
+    (rename-key-prefix "e" "Errors")
+    (prefixed-keys
+     ("en" . flycheck-next-error)
+     ("ep" . flycheck-previous-error))))
 
 ; (electric-pair-mode +1)
 
@@ -166,7 +174,7 @@
   :diminish (smartparens-mode . " ✓")
   :config
   (smartparens-global-mode +1)
-  (bind-keys :map smartparens-mode-map
+  (mode-keys smartparens-mode-map
              ;; Navigation
              ("C-M-a" . sp-beginning-of-sexp)
              ("C-M-e" . sp-end-of-sexp)
@@ -207,19 +215,20 @@
              ;; ("C-x C-t" . sp-transpose-hybrid-sexp)
 
              ;; Wrap
-             ("C-c C-w (" . sp/wrap-with-parens)
-             ("C-c C-w [" . sp/wrap-with-brackets)
-             ("C-c C-w {" . sp/wrap-with-braces)
-             ("C-c C-w '" . sp/wrap-with-single-quotes)
-             ("C-c C-w \"" . sp/wrap-with-double-quotes)
-             ("C-c C-w `" . sp/wrap-with-back-quotes)))
+             ;; ("C-c C-w (" . sp/wrap-with-parens)
+             ;; ("C-c C-w [" . sp/wrap-with-brackets)
+             ;; ("C-c C-w {" . sp/wrap-with-braces)
+             ;; ("C-c C-w '" . sp/wrap-with-single-quotes)
+             ;; ("C-c C-w \"" . sp/wrap-with-double-quotes)
+             ;; ("C-c C-w `" . sp/wrap-with-back-quotes)
+             ))
 
 (electric-indent-mode +1)
 
 (use-package avy
   :ensure t
   :config
-    (global-set-key (kbd "C-:") 'avy-goto-word-1))
+    (prefixed-key "," avy-goto-word-1))
 
 (setq savehist-additional-variables '(kill-ring search-ring regexp-search-ring))
 (setq savehist-file "~/.emacs.d/tmp/history")
@@ -232,3 +241,15 @@
 
 ;; Save recent files every few minutes.
 (run-at-time nil (* 5 60) 'recentf-save-list)
+
+(use-package magit
+  :ensure t
+  :config
+  (progn
+    (prefixed-key "gs" magit-status)))
+
+(use-package monky
+  :ensure t
+  :config
+  (progn
+    (prefixed-key "gh" monky-status)))

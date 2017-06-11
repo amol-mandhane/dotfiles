@@ -32,7 +32,7 @@
 
 (require 'cl-lib)
 
-(defconst +keybinding/mnemonic-prefix+ "M-m" "Prefix of the mnemonic keybindings.")
+(defconst +keybinding/mnemonic-prefix+ "C-." "Prefix of the mnemonic keybindings.")
 
 (defalias 'global-key 'bind-key*
   "Define global keybinding which overrides all minor mode keybindings. Alias for bind-key*.")
@@ -58,35 +58,20 @@
 	     for keybd in keys
 	     collect `(mode-key ,keymap ,(car keybd) ,(cdr keybd)))))
 
-(defmacro prefixed-keys (&rest keys)
-  "Define keys with mnemonic prefix.
-
-  KEYS: conses of (`kbd' style keybinding string . function) for keybinding definition."
-  (let
-      ((keys-with-prefix
-	(mapcar
-	 (lambda (k) '((concat +keybinding/mnemonic-prefix+ " " (car k)) (cdr k)))
-	 keys)))
-    `(bind-keys ,@keys-with-prefix)))
-
 (defmacro prefixed-key (key-string function)
   "Define key with mnemonic prefix.
 
   KEY-STRING: `kbd' style keybinding string.
   FUNCTION: Function to bind the key to."
-  `(prefixed-keys (,key-string . ,function)))
+  `(bind-keys ((concat +keybinding/mnemonic-prefix+ " " ,key-string) . ,function)))
 
-(defmacro prefixed-mode-keys (keymap &rest keys)
-  "Define keys with mnemonic prefox within the given keymap.
+(defmacro prefixed-keys (&rest keys)
+  "Define keys with mnemonic prefix.
 
-  KEYMAP: Keymap to add the binding to.
   KEYS: conses of (`kbd' style keybinding string . function) for keybinding definition."
-  (let
-      ((keys-with-prefix
-	(mapcar
-	 (lambda (k) '((concat +keybinding/mnemonic-prefix+ " " (car k)) (cdr k)))
-	 keys)))
-    `(bind-keys :map ,keymap ,@keys-with-prefix)))
+  `(progn ,@(cl-loop
+	     for keybd in keys
+	     collect `(prefixed-key ,(car keybd) ,(cdr keybd)))))
 
 (defmacro prefixed-mode-key (keymap key-string function)
   "Define key with mnemonic prefix within the given keymap.
@@ -94,7 +79,16 @@
   KEYMAP: Keymap to add the binding to.
   KEY-STRING: `kbd' style keybinding string.
   FUNCTION: Function to bind the key to."
-  `(prefixed-mode-keys ,keymap (,key-string . ,function)))
+  `(bind-keys :map keymap ((concat +keybinding/mnemonic-prefix+ " " ,key-string) . ,function)))
+
+(defmacro prefixed-mode-keys (keymap &rest keys)
+  "Define keys with mnemonic prefox within the given keymap.
+
+  KEYMAP: Keymap to add the binding to.
+  KEYS: conses of (`kbd' style keybinding string . function) for keybinding definition."
+  `(progn ,@(cl-loop
+	     for keybd in keys
+	     collect `(prefixed-mode-key ,keymap ,(car keybd) ,(cdr keybd)))))
 
 (defun rename-mnemonic-key-prefix (key-string name)
   "Add label to the mnemonic keybinding prefix to be displayed in `which-key'.
