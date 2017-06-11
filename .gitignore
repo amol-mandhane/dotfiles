@@ -18,7 +18,7 @@ vim/.vim/bundle/
 # to be tracked. Instead of blacklisting all of them, whitelist selected
 # config files.
 emacs.wip/.emacs.d/*
-!emacs.wip/.emacs.d/lisp/*.el
-!emacs.wip/init.el
-!emacs.wip/.emacs.d/config.el
+!emacs.wip/.emacs.d/*.el
 !emacs.wip/.emacs.d/config.org
+!emacs.wip/.emacs.d/lisp
+!emacs.wip/.emacs.d/lisp/*.el

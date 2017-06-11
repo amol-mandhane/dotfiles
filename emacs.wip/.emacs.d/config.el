@@ -1,4 +1,3 @@
-
 (setq user-full-name "Amol Mandhane"
       user-mail-address "amol.mandhane@gmail.com")
 
@@ -15,7 +14,12 @@
 
 (add-to-list 'load-path (expand-file-name "~/.emacs.d/lisp"))
 
-(global-unset-key (kbd "C-."))
+(use-package exec-path-from-shell
+  :ensure t
+  :config
+  (exec-path-from-shell-initialize))
+
+(global-unset-key (kbd "M-m"))
 (require 'keybinding)
 
 (use-package smex
@@ -25,8 +29,11 @@
 (use-package ido-vertical-mode
   :ensure t)
 (use-package flx
+  :ensure t)
+(use-package flx-ido
   :ensure t
   :after ido
+  :after flx
   :config (flx-ido-mode +1))
 
 (use-package ido
@@ -55,9 +62,12 @@
     (require 'smex)
     (smex-initialize)))
 
+(use-package counsel
+  :ensure t)
 (use-package ivy
   :ensure t
   :after flx
+  :after counsel
   :diminish ivy-mode
   :config
   (progn
@@ -74,24 +84,27 @@
       ("C-c M-x" . execute-extended-command)
       ("C-x C-f" . counsel-find-file))))
 
-(setq delete-old-versions -1 )          ; delete excess backup versions silently
-(setq version-control t )               ; use version control
-(setq vc-make-backup-files t )          ; make backups file even when in version controlled dir
-(setq backup-directory-alist `(("." . "~/.emacs.d/backups")) ) ; which directory to put backups file
-(setq vc-follow-symlinks t )                                   ; don't ask for confirmation when opening symlinked file
-(setq auto-save-file-name-transforms '((".*" "~/.emacs.d/auto-save-list/" t)) ) ;transform backups file name
-(setq inhibit-startup-screen t )        ; inhibit useless and old-school startup screen
-(setq ring-bell-function 'ignore )      ; silent bell when you make a mistake
-(setq coding-system-for-read 'utf-8 )   ; use utf-8 by default
-(setq coding-system-for-write 'utf-8 )
-(setq sentence-end-double-space nil)    ; sentence SHOULD end with only a point.
-(setq default-fill-column 80)           ; toggle wrapping text at the 80th character
-(setq initial-scratch-message "Welcome in Emacs") ; print a default message in the empty scratch buffer opened at startup
+(require 'helper-functions)
+
+(setq delete-old-versions -1)		; delete excess backup versions silently
+(setq version-control t)		; use version control
+(setq vc-make-backup-files t)		; make backups file even when in version controlled dir
+(setq backup-directory-alist `(("." . "~/.emacs.d/backups"))) ; which directory to put backups file
+(setq vc-follow-symlinks t)				       ; don't ask for confirmation when opening symlinked file
+(setq auto-save-file-name-transforms '((".*" "~/.emacs.d/auto-save-list/" t))) ;transform backups file name
+(setq inhibit-startup-screen t)	; inhibit useless and old-school startup screen
+(setq ring-bell-function 'ignore)	; silent bell when you make a mistake
+(setq coding-system-for-read 'utf-8)	; use utf-8 by default
+(setq coding-system-for-write 'utf-8)
+(setq sentence-end-double-space nil)	; sentence SHOULD end with only a point.
+(setq default-fill-column 80)		; toggle wrapping text at the 80th character
 
 (scroll-bar-mode -1)
 (tool-bar-mode -1)
 
 (global-linum-mode t)
+(global-auto-revert-mode nil)
+(diminish 'auto-revert-mode)
 
 (line-number-mode t)
 (column-number-mode t)
@@ -99,18 +112,24 @@
 (global-hl-line-mode t)
 
 (defalias 'yes-or-no-p 'y-or-n-p)
-(global-auto-revert-mode t)
 
 (setq ns-use-srgb-colorspace nil)
 
 (setq require-final-newline t)
 
-(set-default-font "Inconsolata-16")
+(set-default-font "Inconsolata-18")
 
 (setq cursor-type 'bar)
 (blink-cursor-mode 0)
 
 (add-hook 'before-save-hook 'delete-trailing-whitespace)
+
+(defhydra text-zoom ()
+  "zoom"
+  ("g" text-scale-increase "in")
+  ("l" text-scale-decrease "out"))
+
+(prefixed-key "zz" text-zoom/body)
 
 (use-package which-key
   :ensure t
@@ -121,20 +140,53 @@
       which-key-side-window-max-width 0.33
       which-key-idle-delay 0.05))
 
-(use-package zenburn-theme
+(use-package spacegray-theme
   :ensure t
-  :init (load-theme 'zenburn t))
+  :config (load-theme 'spacegray t))
+
+(require 'theme-enhancement)
+(theme-enhancement/apply)
+
+(rename-key-prefix "g" "VCS")
+(rename-key-prefix "e" "Errors")
+(rename-key-prefix "p" "Projects")
+(rename-key-prefix "f" "Files")
+(rename-key-prefix "b" "Buffers")
+(rename-key-prefix "w" "Windows")
+
+(defhydra windmove-hydra ()
+  "windmove"
+  ("<left>" windmove-left "left")
+  ("<right>" windmove-right "right")
+  ("<up>" windmove-up "up")
+  ("<down>" windmove-down "down")
+  ("h" windmove-left "left")
+  ("j" windmove-down "down")
+  ("k" windmove-up "up")
+  ("l" windmove-right "right"))
+
+(prefixed-keys
+  ("bb" . switch-to-buffer)
+  ("bd" . kill-this-buffer)
+  ("bv" . switch-to-previous-buffer)
+  ("bn" . next-buffer)
+  ("bp" . previous-buffer)
+  ("wd" . delete-window)
+  ("wD" . delete-other-window)
+  ("wh" . split-window-horizontally)
+  ("wv" . split-window-vertically)
+  ("ww" . windmove-hydra/body))
 
 (use-package company
   :ensure t
   :diminish (company-mode . " Ξ")
   :init (global-company-mode t))
 
-; (use-package spaceline
-;   :ensure t
-;   :config
-;     (require 'spaceline-config)
-;     (spaceline-emacs-theme))
+;; (use-package spaceline
+;;   :ensure t
+;;  :config
+;;    (require 'spaceline-config)
+;;    (spaceline-emacs-theme))
 
 (use-package smart-mode-line
   :ensure t
@@ -228,7 +280,7 @@
 (use-package avy
   :ensure t
   :config
-    (prefixed-key "," avy-goto-word-1))
+    (prefixed-key "m" avy-goto-word-1))
 
 (setq savehist-additional-variables '(kill-ring search-ring regexp-search-ring))
 (setq savehist-file "~/.emacs.d/tmp/history")
@@ -253,3 +305,53 @@
   :config
   (progn
     (prefixed-key "gh" monky-status)))
+
+(use-package projectile
+  :ensure t
+  :init
+  (progn
+    (setq projectile-enable-caching t)
+    (setq projectile-keymap-prefix (kbd (concat +keybinding/mnemonic-prefix+ " p"))))
+  :config
+  (projectile-global-mode))
+
+(show-paren-mode +1)
+
+(use-package rainbow-delimiters
+  :ensure t
+  :config
+  (enable-minor-mode-globally rainbow-delimiters-mode))
+
+(use-package flyspell
+  :ensure t
+  :diminish (flyspell-mode . " _")
+  :config
+  (progn
+    (setq ispell-program-name (locate-file "aspell" exec-path))
+    (setq ispell-list-command "--list")
+    (enable-minor-mode-globally flyspell-mode)))
+
+(use-package org-bullets
+  :ensure t
+  :diminish org-bullets-mode
+  :config
+  (add-hook
+   'org-mode-hook
+   (lambda () (org-bullets-mode +1))))
+
+(use-package org-indent
+  :ensure t
+  :config
+  (add-hook 'org-mode-hook (lambda () (org-indent-mode +1))))
+
+(use-package anzu
+  :ensure t
+  :diminish anzu-mode
+  :config (global-anzu-mode +1))
+
+(use-package evil
+  :ensure t)
+
+(use-package undo-tree
+  :ensure t
+  :diminish undo-tree-mode)

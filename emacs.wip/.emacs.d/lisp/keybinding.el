@@ -32,7 +32,7 @@
 
 (require 'cl-lib)
 
-(defconst +keybinding/mnemonic-prefix+ "C-." "Prefix of the mnemonic keybindings.")
+(defconst +keybinding/mnemonic-prefix+ "M-m" "Prefix of the mnemonic keybindings.")
 
 (defalias 'global-key 'bind-key*
   "Define global keybinding which overrides all minor mode keybindings. Alias for bind-key*.")
