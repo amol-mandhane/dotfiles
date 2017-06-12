@@ -235,6 +235,7 @@ Enhance the loaded theme.
     ("bv" . switch-to-previous-buffer)
     ("bn" . next-buffer)
     ("bp" . previous-buffer)
+    ("ff" . find-file)
     ("wd" . delete-window)
     ("wD" . delete-other-window)
     ("wh" . split-window-horizontally)
@@ -447,6 +448,10 @@ Multi-colored parantheses are helpful, especially in lisp-like modes.
       (enable-minor-mode-globally flyspell-mode)))
 #+END_SRC
 * TODO Org mode setup
+** Org agenda
+#+BEGIN_SRC emacs-lisp
+(setq org-agenda-files '("~/organizer/main.org"))
+#+END_SRC
 ** Org bullets
 #+BEGIN_SRC emacs-lisp
   (use-package org-bullets
@@ -461,8 +466,28 @@ Multi-colored parantheses are helpful, especially in lisp-like modes.
 #+BEGIN_SRC emacs-lisp
   (use-package org-indent
     :ensure t
+    :diminish org-indent-mode
     :config
     (add-hook 'org-mode-hook (lambda () (org-indent-mode +1))))
+#+END_SRC
+** Org capture
+#+BEGIN_SRC emacs-lisp
+  (setq org-capture-templates
+        '(("a" "Action Item" entry (file+headline "~/organizer/main.org" "Action Items")
+           "* TODO %?\n  %i")
+          ("c" "Calendar" entry (file+headline "~/organizer/main.org" "Calendar")
+           "* %?\n %^T\n %i")
+          ("r" "Reference" entry (file "~/organizer/reference.org")
+           "* %?\n  %i\n%^{prompt|Description}\n\n:PROPERTIES:\n:RecordDate:\t%T\n:END:"
+           :prepend t
+           :empty-lines 1)))
+
+  (global-key "<f6>" 'org-capture)
+  (global-key "C-c c" 'org-capture)
+#+END_SRC
+** Org refile
+#+BEGIN_SRC emacs-lisp
+(setq org-refile-targets '((org-agenda-files . (:maxlevel . 6))))
 #+END_SRC
 * TODO GTD
 * TODO Lang setup

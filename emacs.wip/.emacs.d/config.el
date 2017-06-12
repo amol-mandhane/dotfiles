@@ -171,6 +171,7 @@
   ("bv" . switch-to-previous-buffer)
   ("bn" . next-buffer)
   ("bp" . previous-buffer)
+  ("ff" . find-file)
   ("wd" . delete-window)
   ("wD" . delete-other-window)
   ("wh" . split-window-horizontally)
@@ -331,6 +332,8 @@
     (setq ispell-list-command "--list")
     (enable-minor-mode-globally flyspell-mode)))
 
+(setq org-agenda-files '("~/organizer/main.org"))
+
 (use-package org-bullets
   :ensure t
   :diminish org-bullets-mode
@@ -341,8 +344,24 @@
 
 (use-package org-indent
   :ensure t
+  :diminish org-indent-mode
   :config
   (add-hook 'org-mode-hook (lambda () (org-indent-mode +1))))
+
+(setq org-capture-templates
+      '(("a" "Action Item" entry (file+headline "~/organizer/main.org" "Action Items")
+         "* TODO %?\n  %i")
+        ("c" "Calendar" entry (file+headline "~/organizer/main.org" "Calendar")
+         "* %?\n %^T\n %i")
+        ("r" "Reference" entry (file "~/organizer/reference.org")
+         "* %?\n  %i\n%^{prompt|Description}\n\n:PROPERTIES:\n:RecordDate:\t%T\n:END:"
+         :prepend t
+         :empty-lines 1)))
+
+(global-key "<f6>" 'org-capture)
+(global-key "C-c c" 'org-capture)
+
+(setq org-refile-targets '((org-agenda-files . (:maxlevel . 6))))
 
 (use-package anzu
   :ensure t
