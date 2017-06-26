@@ -19,6 +19,8 @@
   :config
   (exec-path-from-shell-initialize))
 
+(use-package hydra :ensure t)
+
 (global-unset-key (kbd "M-m"))
 (require 'keybinding)
 
@@ -119,7 +121,7 @@
 
 (set-default-font "Inconsolata-18")
 
-(setq cursor-type 'bar)
+(setq-default cursor-type 'bar)
 (blink-cursor-mode 0)
 
 (add-hook 'before-save-hook 'delete-trailing-whitespace)
@@ -131,6 +133,17 @@
 
 (prefixed-key "zz" text-zoom/body)
 
+(use-package annoying-arrows-mode
+  :ensure t
+  :diminish annoying-arrows-mode
+  :config
+  (global-annoying-arrows-mode +1))
+
+(use-package beacon
+  :ensure t
+  :config
+  (global-key "C-\\" 'beacon-blink))
+
 (use-package which-key
   :ensure t
   :diminish which-key-mode
@@ -140,9 +153,9 @@
       which-key-side-window-max-width 0.33
       which-key-idle-delay 0.05))
 
-(use-package spacegray-theme
+(use-package darktooth-theme
   :ensure t
-  :config (load-theme 'spacegray t))
+  :config (load-theme 'darktooth t))
 
 (require 'theme-enhancement)
 (theme-enhancement/apply)
@@ -181,7 +194,12 @@
 (use-package company
   :ensure t
   :diminish (company-mode . " Ξ")
-  :init (global-company-mode t))
+  :config (global-company-mode t))
+
+(use-package company-quickhelp
+  :ensure t
+  :after company
+  :config (company-quickhelp-mode +1))
 
 ;; (use-package spaceline
 ;;   :ensure t
@@ -192,6 +210,7 @@
 (use-package smart-mode-line
   :ensure t
   :config
+    (setq sml/no-confirm-load-theme t)
     (sml/setup))
 
 (use-package flycheck
@@ -362,6 +381,72 @@
 (global-key "C-c c" 'org-capture)
 
 (setq org-refile-targets '((org-agenda-files . (:maxlevel . 6))))
+
+(use-package protobuf-mode
+  :ensure t
+  :init
+  (add-hook
+   'protobuf-mode-hook
+   #'(lambda ()
+       (setq
+        imenu-generic-expression
+        '((nil "^[[:space:]]*\\(message\\|service\\|enum\\)[[:space:]]+\\([[:alnum:]]+\\)" 2))))))
+
+(defconst +zsh-filename-patterns+
+  '("\\.zsh\\'"
+    "zlogin\\'"
+    "zlogout\\'"
+    "zpreztorc\\'"
+    "zprofile\\'"
+    "zshenv\\'"
+    "zshrc\\'")
+  "Filename patterns for Zsh script files.")
+
+(use-package sh-script
+  :defer t
+  :init
+  (progn
+    (dolist (pattern +zsh-filename-patterns+)
+      (add-to-list 'auto-mode-alist (cons pattern 'sh-mode)))
+    (add-hook
+     'sh-mode-hook
+     #'(lambda ()
+       (when
+           (and
+            buffer-file-name
+            (cl-mapcar #'(lambda (pat) (string-match-p pat buffer-file-name)) +zsh-filename-patterns+))
+         (sh-set-shell "zsh"))))))
+
+(use-package company-shell
+  :ensure t
+  :after company
+  :config
+  (add-hook
+   'sh-mode-hook
+   #'(lambda ()
+     (add-to-list
+      (make-local-variable 'company-backends)
+      'company-shell))))
+
+(use-package insert-shebang
+  :ensure t)
+
+(use-package ess
+  :ensure t
+  :config
+  (progn
+    (add-hook
+     'inferior-ess-mode-hook
+     #'(lambda nil
+         (define-key inferior-ess-mode-map [\C-up]
+           'comint-previous-matching-input-from-input)
+         (define-key inferior-ess-mode-map [\C-down]
+           'comint-next-matching-input-from-input)
+         (define-key inferior-ess-mode-map [\C-x \t]
+           'comint-dynamic-complete-filename)))))
+
+(use-package ag
+  :ensure t)
 
 (use-package anzu
   :ensure t
