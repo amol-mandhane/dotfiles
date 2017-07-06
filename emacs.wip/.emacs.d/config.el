@@ -24,6 +24,12 @@
 (global-unset-key (kbd "M-m"))
 (require 'keybinding)
 
+(use-package key-chord
+  :ensure t
+  :init
+  (progn (setq key-chord-two-keys-delay 0.05))
+  :config (key-chord-mode +1))
+
 (use-package smex
   :ensure t)
 (use-package ido-ubiquitous
@@ -144,6 +150,8 @@
   :config
   (global-key "C-\\" 'beacon-blink))
 
+(setq-default custom-file "/dev/null")
+
 (use-package which-key
   :ensure t
   :diminish which-key-mode
@@ -181,7 +189,7 @@
 (prefixed-keys
   ("bb" . switch-to-buffer)
   ("bd" . kill-this-buffer)
-  ("bv" . switch-to-previous-buffer)
+  ("C-i" . switch-to-previous-buffer)
   ("bn" . next-buffer)
   ("bp" . previous-buffer)
   ("ff" . find-file)
@@ -300,7 +308,7 @@
 (use-package avy
   :ensure t
   :config
-    (prefixed-key "m" avy-goto-word-1))
+    (key-chord-define-global "jj" 'avy-goto-word-1))
 
 (setq savehist-additional-variables '(kill-ring search-ring regexp-search-ring))
 (setq savehist-file "~/.emacs.d/tmp/history")
@@ -325,6 +333,41 @@
   :config
   (progn
     (prefixed-key "gh" monky-status)))
+
+(use-package diff-hl
+  :ensure t
+  :config
+  (progn
+    (enable-minor-mode-globally diff-hl-mode)
+    (enable-minor-mode-globally diff-hl-flydiff-mode)
+    (add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh)))
+
+(defhydra hydra-smerge
+  (:color green)
+  "
+^Move^	^Keep^	^Aux^	^Diff^
+------------------------------------------------------
+_n_ext	_b_ase	_R_efine	_<_: base-mine	_q_uit
+_p_rev	_m_ine	_E_diff	_=_: mine-other	_RET_: current
+^ ^	_o_ther	_C_ombine	_>_: base-other
+^ ^	_a_ll	_r_esolve"
+  ("RET" smerge-keep-current)
+  ("C" smerge-combine-with-next)
+  ("E" smerge-ediff)
+  ("R" smerge-refine)
+  ("a" smerge-keep-all)
+  ("b" smerge-keep-base)
+  ("m" smerge-keep-mine)
+  ("n" smerge-next)
+  ("o" smerge-keep-other)
+  ("p" smerge-prev)
+  ("r" smerge-resolve)
+  ("<" smerge-diff-base-mine)
+  ("=" smerge-diff-mine-other)
+  (">" smerge-diff-base-other)
+  ("q" nil :color red))
+
+(prefixed-mode-key smerge-mode-map "m" hydra-smerge/body)
 
 (use-package projectile
   :ensure t
@@ -382,6 +425,19 @@
 
 (setq org-refile-targets '((org-agenda-files . (:maxlevel . 6))))
 
+(use-package google-c-style
+  :ensure t
+  :config
+  (add-hook 'c-mode-common-hook 'google-set-c-style))
+
+(add-to-list 'flycheck-ghc-search-path (expand-file-name "~/.xmonad/lib"))
+
+(use-package meghanda
+  :ensure t
+  :config
+  (progn
+    (add-hook 'java-mode-hook #'(lambda () (meghanada-mode +1)))))
+
 (use-package protobuf-mode
   :ensure t
   :init
@@ -391,6 +447,43 @@
        (setq
         imenu-generic-expression
         '((nil "^[[:space:]]*\\(message\\|service\\|enum\\)[[:space:]]+\\([[:alnum:]]+\\)" 2))))))
+
+(use-package python
+  :ensure t
+  :config
+  (setq python-shell-interpreter "ipython"
+        python-shell-interpreter-args "--simple-prompt -i"))
+
+(use-package anaconda-mode
+  :ensure t
+  :diminish anaconda-mode
+  :diminish anaconda-eldoc-mode
+  :config
+  (anaconda-mode +1))
+
+(use-package company-anaconda
+  :ensure t)
+
+(use-package virtualenvwrapper
+  :ensure t
+  :config
+  (progn
+    (setq eshell-prompt-function
+       (lambda () (concat venv-current-name " $ ")))
+    (venv-initialize-interactive-shells)
+    (venv-initialize-eshell)))
+
+(use-package pyenv-mode
+  :ensure t
+  :after virtualenvwrapper
+  :config
+  (pyenv-mode +1))
+
+(use-package py-yapf
+  :ensure t)
+
+(use-package pytest
+  :ensure t)
 
 (defconst +zsh-filename-patterns+
   '("\\.zsh\\'"
@@ -445,8 +538,43 @@
          (define-key inferior-ess-mode-map [\C-x \t]
            'comint-dynamic-complete-filename)))))
 
+(use-package stickyfunc-enhance
+  :ensure t)
+
+(use-package srefactor
+  :ensure t)
+
+(setq semantic-default-submodes
+      '( ;; Perform semantic actions during idle time
+        global-semantic-idle-scheduler-mode
+        ;; Use a database of parsed tags
+        global-semanticdb-minor-mode
+        ;; Decorate buffers with additional semantic information
+        global-semantic-decoration-mode
+        ;; Highlight the name of the function you're currently in
+        global-semantic-highlight-func-mode
+        ;; show the name of the function at the top in a sticky
+        global-semantic-stickyfunc-mode
+        ;; Generate a summary of the current tag when idle
+        ; global-semantic-idle-summary-mode
+
+        ;; Show a breadcrumb of location during idle time
+        global-semantic-idle-breadcrumbs-mode
+        ;; Switch to recently changed tags with `semantic-mrub-switch-tags',
+        ;; or `C-x B'
+        global-semantic-mru-bookmark-mode))
+
+(add-hook 'emacs-lisp-mode-hook 'semantic-mode)
+(add-hook 'python-mode-hook 'semantic-mode)
+(add-hook 'java-mode-hook 'semantic-mode)
+(add-hook 'c-mode-hook 'semantic-mode)
+;; etc etc
+(add-hook 'prog-mode-hook 'semantic-mode)
+
 (use-package ag
   :ensure t)
+
+(prefixed-key "ss" swiper)
 
 (use-package anzu
   :ensure t

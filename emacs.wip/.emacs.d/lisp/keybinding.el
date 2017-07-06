@@ -79,7 +79,7 @@
   KEYMAP: Keymap to add the binding to.
   KEY-STRING: `kbd' style keybinding string.
   FUNCTION: Function to bind the key to."
-  `(bind-keys :map keymap ((concat +keybinding/mnemonic-prefix+ " " ,key-string) . ,function)))
+  `(bind-keys :map ,keymap ((concat +keybinding/mnemonic-prefix+ " " ,key-string) . ,function)))
 
 (defmacro prefixed-mode-keys (keymap &rest keys)
   "Define keys with mnemonic prefox within the given keymap.

@@ -47,7 +47,14 @@ creates a framework like that using `bind-key`.
 (global-unset-key (kbd "M-m"))
 (require 'keybinding)
 #+END_SRC
-
+** Key-chord
+#+BEGIN_SRC emacs-lisp
+  (use-package key-chord
+    :ensure t
+    :init
+    (progn (setq key-chord-two-keys-delay 0.05))
+    :config (key-chord-mode +1))
+#+END_SRC
 * Interface framework
 Current iteration of interface framework is combination of IDO and Ivy. Helm is proving difficult to
 configure exactly like I want.
@@ -200,6 +207,10 @@ Approach to evolve interface framework
     :config
     (global-key "C-\\" 'beacon-blink))
 #+END_SRC
+** Don't use `custom`
+#+BEGIN_SRC emacs-lisp
+(setq-default custom-file "/dev/null")
+#+END_SRC
 * Which Key?
 #+BEGIN_SRC emacs-lisp
 (use-package which-key
@@ -250,7 +261,7 @@ Enhance the loaded theme.
   (prefixed-keys
     ("bb" . switch-to-buffer)
     ("bd" . kill-this-buffer)
-    ("bv" . switch-to-previous-buffer)
+    ("C-i" . switch-to-previous-buffer)
     ("bn" . next-buffer)
     ("bp" . previous-buffer)
     ("ff" . find-file)
@@ -397,7 +408,7 @@ Avy is used to jump around the file.
   (use-package avy
     :ensure t
     :config
-      (prefixed-key "m" avy-goto-word-1))
+      (key-chord-define-global "jj" 'avy-goto-word-1))
 #+END_SRC
 * Persistent history
 ** Minibuffer, M-x and ring history
@@ -438,6 +449,45 @@ Avy is used to jump around the file.
 #+END_SRC
 ** VC-mode
 Use `C-x v` prefixed commands for now.
+** Highlight diff
+#+BEGIN_SRC emacs-lisp
+  (use-package diff-hl
+    :ensure t
+    :config
+    (progn
+      (enable-minor-mode-globally diff-hl-mode)
+      (enable-minor-mode-globally diff-hl-flydiff-mode)
+      (add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh)))
+#+END_SRC
+** SMerge keybindings
+#+BEGIN_SRC emacs-lisp
+  (defhydra hydra-smerge
+    (:color green)
+    "
+  ^Move^	^Keep^	^Aux^	^Diff^
+  ------------------------------------------------------
+  _n_ext	_b_ase	_R_efine	_<_: base-mine	_q_uit
+  _p_rev	_m_ine	_E_diff	_=_: mine-other	_RET_: current
+  ^ ^	_o_ther	_C_ombine	_>_: base-other
+  ^ ^	_a_ll	_r_esolve"
+    ("RET" smerge-keep-current)
+    ("C" smerge-combine-with-next)
+    ("E" smerge-ediff)
+    ("R" smerge-refine)
+    ("a" smerge-keep-all)
+    ("b" smerge-keep-base)
+    ("m" smerge-keep-mine)
+    ("n" smerge-next)
+    ("o" smerge-keep-other)
+    ("p" smerge-prev)
+    ("r" smerge-resolve)
+    ("<" smerge-diff-base-mine)
+    ("=" smerge-diff-mine-other)
+    (">" smerge-diff-base-other)
+    ("q" nil :color red))
+
+  (prefixed-mode-key smerge-mode-map "m" hydra-smerge/body)
+#+END_SRC
 * Projectile
 #+BEGIN_SRC emacs-lisp
   (use-package projectile
@@ -513,15 +563,33 @@ Multi-colored parantheses are helpful, especially in lisp-like modes.
 #+BEGIN_SRC emacs-lisp
 (setq org-refile-targets '((org-agenda-files . (:maxlevel . 6))))
 #+END_SRC
-* TODO Lang setup [3/14]
-** TODO C++
+* TODO Lang setup [4/13]
+** TODO C/C++
+Coding style
+#+BEGIN_SRC emacs-lisp
+  (use-package google-c-style
+    :ensure t
+    :config
+    (add-hook 'c-mode-common-hook 'google-set-c-style))
+#+END_SRC
 ** TODO common-lisp
 ** TODO Elisp
 ** TODO Go
 ** TODO Haskell
+Add libraries for XMonad.
+#+BEGIN_SRC emacs-lisp
+(add-to-list 'flycheck-ghc-search-path (expand-file-name "~/.xmonad/lib"))
+#+END_SRC
 ** TODO HTML emmet
 ** TODO JS
-** TODO Java meghanada
+** Java meghanada
+#+BEGIN_SRC emacs-lisp
+  (use-package meghanda
+    :ensure t
+    :config
+    (progn
+      (add-hook 'java-mode-hook #'(lambda () (meghanada-mode +1)))))
+#+END_SRC
 ** TODO latex
 ** TODO markdown
 ** DONE Protocol buffers
@@ -536,7 +604,59 @@ Multi-colored parantheses are helpful, especially in lisp-like modes.
           imenu-generic-expression
           '((nil "^[[:space:]]*\\(message\\|service\\|enum\\)[[:space:]]+\\([[:alnum:]]+\\)" 2))))))
 #+END_SRC
-** TODO Python
+** DONE Python
+Python mode setup
+#+BEGIN_SRC emacs-lisp
+  (use-package python
+    :ensure t
+    :config
+    (setq python-shell-interpreter "ipython"
+          python-shell-interpreter-args "--simple-prompt -i"))
+#+END_SRC
+
+Anaconda setup
+#+BEGIN_SRC emacs-lisp
+  (use-package anaconda-mode
+    :ensure t
+    :diminish anaconda-mode
+    :diminish anaconda-eldoc-mode
+    :config
+    (anaconda-mode +1))
+
+  (use-package company-anaconda
+    :ensure t)
+#+END_SRC
+
+Virtualenv
+#+BEGIN_SRC emacs-lisp
+  (use-package virtualenvwrapper
+    :ensure t
+    :config
+    (progn
+      (setq eshell-prompt-function
+         (lambda () (concat venv-current-name " $ ")))
+      (venv-initialize-interactive-shells)
+      (venv-initialize-eshell)))
+
+  (use-package pyenv-mode
+    :ensure t
+    :after virtualenvwrapper
+    :config
+    (pyenv-mode +1))
+#+END_SRC
+
+Formatter
+#+BEGIN_SRC emacs-lisp
+  (use-package py-yapf
+    :ensure t)
+
+#+END_SRC
+
+Testing
+#+BEGIN_SRC emacs-lisp
+  (use-package pytest
+    :ensure t)
+#+END_SRC
 ** DONE Shell
 
 Setup for Bash and Zsh files
@@ -603,15 +723,60 @@ Insert shebang
            (define-key inferior-ess-mode-map [\C-x \t]
              'comint-dynamic-complete-filename)))))
 #+END_SRC
-* TODO Semantic
+* Semantic
+Stickyfunc
+#+BEGIN_SRC emacs-lisp
+  (use-package stickyfunc-enhance
+    :ensure t)
+#+END_SRC
+
+Srefactor
+#+BEGIN_SRC emacs-lisp
+  (use-package srefactor
+    :ensure t)
+#+END_SRC
+
+Semantic setup
+#+BEGIN_SRC emacs-lisp
+  (setq semantic-default-submodes
+        '( ;; Perform semantic actions during idle time
+          global-semantic-idle-scheduler-mode
+          ;; Use a database of parsed tags
+          global-semanticdb-minor-mode
+          ;; Decorate buffers with additional semantic information
+          global-semantic-decoration-mode
+          ;; Highlight the name of the function you're currently in
+          global-semantic-highlight-func-mode
+          ;; show the name of the function at the top in a sticky
+          global-semantic-stickyfunc-mode
+          ;; Generate a summary of the current tag when idle
+          ; global-semantic-idle-summary-mode
+
+          ;; Show a breadcrumb of location during idle time
+          global-semantic-idle-breadcrumbs-mode
+          ;; Switch to recently changed tags with `semantic-mrub-switch-tags',
+          ;; or `C-x B'
+          global-semantic-mru-bookmark-mode))
+
+  (add-hook 'emacs-lisp-mode-hook 'semantic-mode)
+  (add-hook 'python-mode-hook 'semantic-mode)
+  (add-hook 'java-mode-hook 'semantic-mode)
+  (add-hook 'c-mode-hook 'semantic-mode)
+  ;; etc etc
+  (add-hook 'prog-mode-hook 'semantic-mode)
+#+END_SRC
 * TODO Tags
-* TODO Search using ag/grep
+* Search
+** Ag
 #+BEGIN_SRC emacs-lisp
   (use-package ag
     :ensure t)
 #+END_SRC
+** Swiper
+#+BEGIN_SRC emacs-lisp
+  (prefixed-key "ss" swiper)
+#+END_SRC
 * TODO Iedit
-* TODO SMerge keybindings
 * Anzu
 Anzu is good for interactive search and replace.
 #+BEGIN_SRC emacs-lisp
@@ -633,7 +798,6 @@ Don't use evil mode for general purpose. Current use of evil mode is for vim lik
   :ensure t
   :diminish undo-tree-mode)
 #+END_SRC
-* TODO Context leader config
 * TODO Gnus
 * TODO ERC
 * TODO Keychord
