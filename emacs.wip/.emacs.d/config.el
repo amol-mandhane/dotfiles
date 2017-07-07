@@ -19,6 +19,8 @@
   :config
   (exec-path-from-shell-initialize))
 
+(add-hook 'after-init-hook #'(lambda () (server-start)))
+
 (use-package hydra :ensure t)
 
 (global-unset-key (kbd "M-m"))
@@ -126,6 +128,7 @@
 (setq require-final-newline t)
 
 (set-default-font "Inconsolata-18")
+(setq default-frame-alist '((font . "Inconsolata-18")))
 
 (setq-default cursor-type 'bar)
 (blink-cursor-mode 0)
@@ -174,6 +177,7 @@
 (rename-key-prefix "f" "Files")
 (rename-key-prefix "b" "Buffers")
 (rename-key-prefix "w" "Windows")
+(rename-key-prefix "s" "Search")
 
 (defhydra windmove-hydra ()
   "windmove"
@@ -198,6 +202,9 @@
   ("wh" . split-window-horizontally)
   ("wv" . split-window-vertically)
   ("ww" . windmove-hydra/body))
+
+(global-key "C-J" #'join-next-line)
+(global-key "C-K" #'join-line)
 
 (use-package company
   :ensure t
@@ -399,7 +406,7 @@ _p_rev	_m_ine	_E_diff	_=_: mine-other	_RET_: current
   (progn
     (setq ispell-program-name (locate-file "aspell" exec-path))
     (setq ispell-list-command "--list")
-    (enable-minor-mode-globally flyspell-mode)))
+    (add-hook 'text-mode-hook #'(lambda () (flyspell-mode +1)))))
 
 (setq org-agenda-files '("~/organizer/main.org"))
 
@@ -643,6 +650,7 @@ _p_rev	_m_ine	_E_diff	_=_: mine-other	_RET_: current
   :ensure t)
 
 (prefixed-key "ss" swiper)
+(key-chord-define-global "ss" 'swiper)
 
 (use-package anzu
   :ensure t

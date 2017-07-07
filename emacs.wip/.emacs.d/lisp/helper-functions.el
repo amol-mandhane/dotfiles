@@ -16,6 +16,12 @@ Repeated invocations toggle between the two most recently open buffers."
   (interactive)
   (switch-to-buffer (other-buffer (current-buffer) 1)))
 
+(defun join-next-line ()
+  "Join the next line to the current one."
+  (interactive)
+  (forward-line)
+  (join-line))
+
 (defmacro enable-minor-mode-globally (minor-mode)
   "Enables the minor mode globally.
 MINOR-MODE: Symbol of minor mode to enable."

@@ -34,6 +34,11 @@
     :config
     (exec-path-from-shell-initialize))
 #+END_SRC
+
+* Daemon
+#+BEGIN_SRC emacs-lisp
+  (add-hook 'after-init-hook #'(lambda () (server-start)))
+#+END_SRC
 * Keybinding framework
 ** Hydra
 #+BEGIN_SRC emacs-lisp
@@ -172,6 +177,7 @@ Approach to evolve interface framework
 (setq require-final-newline t)
 
 (set-default-font "Inconsolata-18")
+(setq default-frame-alist '((font . "Inconsolata-18")))
 
 (setq-default cursor-type 'bar)
 (blink-cursor-mode 0)
@@ -244,6 +250,7 @@ Enhance the loaded theme.
   (rename-key-prefix "f" "Files")
   (rename-key-prefix "b" "Buffers")
   (rename-key-prefix "w" "Windows")
+  (rename-key-prefix "s" "Search")
 #+END_SRC
 * General shortcuts
 #+BEGIN_SRC emacs-lisp
@@ -270,6 +277,9 @@ Enhance the loaded theme.
     ("wh" . split-window-horizontally)
     ("wv" . split-window-vertically)
     ("ww" . windmove-hydra/body))
+
+  (global-key "C-J" #'join-next-line)
+  (global-key "C-K" #'join-line)
 #+END_SRC
 * Auto-completion
 #+BEGIN_SRC emacs-lisp
@@ -527,7 +537,7 @@ Multi-colored parantheses are helpful, especially in lisp-like modes.
     (progn
       (setq ispell-program-name (locate-file "aspell" exec-path))
       (setq ispell-list-command "--list")
-      (enable-minor-mode-globally flyspell-mode)))
+      (add-hook 'text-mode-hook #'(lambda () (flyspell-mode +1)))))
 #+END_SRC
 * Org mode setup
 ** Org agenda
@@ -868,6 +878,7 @@ Semantic setup
 ** Swiper
 #+BEGIN_SRC emacs-lisp
   (prefixed-key "ss" swiper)
+  (key-chord-define-global "ss" 'swiper)
 #+END_SRC
 * TODO Iedit
 * Anzu
@@ -893,4 +904,3 @@ Don't use evil mode for general purpose. Current use of evil mode is for vim lik
 #+END_SRC
 * TODO Gnus
 * TODO ERC
-* TODO Keychord
