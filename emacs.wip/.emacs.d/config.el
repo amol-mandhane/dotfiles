@@ -201,7 +201,6 @@
 
 (use-package company
   :ensure t
-  :diminish (company-mode . " Ξ")
   :config (global-company-mode t))
 
 (use-package company-quickhelp
@@ -378,6 +377,14 @@ _p_rev	_m_ine	_E_diff	_=_: mine-other	_RET_: current
   :config
   (projectile-global-mode))
 
+(use-package yasnippet
+  :ensure t
+  :diminish yas-minor-mode
+  :config
+  (progn
+    (yas-global-mode +1)
+    (prefixed-key "is" yas-expand)))
+
 (show-paren-mode +1)
 
 (use-package rainbow-delimiters
@@ -425,10 +432,69 @@ _p_rev	_m_ine	_E_diff	_=_: mine-other	_RET_: current
 
 (setq org-refile-targets '((org-agenda-files . (:maxlevel . 6))))
 
+(use-package irony
+  :ensure t
+  :init
+  (progn
+    (add-hook 'c++-mode-hook 'irony-mode)
+    (add-hook 'c-mode-hook 'irony-mode)
+    (add-hook 'objc-mode-hook 'irony-mode))
+  :config
+  (add-hook 'irony-mode-hook 'irony-cdb-autosetup-compile-options))
+
+(use-package company-irony
+  :ensure t
+  :after company
+  :after irony
+  :config
+  (add-to-list 'company-backends 'company-irony))
+
+(use-package company-irony-c-headers
+  :ensure t
+  :after company
+  :after irony
+  :config
+  (add-to-list 'company-backends 'company-irony-c-headers))
+
+;; Company-clang doesn't work well with the work setup.
+(setq company-backends (delete 'company-clang company-backends))
+
+(use-package flycheck-irony
+  :ensure t
+  :after flycheck
+  :after irony
+  :config
+  (add-hook 'flycheck-mode-hook #'flycheck-irony-setup))
+
+(use-package irony-eldoc
+  :ensure t
+  :after irony
+  :config
+  (add-hook 'irony-mode-hook #'irony-eldoc))
+
 (use-package google-c-style
   :ensure t
   :config
   (add-hook 'c-mode-common-hook 'google-set-c-style))
+
+(use-package rtags
+  :ensure t
+  :config
+  (progn
+    ;; Can't do it since this is not compatible with work. Also, irony-mode is pretty good.
+    (setq rtags-completions-enabled nil)
+
+    (setq rtags-autostart-diagnostics t)
+    (rtags-enable-standard-keybindings)))
+
+;; Maybe someday.
+;;
+;; (use-package company-rtags
+;;   :ensure t
+;;   :after company
+;;   :after rtags
+;;   :config
+;;   (add-to-list 'company-backends 'company-rtags))
 
 (add-to-list 'flycheck-ghc-search-path (expand-file-name "~/.xmonad/lib"))
 
@@ -462,7 +528,9 @@ _p_rev	_m_ine	_E_diff	_=_: mine-other	_RET_: current
   (anaconda-mode +1))
 
 (use-package company-anaconda
-  :ensure t)
+  :ensure t
+  :config
+  (add-to-list 'company-backends 'company-anaconda))
 
 (use-package virtualenvwrapper
   :ensure t

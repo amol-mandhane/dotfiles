@@ -275,7 +275,6 @@ Enhance the loaded theme.
 #+BEGIN_SRC emacs-lisp
   (use-package company
     :ensure t
-    :diminish (company-mode . " Ξ")
     :config (global-company-mode t))
 
   (use-package company-quickhelp
@@ -499,7 +498,16 @@ Use `C-x v` prefixed commands for now.
     :config
     (projectile-global-mode))
 #+END_SRC
-* TODO Snippets
+* Snippets
+#+BEGIN_SRC emacs-lisp
+  (use-package yasnippet
+    :ensure t
+    :diminish yas-minor-mode
+    :config
+    (progn
+      (yas-global-mode +1)
+      (prefixed-key "is" yas-expand)))
+#+END_SRC
 * Rainbow parens
 Multi-colored parantheses are helpful, especially in lisp-like modes.
 #+BEGIN_SRC emacs-lisp
@@ -521,7 +529,7 @@ Multi-colored parantheses are helpful, especially in lisp-like modes.
       (setq ispell-list-command "--list")
       (enable-minor-mode-globally flyspell-mode)))
 #+END_SRC
-* TODO Org mode setup
+* Org mode setup
 ** Org agenda
 #+BEGIN_SRC emacs-lisp
 (setq org-agenda-files '("~/organizer/main.org"))
@@ -563,15 +571,98 @@ Multi-colored parantheses are helpful, especially in lisp-like modes.
 #+BEGIN_SRC emacs-lisp
 (setq org-refile-targets '((org-agenda-files . (:maxlevel . 6))))
 #+END_SRC
-* TODO Lang setup [4/13]
-** TODO C/C++
-Coding style
+* TODO Lang setup [5/13]
+** DONE C/C++
+*** Irony Mode
+Irony mode is clang based autocompletion and syntax checker. It is like YouCompleteMe, but only for C-family and better.
+I've had many problems with the YCM setup at work.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package irony
+    :ensure t
+    :init
+    (progn
+      (add-hook 'c++-mode-hook 'irony-mode)
+      (add-hook 'c-mode-hook 'irony-mode)
+      (add-hook 'objc-mode-hook 'irony-mode))
+    :config
+    (add-hook 'irony-mode-hook 'irony-cdb-autosetup-compile-options))
+#+END_SRC
+
+*** Completion
+#+BEGIN_SRC emacs-lisp
+  (use-package company-irony
+    :ensure t
+    :after company
+    :after irony
+    :config
+    (add-to-list 'company-backends 'company-irony))
+
+  (use-package company-irony-c-headers
+    :ensure t
+    :after company
+    :after irony
+    :config
+    (add-to-list 'company-backends 'company-irony-c-headers))
+
+  ;; Company-clang doesn't work well with the work setup.
+  (setq company-backends (delete 'company-clang company-backends))
+#+END_SRC
+
+*** Syntax checker
+#+BEGIN_SRC emacs-lisp
+  (use-package flycheck-irony
+    :ensure t
+    :after flycheck
+    :after irony
+    :config
+    (add-hook 'flycheck-mode-hook #'flycheck-irony-setup))
+#+END_SRC
+
+*** Eldoc
+#+BEGIN_SRC emacs-lisp
+  (use-package irony-eldoc
+    :ensure t
+    :after irony
+    :config
+    (add-hook 'irony-mode-hook #'irony-eldoc))
+#+END_SRC
+
+*** Coding style
 #+BEGIN_SRC emacs-lisp
   (use-package google-c-style
     :ensure t
     :config
     (add-hook 'c-mode-common-hook 'google-set-c-style))
 #+END_SRC
+
+*** Navigation using RTags
+RTags is a great navigation framework for C++. Unfortunately, it doesn't handle gargantuan codebases from cloud filesystems like work.
+Still, good to have in config.
+#+BEGIN_SRC emacs-lisp
+  (use-package rtags
+    :ensure t
+    :config
+    (progn
+      ;; Can't do it since this is not compatible with work. Also, irony-mode is pretty good.
+      (setq rtags-completions-enabled nil)
+
+      (setq rtags-autostart-diagnostics t)
+      (rtags-enable-standard-keybindings)))
+
+  ;; Maybe someday.
+  ;;
+  ;; (use-package company-rtags
+  ;;   :ensure t
+  ;;   :after company
+  ;;   :after rtags
+  ;;   :config
+  ;;   (add-to-list 'company-backends 'company-rtags))
+#+END_SRC
+
+*** TODO Explore cmake-ide
+
+*** TODO Set up debugger
 ** TODO common-lisp
 ** TODO Elisp
 ** TODO Go
@@ -624,7 +715,9 @@ Anaconda setup
     (anaconda-mode +1))
 
   (use-package company-anaconda
-    :ensure t)
+    :ensure t
+    :config
+    (add-to-list 'company-backends 'company-anaconda))
 #+END_SRC
 
 Virtualenv
