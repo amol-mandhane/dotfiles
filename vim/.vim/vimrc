@@ -23,10 +23,7 @@ set clipboard=unnamedplus
 set autoread               " Autoreload
 set number                 " Line numbers
 set relativenumber
-set tw=79                  " width of document (used by gd)
 set colorcolumn=80
-set list                   " show EOL
-set listchars=tab:▸\ ,eol:¬
 set showcmd
 set wildmenu            " visual autocomplete for command menu
 set backspace=indent,eol,start    " Backspace in normal mode

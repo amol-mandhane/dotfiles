@@ -46,9 +46,17 @@
 
 (add-to-list 'flycheck-ghc-search-path (expand-file-name "~/.xmonad/lib"))
 
-(setq org-agenda-files '("~/org-plan"))
+(setq org-agenda-files '("~/organizer"))
 
-(add-to-list 'auto-mode-alist '("\\.org.text\\'" . org-mode))
+(setq org-capture-templates
+      '(("a" "Action Item" entry (file+headline "~/organizer/main.org" "Action Items")
+         "* TODO %?\n  %i")
+        ("c" "Calendar" entry (file+headline "~/organizer/main.org" "Calendar")
+         "* %?\n %^T\n %i")
+        ("r" "Reference" entry (file "~/organizer/reference.org")
+         "* %?\n  %i\n%^{prompt|Description}\n\n:PROPERTIES:\n:RecordDate:\t%T\n:END:"
+         :prepend t
+         :empty-lines 1)))
 
 (evil-ex-define-cmd "W" "w")
 
