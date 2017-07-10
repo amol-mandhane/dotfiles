@@ -217,6 +217,11 @@ Approach to evolve interface framework
 #+BEGIN_SRC emacs-lisp
 (setq-default custom-file "/dev/null")
 #+END_SRC
+** Crux package
+#+BEGIN_SRC emacs-lisp
+  (use-package crux
+    :ensure t)
+#+END_SRC
 * Which Key?
 #+BEGIN_SRC emacs-lisp
 (use-package which-key
@@ -278,8 +283,8 @@ Enhance the loaded theme.
     ("wv" . split-window-vertically)
     ("ww" . windmove-hydra/body))
 
-  (global-key "C-J" #'join-next-line)
-  (global-key "C-K" #'join-line)
+  (global-key "C-S-j" #'join-next-line)
+  (global-key "C-S-k" #'join-line)
 #+END_SRC
 * Auto-completion
 #+BEGIN_SRC emacs-lisp
@@ -878,7 +883,7 @@ Semantic setup
 ** Swiper
 #+BEGIN_SRC emacs-lisp
   (prefixed-key "ss" swiper)
-  (key-chord-define-global "ss" 'swiper)
+  (key-chord-define-global "??" 'swiper)
 #+END_SRC
 * TODO Iedit
 * Anzu

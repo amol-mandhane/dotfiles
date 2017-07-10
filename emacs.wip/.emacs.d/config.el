@@ -155,6 +155,9 @@
 
 (setq-default custom-file "/dev/null")
 
+(use-package crux
+  :ensure t)
+
 (use-package which-key
   :ensure t
   :diminish which-key-mode
@@ -203,8 +206,8 @@
   ("wv" . split-window-vertically)
   ("ww" . windmove-hydra/body))
 
-(global-key "C-J" #'join-next-line)
-(global-key "C-K" #'join-line)
+(global-key "C-S-j" #'join-next-line)
+(global-key "C-S-k" #'join-line)
 
 (use-package company
   :ensure t
@@ -650,7 +653,7 @@ _p_rev	_m_ine	_E_diff	_=_: mine-other	_RET_: current
   :ensure t)
 
 (prefixed-key "ss" swiper)
-(key-chord-define-global "ss" 'swiper)
+(key-chord-define-global "??" 'swiper)
 
 (use-package anzu
   :ensure t
