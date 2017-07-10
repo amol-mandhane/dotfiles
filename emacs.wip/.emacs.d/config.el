@@ -156,7 +156,15 @@
 (setq-default custom-file "/dev/null")
 
 (use-package crux
-  :ensure t)
+  :ensure t
+  :config
+  (progn
+    (global-key "C-a" #'crux-move-beginning-of-line)
+    (global-key "C-o" #'crux-smart-open-line)
+    (global-key "C-S-o" #'crux-smart-open-line-above)
+    (global-key "C-S-d" #'crux-kill-whole-line)
+    (global-key "C-c =" #'crux-indent-defun)
+    (prefixed-key "tt" crux-visit-term-buffer)))
 
 (use-package which-key
   :ensure t
@@ -181,6 +189,7 @@
 (rename-key-prefix "b" "Buffers")
 (rename-key-prefix "w" "Windows")
 (rename-key-prefix "s" "Search")
+(rename-key-prefix "t" "Terminal")
 
 (defhydra windmove-hydra ()
   "windmove"
@@ -218,6 +227,12 @@
   :after company
   :config (company-quickhelp-mode +1))
 
+(use-package eldoc
+  :ensure t
+  :diminish eldoc-mode
+  :config
+  (global-eldoc-mode +1))
+
 ;; (use-package spaceline
 ;;   :ensure t
 ;;  :config
@@ -232,14 +247,13 @@
 
 (use-package flycheck
   :ensure t
-  :diminish (flycheck-mode . " !")
+  :init
+  (setq flycheck-keymap-prefix (kbd (concat +keybinding/mnemonic-prefix+ " e")))
   :config
   (progn
     (global-flycheck-mode t)
     (rename-key-prefix "e" "Errors")
-    (prefixed-keys
-     ("en" . flycheck-next-error)
-     ("ep" . flycheck-previous-error))))
+    (setq flycheck-mode-line-prefix "!")))
 
 ; (electric-pair-mode +1)
 
@@ -385,7 +399,10 @@ _p_rev	_m_ine	_E_diff	_=_: mine-other	_RET_: current
     (setq projectile-enable-caching t)
     (setq projectile-keymap-prefix (kbd (concat +keybinding/mnemonic-prefix+ " p"))))
   :config
-  (projectile-global-mode))
+  (progn
+    (projectile-global-mode +1)
+    (setq projectile-completion-system 'ivy)
+    (setq projectile-mode-line '(:eval (format " P[%s]" (projectile-project-name))))))
 
 (use-package yasnippet
   :ensure t
@@ -505,6 +522,49 @@ _p_rev	_m_ine	_E_diff	_=_: mine-other	_RET_: current
 ;;   :after rtags
 ;;   :config
 ;;   (add-to-list 'company-backends 'company-rtags))
+
+;; Helper functions.
+(defun elisp-visit-ielm ()
+  "Switch to default `ielm' buffer.
+Start `ielm' if it's not already running."
+  (interactive)
+  (crux-start-or-switch-to 'ielm "*ielm*"))
+
+(defun elisp-recompile-elc-on-save ()
+  "Recompile your elc when saving an elisp file."
+  (add-hook 'after-save-hook
+            (lambda ()
+              (when (and
+                     (string-prefix-p prelude-dir (file-truename buffer-file-name))
+                     (file-exists-p (byte-compile-dest-file buffer-file-name)))
+                (emacs-lisp-byte-compile)))
+            nil
+            t))
+
+(defun conditionally-enable-smartparens-mode ()
+  "Enable `smartparens-mode' in the minibuffer, during `eval-expression'."
+  (if (eq this-command 'eval-expression)
+      (smartparens-mode +1)))
+
+(defun emacs-lisp-mode-setup ()
+  "Setup for emacs-lisp mode."
+  (elisp-recompile-elc-on-save)
+  (setq mode-name "ELisp"))
+
+(add-hook 'emacs-lisp-mode-hook #'emacs-lisp-mode-setup)
+(add-hook 'minibuffer-setup-hook #'conditionally-enable-smartparens-mode)
+
+(use-package elisp-slime-nav
+  :ensure t
+  :diminish elisp-slime-nav-mode
+  :config
+  (dolist (hook '(emacs-lisp-mode-hook ielm-mode-hook))
+    (add-hook hook 'turn-on-elisp-slime-nav-mode)))
+
+(define-key emacs-lisp-mode-map (kbd "C-c C-z") 'elisp-visit-ielm)
+(define-key emacs-lisp-mode-map (kbd "C-c C-c") 'eval-defun)
+(define-key emacs-lisp-mode-map (kbd "C-c C-b") 'eval-buffer)
+(define-key emacs-lisp-mode-map (kbd "C-c C-r") 'eval-region)
 
 (add-to-list 'flycheck-ghc-search-path (expand-file-name "~/.xmonad/lib"))
 
@@ -666,3 +726,5 @@ _p_rev	_m_ine	_E_diff	_=_: mine-other	_RET_: current
 (use-package undo-tree
   :ensure t
   :diminish undo-tree-mode)
+
+(load-file "~/.emacs.machine.el")

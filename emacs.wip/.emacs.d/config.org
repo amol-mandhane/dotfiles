@@ -217,10 +217,18 @@ Approach to evolve interface framework
 #+BEGIN_SRC emacs-lisp
 (setq-default custom-file "/dev/null")
 #+END_SRC
-** Crux package
+** Crux helper setup
 #+BEGIN_SRC emacs-lisp
   (use-package crux
-    :ensure t)
+    :ensure t
+    :config
+    (progn
+      (global-key "C-a" #'crux-move-beginning-of-line)
+      (global-key "C-o" #'crux-smart-open-line)
+      (global-key "C-S-o" #'crux-smart-open-line-above)
+      (global-key "C-S-d" #'crux-kill-whole-line)
+      (global-key "C-c =" #'crux-indent-defun)
+      (prefixed-key "tt" crux-visit-term-buffer)))
 #+END_SRC
 * Which Key?
 #+BEGIN_SRC emacs-lisp
@@ -256,6 +264,7 @@ Enhance the loaded theme.
   (rename-key-prefix "b" "Buffers")
   (rename-key-prefix "w" "Windows")
   (rename-key-prefix "s" "Search")
+  (rename-key-prefix "t" "Terminal")
 #+END_SRC
 * General shortcuts
 #+BEGIN_SRC emacs-lisp
@@ -298,6 +307,14 @@ Enhance the loaded theme.
     :config (company-quickhelp-mode +1))
 #+END_SRC
 
+* Documentation
+#+BEGIN_SRC emacs-lisp
+  (use-package eldoc
+    :ensure t
+    :diminish eldoc-mode
+    :config
+    (global-eldoc-mode +1))
+#+END_SRC
 * Spaceline
 #+BEGIN_SRC emacs-lisp
 
@@ -320,14 +337,13 @@ Enhance the loaded theme.
 #+BEGIN_SRC emacs-lisp
   (use-package flycheck
     :ensure t
-    :diminish (flycheck-mode . " !")
+    :init
+    (setq flycheck-keymap-prefix (kbd (concat +keybinding/mnemonic-prefix+ " e")))
     :config
     (progn
       (global-flycheck-mode t)
       (rename-key-prefix "e" "Errors")
-      (prefixed-keys
-       ("en" . flycheck-next-error)
-       ("ep" . flycheck-previous-error))))
+      (setq flycheck-mode-line-prefix "!")))
 #+END_SRC
 * Smartparens/Indentation/autopair
 ** Electric-pair mode
@@ -511,7 +527,10 @@ Use `C-x v` prefixed commands for now.
       (setq projectile-enable-caching t)
       (setq projectile-keymap-prefix (kbd (concat +keybinding/mnemonic-prefix+ " p"))))
     :config
-    (projectile-global-mode))
+    (progn
+      (projectile-global-mode +1)
+      (setq projectile-completion-system 'ivy)
+      (setq projectile-mode-line '(:eval (format " P[%s]" (projectile-project-name))))))
 #+END_SRC
 * Snippets
 #+BEGIN_SRC emacs-lisp
@@ -586,7 +605,7 @@ Multi-colored parantheses are helpful, especially in lisp-like modes.
 #+BEGIN_SRC emacs-lisp
 (setq org-refile-targets '((org-agenda-files . (:maxlevel . 6))))
 #+END_SRC
-* TODO Lang setup [5/13]
+* TODO Lang setup [6/13]
 ** DONE C/C++
 *** Irony Mode
 Irony mode is clang based autocompletion and syntax checker. It is like YouCompleteMe, but only for C-family and better.
@@ -679,7 +698,51 @@ Still, good to have in config.
 
 *** TODO Set up debugger
 ** TODO common-lisp
-** TODO Elisp
+** DONE Emacs Lisp
+#+BEGIN_SRC emacs-lisp
+  ;; Helper functions.
+  (defun elisp-visit-ielm ()
+    "Switch to default `ielm' buffer.
+  Start `ielm' if it's not already running."
+    (interactive)
+    (crux-start-or-switch-to 'ielm "*ielm*"))
+
+  (defun elisp-recompile-elc-on-save ()
+    "Recompile your elc when saving an elisp file."
+    (add-hook 'after-save-hook
+              (lambda ()
+                (when (and
+                       (string-prefix-p prelude-dir (file-truename buffer-file-name))
+                       (file-exists-p (byte-compile-dest-file buffer-file-name)))
+                  (emacs-lisp-byte-compile)))
+              nil
+              t))
+
+  (defun conditionally-enable-smartparens-mode ()
+    "Enable `smartparens-mode' in the minibuffer, during `eval-expression'."
+    (if (eq this-command 'eval-expression)
+        (smartparens-mode +1)))
+
+  (defun emacs-lisp-mode-setup ()
+    "Setup for emacs-lisp mode."
+    (elisp-recompile-elc-on-save)
+    (setq mode-name "ELisp"))
+
+  (add-hook 'emacs-lisp-mode-hook #'emacs-lisp-mode-setup)
+  (add-hook 'minibuffer-setup-hook #'conditionally-enable-smartparens-mode)
+
+  (use-package elisp-slime-nav
+    :ensure t
+    :diminish elisp-slime-nav-mode
+    :config
+    (dolist (hook '(emacs-lisp-mode-hook ielm-mode-hook))
+      (add-hook hook 'turn-on-elisp-slime-nav-mode)))
+
+  (define-key emacs-lisp-mode-map (kbd "C-c C-z") 'elisp-visit-ielm)
+  (define-key emacs-lisp-mode-map (kbd "C-c C-c") 'eval-defun)
+  (define-key emacs-lisp-mode-map (kbd "C-c C-b") 'eval-buffer)
+  (define-key emacs-lisp-mode-map (kbd "C-c C-r") 'eval-region)
+#+END_SRC
 ** TODO Go
 ** TODO Haskell
 Add libraries for XMonad.
@@ -909,3 +972,7 @@ Don't use evil mode for general purpose. Current use of evil mode is for vim lik
 #+END_SRC
 * TODO Gnus
 * TODO ERC
+* Load machine configuration
+#+BEGIN_SRC emacs-lisp
+  (load-file "~/.emacs.machine.el")
+#+END_SRC
