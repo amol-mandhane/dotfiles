@@ -175,9 +175,9 @@
       which-key-side-window-max-width 0.33
       which-key-idle-delay 0.05))
 
-(use-package darktooth-theme
+(use-package flatui
   :ensure t
-  :config (load-theme 'darktooth t))
+  :config (load-theme 'flatui t))
 
 (require 'theme-enhancement)
 (theme-enhancement/apply)
@@ -208,7 +208,7 @@
   ("C-i" . switch-to-previous-buffer)
   ("bn" . next-buffer)
   ("bp" . previous-buffer)
-  ("ff" . find-file)
+  ("ff" . counsel-find-file)
   ("wd" . delete-window)
   ("wD" . delete-other-window)
   ("wh" . split-window-horizontally)
@@ -534,9 +534,7 @@ Start `ielm' if it's not already running."
   "Recompile your elc when saving an elisp file."
   (add-hook 'after-save-hook
             (lambda ()
-              (when (and
-                     (string-prefix-p prelude-dir (file-truename buffer-file-name))
-                     (file-exists-p (byte-compile-dest-file buffer-file-name)))
+              (when (file-exists-p (byte-compile-dest-file buffer-file-name))
                 (emacs-lisp-byte-compile)))
             nil
             t))
@@ -708,6 +706,13 @@ Start `ielm' if it's not already running."
 (add-hook 'c-mode-hook 'semantic-mode)
 ;; etc etc
 (add-hook 'prog-mode-hook 'semantic-mode)
+
+(use-package emr
+  :ensure t
+  :config
+  (progn
+    (add-hook 'prog-mode-hook 'emr-initialize)
+    (mode-key prog-mode-map "M-RET" emr-show-refactor-menu)))
 
 (use-package ag
   :ensure t)

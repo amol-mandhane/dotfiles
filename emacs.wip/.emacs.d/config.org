@@ -244,9 +244,9 @@ Approach to evolve interface framework
 
 * Theme
 #+BEGIN_SRC emacs-lisp
-(use-package darktooth-theme
-  :ensure t
-  :config (load-theme 'darktooth t))
+  (use-package flatui
+    :ensure t
+    :config (load-theme 'flatui t))
 #+END_SRC
 
 Enhance the loaded theme.
@@ -285,7 +285,7 @@ Enhance the loaded theme.
     ("C-i" . switch-to-previous-buffer)
     ("bn" . next-buffer)
     ("bp" . previous-buffer)
-    ("ff" . find-file)
+    ("ff" . counsel-find-file)
     ("wd" . delete-window)
     ("wD" . delete-other-window)
     ("wh" . split-window-horizontally)
@@ -711,9 +711,7 @@ Still, good to have in config.
     "Recompile your elc when saving an elisp file."
     (add-hook 'after-save-hook
               (lambda ()
-                (when (and
-                       (string-prefix-p prelude-dir (file-truename buffer-file-name))
-                       (file-exists-p (byte-compile-dest-file buffer-file-name)))
+                (when (file-exists-p (byte-compile-dest-file buffer-file-name))
                   (emacs-lisp-byte-compile)))
               nil
               t))
@@ -774,7 +772,7 @@ Add libraries for XMonad.
           '((nil "^[[:space:]]*\\(message\\|service\\|enum\\)[[:space:]]+\\([[:alnum:]]+\\)" 2))))))
 #+END_SRC
 ** DONE Python
-Python mode setup
+*** Python mode setup
 #+BEGIN_SRC emacs-lisp
   (use-package python
     :ensure t
@@ -783,7 +781,7 @@ Python mode setup
           python-shell-interpreter-args "--simple-prompt -i"))
 #+END_SRC
 
-Anaconda setup
+*** Anaconda setup
 #+BEGIN_SRC emacs-lisp
   (use-package anaconda-mode
     :ensure t
@@ -798,7 +796,7 @@ Anaconda setup
     (add-to-list 'company-backends 'company-anaconda))
 #+END_SRC
 
-Virtualenv
+*** Virtualenv
 #+BEGIN_SRC emacs-lisp
   (use-package virtualenvwrapper
     :ensure t
@@ -816,18 +814,19 @@ Virtualenv
     (pyenv-mode +1))
 #+END_SRC
 
-Formatter
+*** Formatter
 #+BEGIN_SRC emacs-lisp
   (use-package py-yapf
     :ensure t)
 
 #+END_SRC
 
-Testing
+*** Testing
 #+BEGIN_SRC emacs-lisp
   (use-package pytest
     :ensure t)
 #+END_SRC
+*** TODO Setup ein
 ** DONE Shell
 
 Setup for Bash and Zsh files
@@ -895,19 +894,19 @@ Insert shebang
              'comint-dynamic-complete-filename)))))
 #+END_SRC
 * Semantic
-Stickyfunc
+** Stickyfunc
 #+BEGIN_SRC emacs-lisp
   (use-package stickyfunc-enhance
     :ensure t)
 #+END_SRC
 
-Srefactor
+** Srefactor
 #+BEGIN_SRC emacs-lisp
   (use-package srefactor
     :ensure t)
 #+END_SRC
 
-Semantic setup
+** Semantic setup
 #+BEGIN_SRC emacs-lisp
   (setq semantic-default-submodes
         '( ;; Perform semantic actions during idle time
@@ -935,6 +934,16 @@ Semantic setup
   (add-hook 'c-mode-hook 'semantic-mode)
   ;; etc etc
   (add-hook 'prog-mode-hook 'semantic-mode)
+#+END_SRC
+
+** Emacs Refactor
+#+BEGIN_SRC emacs-lisp
+  (use-package emr
+    :ensure t
+    :config
+    (progn
+      (add-hook 'prog-mode-hook 'emr-initialize)
+      (mode-key prog-mode-map "M-RET" emr-show-refactor-menu)))
 #+END_SRC
 * TODO Tags
 * Search
