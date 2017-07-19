@@ -313,6 +313,11 @@ IGNORE: ignore."
   :diminish (smartparens-mode . " ✓")
   :config
   (smartparens-global-mode +1)
+
+  ;; Setup smartparens in minibuffer
+  (setq sp-ignore-modes-list (delete 'minibuffer-inactive-mode sp-ignore-modes-list))
+  (sp-local-pair 'minibuffer-inactive-mode "'" nil :actions nil)
+
   (mode-keys smartparens-mode-map
              ;; Navigation
              ("C-M-a" . sp-beginning-of-sexp)
@@ -579,18 +584,12 @@ Start `ielm' if it's not already running."
    nil
    t))
 
-(defun conditionally-enable-smartparens-mode ()
-  "Enable `smartparens-mode' in the minibuffer, during `eval-expression'."
-  (if (eq this-command 'eval-expression)
-      (smartparens-mode +1)))
-
 (defun emacs-lisp-mode-setup ()
   "Setup for emacs-lisp mode."
   (elisp-recompile-elc-on-save)
   (setq mode-name "ELisp"))
 
 (add-hook 'emacs-lisp-mode-hook #'emacs-lisp-mode-setup)
-(add-hook 'minibuffer-setup-hook #'conditionally-enable-smartparens-mode)
 
 (use-package elisp-slime-nav
   :ensure t
@@ -698,7 +697,11 @@ Start `ielm' if it's not already running."
       'company-shell))))
 
 (use-package insert-shebang
-  :ensure t)
+  :ensure t
+  :config
+  (progn
+    ;; Don't insert shebang proactively.
+    (remove-hook 'find-file-hook 'insert-shebang)))
 
 (use-package ess
   :ensure t
