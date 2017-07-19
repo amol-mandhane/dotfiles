@@ -103,11 +103,11 @@
 (setq vc-follow-symlinks t)				       ; don't ask for confirmation when opening symlinked file
 (setq auto-save-file-name-transforms '((".*" "~/.emacs.d/auto-save-list/" t))) ;transform backups file name
 (setq inhibit-startup-screen t)	; inhibit useless and old-school startup screen
-(setq ring-bell-function 'ignore)	; silent bell when you make a mistake
 (setq coding-system-for-read 'utf-8)	; use utf-8 by default
 (setq coding-system-for-write 'utf-8)
 (setq sentence-end-double-space nil)	; sentence SHOULD end with only a point.
-(setq default-fill-column 80)		; toggle wrapping text at the 80th character
+(setq fill-column 80)		; toggle wrapping text at the 80th character
+(setq visible-bell t)                   ; Show the bell alert using visible flashes than audio dings.
 
 (scroll-bar-mode -1)
 (tool-bar-mode -1)
@@ -127,7 +127,7 @@
 
 (setq require-final-newline t)
 
-(set-default-font "Inconsolata-18")
+(set-frame-font "Inconsolata-18")
 (setq default-frame-alist '((font . "Inconsolata-18")))
 
 (setq-default cursor-type 'bar)
@@ -166,6 +166,29 @@
     (global-key "C-c =" #'crux-indent-defun)
     (prefixed-key "tt" crux-visit-term-buffer)))
 
+(use-package fill-column-indicator
+  :ensure t
+  :config
+  (enable-minor-mode-globally fci-mode))
+
+(defvar-local company-fci-mode-on-p nil)
+
+(defun company-turn-off-fci (&rest ignore)
+  "Turn off FCI for company mode.
+IGNORE: ignore."
+  (when (boundp 'fci-mode)
+    (setq company-fci-mode-on-p fci-mode)
+    (when fci-mode (fci-mode -1))))
+
+(defun company-maybe-turn-on-fci (&rest ignore)
+  "Turn on FCI when company mode is off.
+IGNORE: ignore."
+  (when company-fci-mode-on-p (fci-mode +1)))
+
+(add-hook 'company-completion-started-hook 'company-turn-off-fci)
+(add-hook 'company-completion-finished-hook 'company-maybe-turn-on-fci)
+(add-hook 'company-completion-cancelled-hook 'company-maybe-turn-on-fci)
+
 (use-package which-key
   :ensure t
   :diminish which-key-mode
@@ -175,9 +198,9 @@
       which-key-side-window-max-width 0.33
       which-key-idle-delay 0.05))
 
-(use-package flatui
+(use-package anti-zenburn-theme
   :ensure t
-  :config (load-theme 'flatui t))
+  :config (load-theme 'anti-zenburn t))
 
 (require 'theme-enhancement)
 (theme-enhancement/apply)
@@ -205,7 +228,7 @@
 (prefixed-keys
   ("bb" . switch-to-buffer)
   ("bd" . kill-this-buffer)
-  ("C-i" . switch-to-previous-buffer)
+  ("C-i" . crux-switch-to-previous-buffer)
   ("bn" . next-buffer)
   ("bp" . previous-buffer)
   ("ff" . counsel-find-file)
@@ -215,12 +238,25 @@
   ("wv" . split-window-vertically)
   ("ww" . windmove-hydra/body))
 
-(global-key "C-S-j" #'join-next-line)
-(global-key "C-S-k" #'join-line)
+(global-keys
+  ("C-S-j" . #'join-next-line)
+  ("C-S-k" . #'join-line)
+  ("C-S-y" . crux-duplicate-current-line-or-region))
+(global-key "C-x C-b" 'ibuffer)
+(global-key "M-/" 'hippie-expand)
+
+(global-keys
+ ("C-s" . isearch-forward-regexp)
+ ("C-r" . isearch-backward-regexp)
+ ("C-M-s" . isearch-forward)
+ ("C-M-r" . isearch-backward))
 
 (use-package company
   :ensure t
-  :config (global-company-mode t))
+  :config
+  (progn
+    (global-company-mode t)
+    (setq company-show-numbers t)))
 
 (use-package company-quickhelp
   :ensure t
@@ -344,6 +380,9 @@
 
 ;; Save recent files every few minutes.
 (run-at-time nil (* 5 60) 'recentf-save-list)
+
+;; Silent the saved recent files message
+(silence-function 'recentf-save-list)
 
 (use-package magit
   :ensure t
@@ -532,12 +571,13 @@ Start `ielm' if it's not already running."
 
 (defun elisp-recompile-elc-on-save ()
   "Recompile your elc when saving an elisp file."
-  (add-hook 'after-save-hook
-            (lambda ()
-              (when (file-exists-p (byte-compile-dest-file buffer-file-name))
-                (emacs-lisp-byte-compile)))
-            nil
-            t))
+  (add-hook
+   'after-save-hook
+   (lambda ()
+     (when (and (file-exists-p (byte-compile-dest-file buffer-file-name)))
+       (emacs-lisp-byte-compile)))
+   nil
+   t))
 
 (defun conditionally-enable-smartparens-mode ()
   "Enable `smartparens-mode' in the minibuffer, during `eval-expression'."
