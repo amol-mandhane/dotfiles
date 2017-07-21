@@ -61,8 +61,8 @@
       'ido-setup-hook
       (lambda () (mode-keys
                    ido-completion-map
-                   ("<tab>" . ido-exit-minibuffer)
-                   ("<return>" . ido-exit-minibuffer))))
+                   ("<tab>" . 'ido-exit-minibuffer)
+                   ("<return>" . 'ido-exit-minibuffer))))
 
     (ido-mode +1)
     (ido-everywhere +1)
@@ -90,9 +90,9 @@
             (counsel-find-file . ivy--regex-fuzzy)
             (t . ivy--regex-plus)))
     (global-keys
-      ("M-x" . counsel-M-x)
-      ("C-c M-x" . execute-extended-command)
-      ("C-x C-f" . counsel-find-file))))
+      ("M-x" . 'counsel-M-x)
+      ("C-c M-x" . 'execute-extended-command)
+      ("C-x C-f" . 'counsel-find-file))))
 
 (require 'helper-functions)
 
@@ -140,7 +140,7 @@
   ("g" text-scale-increase "in")
   ("l" text-scale-decrease "out"))
 
-(prefixed-key "zz" text-zoom/body)
+(prefixed-key "zz" #'text-zoom/body)
 
 (use-package annoying-arrows-mode
   :ensure t
@@ -164,7 +164,7 @@
     (global-key "C-S-o" #'crux-smart-open-line-above)
     (global-key "C-S-d" #'crux-kill-whole-line)
     (global-key "C-c =" #'crux-indent-defun)
-    (prefixed-key "tt" crux-visit-term-buffer)))
+    (prefixed-key "tt" #'crux-visit-term-buffer)))
 
 (use-package fill-column-indicator
   :ensure t
@@ -205,14 +205,14 @@ IGNORE: ignore."
 (require 'theme-enhancement)
 (theme-enhancement/apply)
 
-(rename-key-prefix "g" "VCS")
-(rename-key-prefix "e" "Errors")
-(rename-key-prefix "p" "Projects")
-(rename-key-prefix "f" "Files")
-(rename-key-prefix "b" "Buffers")
-(rename-key-prefix "w" "Windows")
-(rename-key-prefix "s" "Search")
-(rename-key-prefix "t" "Terminal")
+(rename-mnemonic-key-prefix "g" "VCS")
+(rename-mnemonic-key-prefix "e" "Errors")
+(rename-mnemonic-key-prefix "p" "Projects")
+(rename-mnemonic-key-prefix "f" "Files")
+(rename-mnemonic-key-prefix "b" "Buffers")
+(rename-mnemonic-key-prefix "w" "Windows")
+(rename-mnemonic-key-prefix "s" "Search")
+(rename-mnemonic-key-prefix "t" "Terminal")
 
 (defhydra windmove-hydra ()
   "windmove"
@@ -226,30 +226,30 @@ IGNORE: ignore."
   ("l" windmove-right "right"))
 
 (prefixed-keys
-  ("bb" . switch-to-buffer)
-  ("bd" . kill-this-buffer)
-  ("C-i" . crux-switch-to-previous-buffer)
-  ("bn" . next-buffer)
-  ("bp" . previous-buffer)
-  ("ff" . counsel-find-file)
-  ("wd" . delete-window)
-  ("wD" . delete-other-window)
-  ("wh" . split-window-horizontally)
-  ("wv" . split-window-vertically)
-  ("ww" . windmove-hydra/body))
+  ("bb" . 'switch-to-buffer)
+  ("bd" . 'kill-this-buffer)
+  ("C-i" . #'crux-switch-to-previous-buffer)
+  ("bn" . 'next-buffer)
+  ("bp" . 'previous-buffer)
+  ("ff" . 'counsel-find-file)
+  ("wd" . 'delete-window)
+  ("wD" . 'delete-other-window)
+  ("wh" . 'split-window-horizontally)
+  ("wv" . 'split-window-vertically)
+  ("ww" . #'windmove-hydra/body))
 
 (global-keys
   ("C-S-j" . #'join-next-line)
   ("C-S-k" . #'join-line)
-  ("C-S-y" . crux-duplicate-current-line-or-region))
+  ("C-S-y" . #'crux-duplicate-current-line-or-region))
 (global-key "C-x C-b" 'ibuffer)
 (global-key "M-/" 'hippie-expand)
 
 (global-keys
- ("C-s" . isearch-forward-regexp)
- ("C-r" . isearch-backward-regexp)
- ("C-M-s" . isearch-forward)
- ("C-M-r" . isearch-backward))
+ ("C-s" . 'isearch-forward-regexp)
+ ("C-r" . 'isearch-backward-regexp)
+ ("C-M-s" . 'isearch-forward)
+ ("C-M-r" . 'isearch-backward))
 
 (use-package company
   :ensure t
@@ -288,7 +288,7 @@ IGNORE: ignore."
   :config
   (progn
     (global-flycheck-mode t)
-    (rename-key-prefix "e" "Errors")
+    (rename-mnemonic-key-prefix "e" "Errors")
     (setq flycheck-mode-line-prefix "!")))
 
 ; (electric-pair-mode +1)
@@ -320,32 +320,32 @@ IGNORE: ignore."
 
   (mode-keys smartparens-mode-map
              ;; Navigation
-             ("C-M-a" . sp-beginning-of-sexp)
-             ("C-M-e" . sp-end-of-sexp)
-             ("C-M-f" . sp-forward-sexp)
-             ("C-M-b" . sp-backward-sexp)
+             ("C-M-a" . 'sp-beginning-of-sexp)
+             ("C-M-e" . 'sp-end-of-sexp)
+             ("C-M-f" . 'sp-forward-sexp)
+             ("C-M-b" . 'sp-backward-sexp)
 
              ;; Traversal
-             ("C-<down>" . sp-down-sexp)
-             ("C-<up>" . sp-up-sexp)
-             ("M-<down>" . sp-backward-down-sexp)
-             ("M-<up>" . sp-backward-up-sexp)
-             ("C-M-n" . sp-next-sexp)
-             ("C-M-p" . sp-previous-sexp)
-             ("C-S-f" . sp-forward-symbol)
-             ("C-S-b" . sp-backward-symbol)
+             ("C-<down>" . 'sp-down-sexp)
+             ("C-<up>" . 'sp-up-sexp)
+             ("M-<down>" . 'sp-backward-down-sexp)
+             ("M-<up>" . 'sp-backward-up-sexp)
+             ("C-M-n" . 'sp-next-sexp)
+             ("C-M-p" . 'sp-previous-sexp)
+             ("C-S-f" . 'sp-forward-symbol)
+             ("C-S-b" . 'sp-backward-symbol)
 
              ;; AST re-arrange.
              ;; ("C-)" . sp-forward-slurp-sexp)
-             ("C-)" . sp-slurp-hybrid-sexp)
-             ("C-}" . sp-forward-barf-sexp)
-             ("C-(" . sp-backward-slurp-sexp)
-             ("C-{" . sp-backward-barf-sexp)
+             ("C-)" . 'sp-slurp-hybrid-sexp)
+             ("C-}" . 'sp-forward-barf-sexp)
+             ("C-(" . 'sp-backward-slurp-sexp)
+             ("C-{" . 'sp-backward-barf-sexp)
 
              ;; Killing
-             ("C-M-k" . sp-kill-sexp)
-             ("C-k" . sp-kill-hybrid-sexp)
-             ("M-k" . sp-backward-kill-sexp)
+             ("C-M-k" . 'sp-kill-sexp)
+             ("C-k" . 'sp-kill-hybrid-sexp)
+             ("M-k" . 'sp-backward-kill-sexp)
 
              ;; Unknown
              ;; ("C-M-t" . sp-transpose-sexp)
@@ -393,13 +393,13 @@ IGNORE: ignore."
   :ensure t
   :config
   (progn
-    (prefixed-key "gs" magit-status)))
+    (prefixed-key "gs" 'magit-status)))
 
 (use-package monky
   :ensure t
   :config
   (progn
-    (prefixed-key "gh" monky-status)))
+    (prefixed-key "gh" 'monky-status)))
 
 (use-package diff-hl
   :ensure t
@@ -434,7 +434,7 @@ _p_rev	_m_ine	_E_diff	_=_: mine-other	_RET_: current
   (">" smerge-diff-base-other)
   ("q" nil :color red))
 
-(prefixed-mode-key smerge-mode-map "m" hydra-smerge/body)
+(prefixed-mode-key smerge-mode-map "m" #'hydra-smerge/body)
 
 (use-package projectile
   :ensure t
@@ -454,7 +454,7 @@ _p_rev	_m_ine	_E_diff	_=_: mine-other	_RET_: current
   :config
   (progn
     (yas-global-mode +1)
-    (prefixed-key "is" yas-expand)))
+    (prefixed-key "is" #'yas-expand)))
 
 (show-paren-mode +1)
 
@@ -755,12 +755,12 @@ Start `ielm' if it's not already running."
   :config
   (progn
     (add-hook 'prog-mode-hook 'emr-initialize)
-    (mode-key prog-mode-map "M-RET" emr-show-refactor-menu)))
+    (mode-key prog-mode-map "M-RET" #'emr-show-refactor-menu)))
 
 (use-package ag
   :ensure t)
 
-(prefixed-key "ss" swiper)
+(prefixed-key "ss" 'swiper)
 (key-chord-define-global "??" 'swiper)
 
 (use-package anzu

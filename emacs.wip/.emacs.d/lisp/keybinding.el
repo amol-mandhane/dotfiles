@@ -34,11 +34,21 @@
 
 (defconst +keybinding/mnemonic-prefix+ "M-m" "Prefix of the mnemonic keybindings.")
 
-(defalias 'global-key 'bind-key*
-  "Define global keybinding which overrides all minor mode keybindings. Alias for bind-key*.")
+(defmacro global-key (key-string function)
+  "Define global keybinding which overrides all minor mode keybindings.
 
-(defalias 'global-keys 'bind-keys*
-  "Define multiple global keybindings which override all minor mode keybinding. Alias for bind-keys*.")
+  Wrapper over `global-set-key'.
+  KEY-STRING: `kbd' style string representation of keybinding.
+  FUNCTION: Function to associate the keybinding to."
+  `(global-set-key (kbd ,key-string) ,function))
+
+(defmacro global-keys (&rest keys)
+  "Define multiple global keybindings which override all minor mode keybinding.
+
+  KEYS: conses of (`kbd' style keybinding string . function) for keybinding definition."
+  `(progn ,@(cl-loop
+	     for keybd in keys
+	     collect `(global-key ,(car keybd) ,(cdr keybd)))))
 
 (defmacro mode-key (keymap key-string function)
   "Define keybinding for specific keymap.
@@ -47,7 +57,7 @@
   KEY-STRING: `kbd' style string representation of keybinding.
   FUNCTION: Function to associate the keybinding to."
 
-  `(define-key ,keymap (kbd ,key-string) (quote ,function)))
+  `(define-key ,keymap (kbd ,key-string) ,function))
 
 (defmacro mode-keys (keymap &rest keys)
   "Define keybindings for specific keymap.
@@ -63,7 +73,7 @@
 
   KEY-STRING: `kbd' style keybinding string.
   FUNCTION: Function to bind the key to."
-  `(bind-keys ((concat +keybinding/mnemonic-prefix+ " " ,key-string) . ,function)))
+  `(bind-key (concat +keybinding/mnemonic-prefix+ " " ,key-string) ,function))
 
 (defmacro prefixed-keys (&rest keys)
   "Define keys with mnemonic prefix.
@@ -79,7 +89,7 @@
   KEYMAP: Keymap to add the binding to.
   KEY-STRING: `kbd' style keybinding string.
   FUNCTION: Function to bind the key to."
-  `(bind-keys :map ,keymap ((concat +keybinding/mnemonic-prefix+ " " ,key-string) . ,function)))
+  `(bind-key (concat +keybinding/mnemonic-prefix+ " " ,key-string) ,function ,keymap))
 
 (defmacro prefixed-mode-keys (keymap &rest keys)
   "Define keys with mnemonic prefox within the given keymap.
@@ -102,7 +112,7 @@
 
   KEY-STRING: `kbd' style keybinding string.
   NAME: String label."
-  (which-key-add-key-based-replacements (concat +keybinding/mnemonic-prefix+ " " key-string) name))
+  (which-key-add-key-based-replacements key-string name))
 
 (provide 'keybinding)
 ;;; keybinding.el ends here

@@ -103,6 +103,25 @@
   '(font-lock-comment-face
     font-lock-doc-face))
 
+(defun theme-enhancement--org-mode ()
+  "Apply theme enhancements to `org-mode' faces.
+
+Currently these are borrowed from Cyberpunk theme."
+  (set-face-attribute 'org-document-title nil :weight 'bold :height 1.5)
+  (set-face-attribute 'org-document-info nil :weight 'bold)
+  (set-face-attribute 'org-agenda-date-today nil :slant 'italic :weight 'bold)
+  (set-face-attribute 'org-agenda-structure nil :inherit font-lock-comment-face)
+  (set-face-attribute 'org-archived nil :slant 'italic)
+  (set-face-attribute 'org-checkbox nil :box '(:line-width 1 :style 'released-button))
+  (set-face-attribute 'org-date nil :underline t)
+  (set-face-attribute 'org-done nil :bold t :weight 'bold :box '(:line-width 1 :style 'none))
+  (set-face-attribute 'org-todo nil :bold t :weight 'bold :box '(:line-width 1 :style 'none))
+  (set-face-attribute 'org-level-1 nil :bold t :weight 'bold :height 1.2)
+  (set-face-attribute 'org-level-2 nil :height 1.1)
+  (set-face-attribute 'org-link nil :underline t)
+  (set-face-attribute 'org-tag nil :bold t :weight 'bold)
+  (set-face-attribute 'org-column-title nil :underline t :weight 'bold))
+
 (require 'cl-lib)
 
 (defun theme-enhancement/apply ()
@@ -111,7 +130,8 @@
     (cl-loop for f in +theme-enhancement/bold-faces+
 	     collect (ignore-errors (set-face-bold f t)))
     (cl-loop for f in +theme-enhancement/italic-faces+
-	     collect (set-face-italic f t))))
+	     collect (set-face-italic f t))
+    (theme-enhancement--org-mode)))
 
 (provide 'theme-enhancement)
 ;;; theme-enhancement.el ends here
