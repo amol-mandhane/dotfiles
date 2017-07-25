@@ -792,7 +792,7 @@ Add libraries for XMonad.
 ** TODO JS
 ** DONE Java
 #+BEGIN_SRC emacs-lisp
-  (use-package meghanda
+  (use-package meghanada
     :ensure t
     :config
     (progn
@@ -1148,9 +1148,12 @@ Don't use evil mode for general purpose. Current use of evil mode is for vim lik
 
 ** Color theme
 #+BEGIN_SRC emacs-lisp
-  (use-package anti-zenburn-theme
+  (use-package color-theme-sanityinc-tomorrow
     :ensure t
-    :config (load-theme 'anti-zenburn t))
+    :config
+    (progn
+      (set-face-background 'linum "#282a2e")
+      (load-theme 'sanityinc-tomorrow-night t)))
 #+END_SRC
 
 ** Modeline

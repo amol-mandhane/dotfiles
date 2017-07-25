@@ -601,7 +601,7 @@ Start `ielm' if it's not already running."
 
 (add-to-list 'flycheck-ghc-search-path (expand-file-name "~/.xmonad/lib"))
 
-(use-package meghanda
+(use-package meghanada
   :ensure t
   :config
   (progn
@@ -862,9 +862,12 @@ Start `ielm' if it's not already running."
 (use-package let-alist :ensure t)
 (use-package all-the-icons :ensure t)
 
-(use-package anti-zenburn-theme
+(use-package color-theme-sanityinc-tomorrow
   :ensure t
-  :config (load-theme 'anti-zenburn t))
+  :config
+  (progn
+    (set-face-background 'linum "#282a2e")
+    (load-theme 'sanityinc-tomorrow-night t)))
 
 ;; (use-package spaceline
 ;;   :ensure t
