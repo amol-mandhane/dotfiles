@@ -176,7 +176,8 @@
   ("h" windmove-left "left")
   ("j" windmove-down "down")
   ("k" windmove-up "up")
-  ("l" windmove-right "right"))
+  ("l" windmove-right "right")
+  ("q" nil "quit"))
 
 (prefixed-keys
   ("bb" . 'switch-to-buffer)
@@ -715,6 +716,26 @@ Start `ielm' if it's not already running."
            'comint-dynamic-complete-filename)))))
 
 (setq org-agenda-files '("~/organizer/main.org"))
+
+(setq
+ org-agenda-custom-commands
+ '(("c" "GTD Agenda View"
+    ((agenda "")
+     (alltodo "")))))
+
+;; Add this above for high priority task
+;; (tags
+;;  "PRIORITY=\"A\""
+;;  ((org-agenda-skip-function '(org-agenda-skip-entry-if 'todo 'done))
+;;   (org-agenda-overriding-header "High-priority unfinished tasks:")))
+
+(defun load-org-gtd-agenda ()
+  "Load custom agenda directly."
+  (interactive)
+  (org-agenda nil "c"))
+
+(global-key "<f2>" #'load-org-gtd-agenda)
+(global-key "C-c a" #'load-org-gtd-agenda)
 
 (use-package org-bullets
   :ensure t
