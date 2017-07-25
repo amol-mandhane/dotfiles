@@ -389,6 +389,15 @@ Enhance the loaded theme.
       (rename-mnemonic-key-prefix "e" "Errors")
       (setq flycheck-mode-line-prefix "!")))
 #+END_SRC
+
+Show errors in tooltip
+#+BEGIN_SRC emacs-lisp
+  (use-package flycheck-pos-tip
+    :ensure t
+    :after flycheck
+    :config
+    (flycheck-pos-tip-mode +1))
+#+END_SRC
 * Smartparens/Indentation/autopair
 ** Electric-pair mode
 Electric-pair mode closes parenthesis automatically. However, if I'm using
