@@ -29,6 +29,7 @@
 (require 'flycheck)
 (require 'erc-track)
 (require 'let-alist)
+(require 'all-the-icons)
 
 (defgroup helium-mode-line nil
   "Group for the faces of Helium mode line."
@@ -114,39 +115,45 @@ Empty string otherwise."
       ((project-name (projectile-project-name)))
     (if (eq project-name "-") "" (concat "[" project-name "]"))))
 
-(defun helium--errors ()
+(defun helium--errors (error-face no-error-face)
   "Generate the string to display errors in the mode-line.
 
 Also propertizes the string to show flycheck mode menu on clicking the
-mode-line section."
+mode-line section.
+
+ERROR-FACE: Face to use to display error information.
+NO-ERROR-FACE: Face to use to display \"no errors\" information."
   (when (boundp 'flycheck-last-status-change)
-    (let
-	((flycheck-string
+    (let*
+	((all-the-icons-default-adjust 0)
+	 (all-the-icons-scale-factor 1)
+	 (flycheck-string
 	  (pcase flycheck-last-status-change
 	    ('finished
 	     (if flycheck-current-errors
 		 (let-alist (flycheck-count-errors flycheck-current-errors)
-		   (let
-		       ((err-string (concat " " (prin1-to-string (or .error 0))))
-			(warn-string (concat " " (prin1-to-string (or .warning 0)))))
-		     (concat err-string " " warn-string)))
-	       ""))
-	    ('running "")
-	    ('no-checker "")
-	    ('errored "")
-	    ('interrupted "")
-	    (default ""))))
+		   (concat
+		    (all-the-icons-octicon "flame" :face error-face)
+		    " "
+		    (prin1-to-string (or .error 0))
+		    " "
+		    (all-the-icons-octicon "alert" :face error-face)
+		    " "
+		    (prin1-to-string (or .warning 0))))
+	       (all-the-icons-octicon "check" :face no-error-face)))
+	    ('running (all-the-icons-octicon "beaker" :face error-face))
+	    ('no-checker (all-the-icons-octicon "circle-slash" :face error-face))
+	    ('errored (all-the-icons-octicon "alert" :face error-face))
+	    ('interrupted (all-the-icons-octicon "x" :face error-face))
+	    (default (all-the-icons-octicon "x" :face error-face)))))
       (propertize
        flycheck-string
        'mouse-face 'mode-line-highlight
-       'help-echo "Flycheck mode\nmouse-1: Flycheck-mode help menu"
+       'help-echo "Flycheck mode\n\nmouse-1: Flycheck-mode help menu"
        'local-map
        (let
 	   ((map (make-sparse-keymap)))
-	 (define-key
-	   map
-	   [mode-line down-mouse-1]
-	   (lambda () (interactive) (minor-mode-menu-from-indicator (flycheck-mode-line-status-text))))
+	 (define-key map [mode-line down-mouse-1] flycheck-mode-menu-map)
 	 map)))))
 
 (defun helium--erc-track ()
@@ -212,8 +219,7 @@ ACTIVE-P: Boolean representing whether the modeline is active or not."
      (:eval
       (let-alist (helium--get-faces (powerline-selected-window-active))
 	(let*
-	    ((flycheck-error-string  (helium--errors))
-	     (lhs
+	    ((lhs
 	      (list
 	       (helium--make-block-xpm)
 	       (powerline-raw (concat " " (window-numbering-get-number-string)) .block-face 'r)
@@ -225,8 +231,7 @@ ACTIVE-P: Boolean representing whether the modeline is active or not."
 	       (powerline-raw " %4l:%c " .default-face)))
 	     (center
 	      (list
-	       (powerline-raw flycheck-error-string
-			      (if (string= flycheck-error-string "") .no-error-face .error-face))
+	       (powerline-raw (helium--errors .error-face .no-error-face) .error-face)
 	       (powerline-major-mode .highlight-face 'l)
 	       (powerline-vc .vc-face)))
 	     (rhs

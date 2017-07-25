@@ -866,8 +866,8 @@ Start `ielm' if it's not already running."
   :ensure t
   :config
   (progn
-    (set-face-background 'linum "#282a2e")
-    (load-theme 'sanityinc-tomorrow-night t)))
+    (load-theme 'sanityinc-tomorrow-night t)
+    (set-face-background 'linum "#282a2e")))
 
 ;; (use-package spaceline
 ;;   :ensure t

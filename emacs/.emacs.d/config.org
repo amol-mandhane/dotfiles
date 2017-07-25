@@ -1152,8 +1152,8 @@ Don't use evil mode for general purpose. Current use of evil mode is for vim lik
     :ensure t
     :config
     (progn
-      (set-face-background 'linum "#282a2e")
-      (load-theme 'sanityinc-tomorrow-night t)))
+      (load-theme 'sanityinc-tomorrow-night t)
+      (set-face-background 'linum "#282a2e")))
 #+END_SRC
 
 ** Modeline
