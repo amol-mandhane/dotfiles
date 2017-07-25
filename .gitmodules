@@ -1,5 +1,5 @@
 [submodule "emacs/.emacs.d"]
-	path = emacs/.emacs.d
+	path = spacemacs.old/.emacs.d
 	url = https://github.com/syl20bnr/spacemacs.git
 [submodule "zsh/.zprezto"]
 	path = zsh/.zprezto

@@ -17,11 +17,11 @@ vim/.vim/bundle/
 # Emacs generates a bunch of files in .emacs.d directory which do not need
 # to be tracked. Instead of blacklisting all of them, whitelist selected
 # config files.
-emacs.wip/.emacs.d/*
-!emacs.wip/.emacs.d/*.el
-!emacs.wip/.emacs.d/config.org
-!emacs.wip/.emacs.d/lisp
-!emacs.wip/.emacs.d/lisp/*.el
-!emacs.wip/.emacs.d/third_party
-!emacs.wip/.emacs.d/third_party/*
-emacs.wip/.emacs.d/srecode-map.el
+emacs/.emacs.d/*
+!emacs/.emacs.d/*.el
+!emacs/.emacs.d/config.org
+!emacs/.emacs.d/lisp
+!emacs/.emacs.d/lisp/*.el
+!emacs/.emacs.d/third_party
+!emacs/.emacs.d/third_party/*
+emacs/.emacs.d/srecode-map.el
