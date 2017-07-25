@@ -60,6 +60,17 @@ creates a framework like that using `bind-key`.
     (progn (setq key-chord-two-keys-delay 0.05))
     :config (key-chord-mode +1))
 #+END_SRC
+** Which Key?
+#+BEGIN_SRC emacs-lisp
+(use-package which-key
+  :ensure t
+  :diminish which-key-mode
+  :init (which-key-mode t)
+  :config
+    (setq which-key-sort-order 'which-key-key-order-alpha
+      which-key-side-window-max-width 0.33
+      which-key-idle-delay 0.05))
+#+END_SRC
 * Interface framework
 Current iteration of interface framework is combination of IDO and Ivy. Helm is proving difficult to
 configure exactly like I want.
@@ -145,24 +156,24 @@ Approach to evolve interface framework
 #+END_SRC
 ** General config
 #+BEGIN_SRC emacs-lisp
-  (setq delete-old-versions -1)		; delete excess backup versions silently
-  (setq version-control t)		; use version control
-  (setq vc-make-backup-files t)		; make backups file even when in version controlled dir
-  (setq backup-directory-alist `(("." . "~/.emacs.d/backups"))) ; which directory to put backups file
-  (setq vc-follow-symlinks t)				       ; don't ask for confirmation when opening symlinked file
-  (setq auto-save-file-name-transforms '((".*" "~/.emacs.d/auto-save-list/" t))) ;transform backups file name
-  (setq inhibit-startup-screen t)	; inhibit useless and old-school startup screen
-  (setq coding-system-for-read 'utf-8)	; use utf-8 by default
+  (setq delete-old-versions -1)
+  (setq version-control t)
+  (setq vc-make-backup-files t)
+  (setq backup-directory-alist `(("." . "~/.emacs.d/backups")))
+  (setq vc-follow-symlinks t)
+  (setq auto-save-file-name-transforms '((".*" "~/.emacs.d/auto-save-list/" t)))
+  (setq inhibit-startup-screen t)
+  (setq coding-system-for-read 'utf-8)
   (setq coding-system-for-write 'utf-8)
-  (setq sentence-end-double-space nil)	; sentence SHOULD end with only a point.
-  (setq fill-column 80)		; toggle wrapping text at the 80th character
-  (setq visible-bell t)                   ; Show the bell alert using visible flashes than audio dings.
+  (setq sentence-end-double-space nil)
+  (setq-default fill-column 80)
+  (setq visible-bell t)
 
   (scroll-bar-mode -1)
   (tool-bar-mode -1)
 
   (global-linum-mode t)
-  (global-auto-revert-mode nil)
+  (global-auto-revert-mode t)
   (diminish 'auto-revert-mode)
   (diminish 'abbrev-mode)
 
@@ -191,90 +202,22 @@ Approach to evolve interface framework
 
 ** Text zoom
 #+BEGIN_SRC emacs-lisp
-(defhydra text-zoom ()
-  "zoom"
-  ("g" text-scale-increase "in")
-  ("l" text-scale-decrease "out"))
+  (defhydra text-zoom ()
+    "zoom"
+    ("+" text-scale-increase "in")
+    ("=" text-scale-increase "in")
+    ("-" text-scale-decrease "out")
+    ("q" nil "quit"))
 
-(prefixed-key "zz" #'text-zoom/body)
+  (prefixed-key "zz" #'text-zoom/body)
 #+END_SRC
 
-** Annoying arrows
-#+BEGIN_SRC emacs-lisp
-  (use-package annoying-arrows-mode
-    :ensure t
-    :diminish annoying-arrows-mode
-    :config
-    (global-annoying-arrows-mode +1))
-#+END_SRC
-** Beacon
-#+BEGIN_SRC emacs-lisp
-  (use-package beacon
-    :ensure t
-    :config
-    (global-key "C-\\" 'beacon-blink))
-#+END_SRC
 ** Don't use `custom`
 #+BEGIN_SRC emacs-lisp
 (setq-default custom-file "/dev/null")
 #+END_SRC
-** Crux helper setup
-#+BEGIN_SRC emacs-lisp
-  (use-package crux
-    :ensure t
-    :config
-    (progn
-      (global-key "C-a" #'crux-move-beginning-of-line)
-      (global-key "C-o" #'crux-smart-open-line)
-      (global-key "C-S-o" #'crux-smart-open-line-above)
-      (global-key "C-S-d" #'crux-kill-whole-line)
-      (global-key "C-c =" #'crux-indent-defun)
-      (prefixed-key "tt" #'crux-visit-term-buffer)))
-#+END_SRC
-** Fill Column Indicator
-Fill column indicator for showing right ruler.
-
-#+BEGIN_SRC emacs-lisp
-  (use-package fill-column-indicator
-    :ensure t
-    :config
-    (enable-minor-mode-globally fci-mode))
-#+END_SRC
-
-Fill column indicator interferes with company mode to create UI breakages.
-This snippet disables FCI when company mode is on.
-#+BEGIN_SRC emacs-lisp
-  (defvar-local company-fci-mode-on-p nil)
-
-  (defun company-turn-off-fci (&rest ignore)
-    "Turn off FCI for company mode.
-  IGNORE: ignore."
-    (when (boundp 'fci-mode)
-      (setq company-fci-mode-on-p fci-mode)
-      (when fci-mode (fci-mode -1))))
-
-  (defun company-maybe-turn-on-fci (&rest ignore)
-    "Turn on FCI when company mode is off.
-  IGNORE: ignore."
-    (when company-fci-mode-on-p (fci-mode +1)))
-
-  (add-hook 'company-completion-started-hook 'company-turn-off-fci)
-  (add-hook 'company-completion-finished-hook 'company-maybe-turn-on-fci)
-  (add-hook 'company-completion-cancelled-hook 'company-maybe-turn-on-fci)
-#+END_SRC
-* Which Key?
-#+BEGIN_SRC emacs-lisp
-(use-package which-key
-  :ensure t
-  :diminish which-key-mode
-  :init (which-key-mode t)
-  :config
-    (setq which-key-sort-order 'which-key-key-order-alpha
-      which-key-side-window-max-width 0.33
-      which-key-idle-delay 0.05))
-#+END_SRC
-
-* Key prefix names
+* Keybinding config
+** Key prefix names
 #+BEGIN_SRC emacs-lisp
   (rename-mnemonic-key-prefix "g" "VCS")
   (rename-mnemonic-key-prefix "e" "Errors")
@@ -282,10 +225,12 @@ This snippet disables FCI when company mode is on.
   (rename-mnemonic-key-prefix "f" "Files")
   (rename-mnemonic-key-prefix "b" "Buffers")
   (rename-mnemonic-key-prefix "w" "Windows")
-  (rename-mnemonic-key-prefix "s" "Search")
-  (rename-mnemonic-key-prefix "t" "Terminal")
+  (rename-mnemonic-key-prefix "s" "Search/Replace")
+  (rename-mnemonic-key-prefix "sr" "Replace")
+  (rename-mnemonic-key-prefix "!" "Terminal")
+  (rename-mnemonic-key-prefix "t" "Tags")
 #+END_SRC
-* General shortcuts
+** General Keybindings
 #+BEGIN_SRC emacs-lisp
   (defhydra windmove-hydra ()
     "windmove"
@@ -323,7 +268,82 @@ This snippet disables FCI when company mode is on.
    ("C-r" . 'isearch-backward-regexp)
    ("C-M-s" . 'isearch-forward)
    ("C-M-r" . 'isearch-backward))
+
+  (global-key "C-a" #'crux-move-beginning-of-line)
+  (global-keys
+   ("C-o" . #'crux-smart-open-line)
+   ("C-S-o" . #'crux-smart-open-line-above)
+   ("C-S-d" . #'crux-kill-whole-line))
+
+  (global-key "C-c =" #'crux-indent-defun)
+
+  (prefixed-key "!!" #'crux-visit-term-buffer)
 #+END_SRC
+* General packages
+** Annoying arrows
+#+BEGIN_SRC emacs-lisp
+  (use-package annoying-arrows-mode
+    :ensure t
+    :diminish annoying-arrows-mode
+    :config
+    (global-annoying-arrows-mode +1))
+#+END_SRC
+
+** Beacon
+#+BEGIN_SRC emacs-lisp
+  (use-package beacon
+    :ensure t
+    :config
+    (global-key "C-\\" 'beacon-blink))
+#+END_SRC
+
+** Crux helper setup
+#+BEGIN_SRC emacs-lisp
+  (use-package crux :ensure t)
+#+END_SRC
+
+** Rainbow parens
+Multi-colored parantheses are helpful, especially in lisp-like modes.
+#+BEGIN_SRC emacs-lisp
+  (show-paren-mode +1)
+
+  (use-package rainbow-delimiters
+    :ensure t
+    :config
+    (enable-minor-mode-globally rainbow-delimiters-mode))
+#+END_SRC
+** Fill Column Indicator
+Fill column indicator for showing right ruler.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package fill-column-indicator
+    :ensure t
+    :config
+    (enable-minor-mode-globally fci-mode))
+#+END_SRC
+
+Fill column indicator interferes with company mode to create UI breakages.
+This snippet disables FCI when company mode is on.
+#+BEGIN_SRC emacs-lisp
+  (defvar-local company-fci-mode-on-p nil)
+
+  (defun company-turn-off-fci (&rest ignore)
+    "Turn off FCI for company mode.
+  IGNORE: ignore."
+    (when (boundp 'fci-mode)
+      (setq company-fci-mode-on-p fci-mode)
+      (when fci-mode (fci-mode -1))))
+
+  (defun company-maybe-turn-on-fci (&rest ignore)
+    "Turn on FCI when company mode is off.
+  IGNORE: ignore."
+    (when company-fci-mode-on-p (fci-mode +1)))
+
+  (add-hook 'company-completion-started-hook 'company-turn-off-fci)
+  (add-hook 'company-completion-finished-hook 'company-maybe-turn-on-fci)
+  (add-hook 'company-completion-cancelled-hook 'company-maybe-turn-on-fci)
+#+END_SRC
+
 * Auto-completion
 #+BEGIN_SRC emacs-lisp
   (use-package company
@@ -356,9 +376,7 @@ This snippet disables FCI when company mode is on.
     (setq flycheck-keymap-prefix (kbd (concat +keybinding/mnemonic-prefix+ " e")))
     :config
     (progn
-      (global-flycheck-mode t)
-      (rename-mnemonic-key-prefix "e" "Errors")
-      (setq flycheck-mode-line-prefix "!")))
+      (global-flycheck-mode t)))
 #+END_SRC
 
 Show errors in tooltip
@@ -369,8 +387,21 @@ Show errors in tooltip
     :config
     (flycheck-pos-tip-mode +1))
 #+END_SRC
-* Smartparens/Indentation/autopair
-** Electric-pair mode
+* Spell Checking
+#+BEGIN_SRC emacs-lisp
+  (use-package flyspell
+    :ensure t
+    :diminish (flyspell-mode . " ")
+    :config
+    (progn
+      (setq ispell-program-name (locate-file "aspell" exec-path))
+      (setq ispell-list-command "--list")
+      (add-hook 'text-mode-hook #'(lambda () (flyspell-mode +1)))
+      (flyspell-prog-mode)))
+#+END_SRC
+* Navigation
+** Smartparens/Indentation/autopair
+*** Electric-pair mode
 Electric-pair mode closes parenthesis automatically. However, if I'm using
 Smartparens/Paredit, no need to use electric pair mode.
 #+BEGIN_SRC emacs-lisp
@@ -378,7 +409,7 @@ Smartparens/Paredit, no need to use electric pair mode.
 
 #+END_SRC
 
-** Smartparens
+*** Smartparens
 Smartparens is generally awesome. It combines the ideas of electric-pair,
 paredit, wrap-region, AST navigation etc.
 #+BEGIN_SRC emacs-lisp
@@ -457,11 +488,11 @@ paredit, wrap-region, AST navigation etc.
                ))
 #+END_SRC
 
-** Auto-indentation
+*** Auto-indentation
 #+BEGIN_SRC emacs-lisp
   (electric-indent-mode +1)
 #+END_SRC
-* Avy
+** Avy
 Avy is used to jump around the file.
 #+BEGIN_SRC emacs-lisp
   (use-package avy
@@ -583,75 +614,7 @@ Use `C-x v` prefixed commands for now.
       (yas-global-mode +1)
       (prefixed-key "is" #'yas-expand)))
 #+END_SRC
-* Rainbow parens
-Multi-colored parantheses are helpful, especially in lisp-like modes.
-#+BEGIN_SRC emacs-lisp
-  (show-paren-mode +1)
-
-  (use-package rainbow-delimiters
-    :ensure t
-    :config
-    (enable-minor-mode-globally rainbow-delimiters-mode))
-#+END_SRC
-* Spell check
-#+BEGIN_SRC emacs-lisp
-  (use-package flyspell
-    :ensure t
-    :diminish (flyspell-mode . " ")
-    :config
-    (progn
-      (setq ispell-program-name (locate-file "aspell" exec-path))
-      (setq ispell-list-command "--list")
-      (add-hook 'text-mode-hook #'(lambda () (flyspell-mode +1)))
-      (flyspell-prog-mode)))
-#+END_SRC
-* Org mode setup
-** Org agenda
-#+BEGIN_SRC emacs-lisp
-(setq org-agenda-files '("~/organizer/main.org"))
-#+END_SRC
-** Org bullets
-#+BEGIN_SRC emacs-lisp
-  (use-package org-bullets
-    :ensure t
-    :diminish org-bullets-mode
-    :config
-    (add-hook
-     'org-mode-hook
-     (lambda () (org-bullets-mode +1))))
-#+END_SRC
-** Org indent
-#+BEGIN_SRC emacs-lisp
-  (use-package org-indent
-    :ensure t
-    :diminish org-indent-mode
-    :config
-    (add-hook 'org-mode-hook (lambda () (org-indent-mode +1))))
-#+END_SRC
-** Org capture
-#+BEGIN_SRC emacs-lisp
-  (setq org-capture-templates
-        '(("a" "Action Item" entry (file+headline "~/organizer/main.org" "Action Items")
-           "* TODO %?\n  %i")
-          ("c" "Calendar" entry (file+headline "~/organizer/main.org" "Calendar")
-           "* %?\n %^T\n %i")
-          ("r" "Reference" entry (file "~/organizer/reference.org")
-           "* %?\n  %i\n%^{prompt|Description}\n\n:PROPERTIES:\n:RecordDate:\t%T\n:END:"
-           :prepend t
-           :empty-lines 1)))
-
-  (global-key "<f6>" 'org-capture)
-  (global-key "C-c c" 'org-capture)
-#+END_SRC
-** Org refile
-#+BEGIN_SRC emacs-lisp
-(setq org-refile-targets '((org-agenda-files . (:maxlevel . 6))))
-#+END_SRC
-** Org source editing
-#+BEGIN_SRC emacs-lisp
-  (diminish 'org-src-mode " ")
-#+END_SRC
-* TODO Lang setup [7/14]
+* TODO Major mode setup [8/15]
 ** DONE C/C++
 *** Irony Mode
 Irony mode is clang based autocompletion and syntax checker. It is like YouCompleteMe, but only for C-family and better.
@@ -745,6 +708,7 @@ Still, good to have in config.
 *** TODO Set up debugger
 ** TODO common-lisp
 ** DONE Emacs Lisp
+*** Basic setup
 #+BEGIN_SRC emacs-lisp
   ;; Helper functions.
   (defun elisp-visit-ielm ()
@@ -782,6 +746,39 @@ Still, good to have in config.
   (define-key emacs-lisp-mode-map (kbd "C-c C-b") 'eval-buffer)
   (define-key emacs-lisp-mode-map (kbd "C-c C-r") 'eval-region)
 #+END_SRC
+*** Macrostep
+Macrostep is for incremental macro expansion.
+#+BEGIN_SRC emacs-lisp
+  (use-package macrostep
+    :ensure t
+    :config
+    (mode-key emacs-lisp-mode-map "C-c m" #'macrostep-mode))
+#+END_SRC
+*** eval-expr
+`eval-expr` is a replacement for `eval-expression` with prettified output.
+#+BEGIN_SRC emacs-lisp
+  (use-package eval-expr
+    :ensure t
+    :config
+    (global-key "M-:" #'eval-expr)
+    (setq eval-expr-print-function 'pp
+          eval-expr-print-level 20
+          eval-expr-print-length 100)
+
+    (defun eval-expr-minibuffer-setup ()
+      (set-syntax-table emacs-lisp-mode-syntax-table)
+      (local-set-key (kbd "<tab>") #'counsel-el)))
+#+END_SRC
+*** Redshank
+#+BEGIN_SRC emacs-lisp
+  (use-package redshank
+    :load-path "third_party/redshank"
+    :defer t
+    :diminish redshank-mode
+    :config
+    (progn
+      (add-hook 'lisp-mode-hook #'(lambda () (redshank-mode +1)))))
+#+END_SRC
 ** TODO Go
 ** TODO Haskell
 Add libraries for XMonad.
@@ -790,13 +787,17 @@ Add libraries for XMonad.
 #+END_SRC
 ** TODO HTML emmet
 ** TODO JS
-** DONE Java meghanada
+** DONE Java
 #+BEGIN_SRC emacs-lisp
   (use-package meghanda
     :ensure t
     :config
     (progn
       (add-hook 'java-mode-hook #'(lambda () (meghanada-mode +1)))))
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp
+  (add-hook 'java-mode-hook #'(lambda () (setq fill-column 100)))
 #+END_SRC
 ** TODO latex
 ** TODO markdown
@@ -938,20 +939,68 @@ Insert shebang
            (define-key inferior-ess-mode-map [\C-x \t]
              'comint-dynamic-complete-filename)))))
 #+END_SRC
-* Semantic
-** Stickyfunc
+** DONE Org mode setup
+*** Org agenda
+#+BEGIN_SRC emacs-lisp
+(setq org-agenda-files '("~/organizer/main.org"))
+#+END_SRC
+*** Org bullets
+#+BEGIN_SRC emacs-lisp
+  (use-package org-bullets
+    :ensure t
+    :diminish org-bullets-mode
+    :config
+    (add-hook
+     'org-mode-hook
+     (lambda () (org-bullets-mode +1))))
+#+END_SRC
+*** Org indent
+#+BEGIN_SRC emacs-lisp
+  (use-package org-indent
+    :ensure t
+    :diminish org-indent-mode
+    :config
+    (add-hook 'org-mode-hook (lambda () (org-indent-mode +1))))
+#+END_SRC
+*** Org capture
+#+BEGIN_SRC emacs-lisp
+  (setq org-capture-templates
+        '(("a" "Action Item" entry (file+headline "~/organizer/main.org" "Action Items")
+           "* TODO %?\n  %i")
+          ("c" "Calendar" entry (file+headline "~/organizer/main.org" "Calendar")
+           "* %?\n %^T\n %i")
+          ("r" "Reference" entry (file "~/organizer/reference.org")
+           "* %?\n  %i\n%^{prompt|Description}\n\n:PROPERTIES:\n:RecordDate:\t%T\n:END:"
+           :prepend t
+           :empty-lines 1)))
+
+  (global-key "<f6>" 'org-capture)
+  (global-key "C-c c" 'org-capture)
+#+END_SRC
+*** Org refile
+#+BEGIN_SRC emacs-lisp
+(setq org-refile-targets '((org-agenda-files . (:maxlevel . 6))))
+#+END_SRC
+*** Org source editing
+#+BEGIN_SRC emacs-lisp
+  (diminish 'org-src-mode " ")
+#+END_SRC
+
+* Code Semantics
+** Semantic
+*** Stickyfunc
 #+BEGIN_SRC emacs-lisp
   (use-package stickyfunc-enhance
     :ensure t)
 #+END_SRC
 
-** Srefactor
+*** Srefactor
 #+BEGIN_SRC emacs-lisp
   (use-package srefactor
     :ensure t)
 #+END_SRC
 
-** Semantic setup
+*** Semantic setup
 #+BEGIN_SRC emacs-lisp
   (setq semantic-default-submodes
         '( ;; Perform semantic actions during idle time
@@ -981,7 +1030,7 @@ Insert shebang
   (add-hook 'prog-mode-hook 'semantic-mode)
 #+END_SRC
 
-** Emacs Refactor
+*** Emacs Refactor
 #+BEGIN_SRC emacs-lisp
   (use-package emr
     :ensure t
@@ -990,12 +1039,17 @@ Insert shebang
       (add-hook 'prog-mode-hook 'emr-initialize)
       (mode-key prog-mode-map "M-RET" #'emr-show-refactor-menu)))
 #+END_SRC
-* TODO Tags
-* Which function mode
+** TODO Tags
+** Which function mode
 #+BEGIN_SRC emacs-lisp
   (which-function-mode +1)
+  (setq which-func-unknown "")
 #+END_SRC
-* Search
+** Imenu
+#+BEGIN_SRC emacs-lisp
+  (prefixed-key "ii" 'counsel-imenu)
+#+END_SRC
+* Search/Replace
 ** Ag
 #+BEGIN_SRC emacs-lisp
   (use-package ag
@@ -1006,14 +1060,43 @@ Insert shebang
   (prefixed-key "ss" 'swiper)
   (key-chord-define-global "??" 'swiper)
 #+END_SRC
-* TODO Iedit
-* Anzu
+** Anzu
 Anzu is good for interactive search and replace.
 #+BEGIN_SRC emacs-lisp
-(use-package anzu
-  :ensure t
-  :diminish anzu-mode
-  :config (global-anzu-mode +1))
+  (use-package anzu
+    :ensure t
+    :diminish anzu-mode
+    :config
+    (progn
+      (global-anzu-mode +1)
+      (global-set-key [remap query-replace] #'anzu-query-replace)
+      (global-set-key [remap query-replace-regexp] #'anzu-query-replace-regexp)
+      (prefixed-keys
+       ("srr" . #'anzu-query-replace-regexp)
+       ("sr." . #'anzu-query-replace-at-cursor-thing))))
+#+END_SRC
+** IEdit
+IEdit is for interactively replacing a symbol.
+#+BEGIN_SRC emacs-lisp
+  (require 'iedit)
+
+  (defun iedit-dwim (arg)
+    "Starts iedit but uses \\[narrow-to-defun] to limit its scope."
+    (interactive "P")
+    (if arg
+        (iedit-mode)
+      (save-excursion
+        (save-restriction
+          (widen)
+          ;; this function determines the scope of `iedit-start'.
+          (if iedit-mode
+              (iedit-done)
+            ;; `current-word' can of course be replaced by other
+            ;; functions.
+            (narrow-to-defun)
+            (iedit-start (current-word) (point-min) (point-max)))))))
+
+  (prefixed-key "sri" #'iedit-dwim)
 #+END_SRC
 * Evil
 Don't use evil mode for general purpose. Current use of evil mode is for vim like search/replace only. Toggle as necessary.
@@ -1030,6 +1113,8 @@ Don't use evil mode for general purpose. Current use of evil mode is for vim lik
 #+END_SRC
 * TODO Gnus
 * TODO ERC
+* TODO Indent guides
+* TODO Crosshairs-mode
 * Theming
 ** Helper packages
 #+BEGIN_SRC emacs-lisp

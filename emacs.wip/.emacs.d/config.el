@@ -32,6 +32,15 @@
   (progn (setq key-chord-two-keys-delay 0.05))
   :config (key-chord-mode +1))
 
+(use-package which-key
+  :ensure t
+  :diminish which-key-mode
+  :init (which-key-mode t)
+  :config
+    (setq which-key-sort-order 'which-key-key-order-alpha
+      which-key-side-window-max-width 0.33
+      which-key-idle-delay 0.05))
+
 (use-package smex
   :ensure t)
 (use-package ido-ubiquitous
@@ -96,24 +105,24 @@
 
 (require 'helper-functions)
 
-(setq delete-old-versions -1)		; delete excess backup versions silently
-(setq version-control t)		; use version control
-(setq vc-make-backup-files t)		; make backups file even when in version controlled dir
-(setq backup-directory-alist `(("." . "~/.emacs.d/backups"))) ; which directory to put backups file
-(setq vc-follow-symlinks t)				       ; don't ask for confirmation when opening symlinked file
-(setq auto-save-file-name-transforms '((".*" "~/.emacs.d/auto-save-list/" t))) ;transform backups file name
-(setq inhibit-startup-screen t)	; inhibit useless and old-school startup screen
-(setq coding-system-for-read 'utf-8)	; use utf-8 by default
+(setq delete-old-versions -1)
+(setq version-control t)
+(setq vc-make-backup-files t)
+(setq backup-directory-alist `(("." . "~/.emacs.d/backups")))
+(setq vc-follow-symlinks t)
+(setq auto-save-file-name-transforms '((".*" "~/.emacs.d/auto-save-list/" t)))
+(setq inhibit-startup-screen t)
+(setq coding-system-for-read 'utf-8)
 (setq coding-system-for-write 'utf-8)
-(setq sentence-end-double-space nil)	; sentence SHOULD end with only a point.
-(setq fill-column 80)		; toggle wrapping text at the 80th character
-(setq visible-bell t)                   ; Show the bell alert using visible flashes than audio dings.
+(setq sentence-end-double-space nil)
+(setq-default fill-column 80)
+(setq visible-bell t)
 
 (scroll-bar-mode -1)
 (tool-bar-mode -1)
 
 (global-linum-mode t)
-(global-auto-revert-mode nil)
+(global-auto-revert-mode t)
 (diminish 'auto-revert-mode)
 (diminish 'abbrev-mode)
 
@@ -138,66 +147,14 @@
 
 (defhydra text-zoom ()
   "zoom"
-  ("g" text-scale-increase "in")
-  ("l" text-scale-decrease "out"))
+  ("+" text-scale-increase "in")
+  ("=" text-scale-increase "in")
+  ("-" text-scale-decrease "out")
+  ("q" nil "quit"))
 
 (prefixed-key "zz" #'text-zoom/body)
 
-(use-package annoying-arrows-mode
-  :ensure t
-  :diminish annoying-arrows-mode
-  :config
-  (global-annoying-arrows-mode +1))
-
-(use-package beacon
-  :ensure t
-  :config
-  (global-key "C-\\" 'beacon-blink))
-
 (setq-default custom-file "/dev/null")
-
-(use-package crux
-  :ensure t
-  :config
-  (progn
-    (global-key "C-a" #'crux-move-beginning-of-line)
-    (global-key "C-o" #'crux-smart-open-line)
-    (global-key "C-S-o" #'crux-smart-open-line-above)
-    (global-key "C-S-d" #'crux-kill-whole-line)
-    (global-key "C-c =" #'crux-indent-defun)
-    (prefixed-key "tt" #'crux-visit-term-buffer)))
-
-(use-package fill-column-indicator
-  :ensure t
-  :config
-  (enable-minor-mode-globally fci-mode))
-
-(defvar-local company-fci-mode-on-p nil)
-
-(defun company-turn-off-fci (&rest ignore)
-  "Turn off FCI for company mode.
-IGNORE: ignore."
-  (when (boundp 'fci-mode)
-    (setq company-fci-mode-on-p fci-mode)
-    (when fci-mode (fci-mode -1))))
-
-(defun company-maybe-turn-on-fci (&rest ignore)
-  "Turn on FCI when company mode is off.
-IGNORE: ignore."
-  (when company-fci-mode-on-p (fci-mode +1)))
-
-(add-hook 'company-completion-started-hook 'company-turn-off-fci)
-(add-hook 'company-completion-finished-hook 'company-maybe-turn-on-fci)
-(add-hook 'company-completion-cancelled-hook 'company-maybe-turn-on-fci)
-
-(use-package which-key
-  :ensure t
-  :diminish which-key-mode
-  :init (which-key-mode t)
-  :config
-    (setq which-key-sort-order 'which-key-key-order-alpha
-      which-key-side-window-max-width 0.33
-      which-key-idle-delay 0.05))
 
 (rename-mnemonic-key-prefix "g" "VCS")
 (rename-mnemonic-key-prefix "e" "Errors")
@@ -205,8 +162,10 @@ IGNORE: ignore."
 (rename-mnemonic-key-prefix "f" "Files")
 (rename-mnemonic-key-prefix "b" "Buffers")
 (rename-mnemonic-key-prefix "w" "Windows")
-(rename-mnemonic-key-prefix "s" "Search")
-(rename-mnemonic-key-prefix "t" "Terminal")
+(rename-mnemonic-key-prefix "s" "Search/Replace")
+(rename-mnemonic-key-prefix "sr" "Replace")
+(rename-mnemonic-key-prefix "!" "Terminal")
+(rename-mnemonic-key-prefix "t" "Tags")
 
 (defhydra windmove-hydra ()
   "windmove"
@@ -245,6 +204,59 @@ IGNORE: ignore."
  ("C-M-s" . 'isearch-forward)
  ("C-M-r" . 'isearch-backward))
 
+(global-key "C-a" #'crux-move-beginning-of-line)
+(global-keys
+ ("C-o" . #'crux-smart-open-line)
+ ("C-S-o" . #'crux-smart-open-line-above)
+ ("C-S-d" . #'crux-kill-whole-line))
+
+(global-key "C-c =" #'crux-indent-defun)
+
+(prefixed-key "!!" #'crux-visit-term-buffer)
+
+(use-package annoying-arrows-mode
+  :ensure t
+  :diminish annoying-arrows-mode
+  :config
+  (global-annoying-arrows-mode +1))
+
+(use-package beacon
+  :ensure t
+  :config
+  (global-key "C-\\" 'beacon-blink))
+
+(use-package crux :ensure t)
+
+(show-paren-mode +1)
+
+(use-package rainbow-delimiters
+  :ensure t
+  :config
+  (enable-minor-mode-globally rainbow-delimiters-mode))
+
+(use-package fill-column-indicator
+  :ensure t
+  :config
+  (enable-minor-mode-globally fci-mode))
+
+(defvar-local company-fci-mode-on-p nil)
+
+(defun company-turn-off-fci (&rest ignore)
+  "Turn off FCI for company mode.
+IGNORE: ignore."
+  (when (boundp 'fci-mode)
+    (setq company-fci-mode-on-p fci-mode)
+    (when fci-mode (fci-mode -1))))
+
+(defun company-maybe-turn-on-fci (&rest ignore)
+  "Turn on FCI when company mode is off.
+IGNORE: ignore."
+  (when company-fci-mode-on-p (fci-mode +1)))
+
+(add-hook 'company-completion-started-hook 'company-turn-off-fci)
+(add-hook 'company-completion-finished-hook 'company-maybe-turn-on-fci)
+(add-hook 'company-completion-cancelled-hook 'company-maybe-turn-on-fci)
+
 (use-package company
   :ensure t
   :config
@@ -270,15 +282,23 @@ IGNORE: ignore."
   (setq flycheck-keymap-prefix (kbd (concat +keybinding/mnemonic-prefix+ " e")))
   :config
   (progn
-    (global-flycheck-mode t)
-    (rename-mnemonic-key-prefix "e" "Errors")
-    (setq flycheck-mode-line-prefix "!")))
+    (global-flycheck-mode t)))
 
 (use-package flycheck-pos-tip
   :ensure t
   :after flycheck
   :config
   (flycheck-pos-tip-mode +1))
+
+(use-package flyspell
+  :ensure t
+  :diminish (flyspell-mode . " ")
+  :config
+  (progn
+    (setq ispell-program-name (locate-file "aspell" exec-path))
+    (setq ispell-list-command "--list")
+    (add-hook 'text-mode-hook #'(lambda () (flyspell-mode +1)))
+    (flyspell-prog-mode)))
 
 ; (electric-pair-mode +1)
 
@@ -451,56 +471,6 @@ _p_rev	_m_ine	_E_diff	_=_: mine-other	_RET_: current
     (yas-global-mode +1)
     (prefixed-key "is" #'yas-expand)))
 
-(show-paren-mode +1)
-
-(use-package rainbow-delimiters
-  :ensure t
-  :config
-  (enable-minor-mode-globally rainbow-delimiters-mode))
-
-(use-package flyspell
-  :ensure t
-  :diminish (flyspell-mode . " ")
-  :config
-  (progn
-    (setq ispell-program-name (locate-file "aspell" exec-path))
-    (setq ispell-list-command "--list")
-    (add-hook 'text-mode-hook #'(lambda () (flyspell-mode +1)))
-    (flyspell-prog-mode)))
-
-(setq org-agenda-files '("~/organizer/main.org"))
-
-(use-package org-bullets
-  :ensure t
-  :diminish org-bullets-mode
-  :config
-  (add-hook
-   'org-mode-hook
-   (lambda () (org-bullets-mode +1))))
-
-(use-package org-indent
-  :ensure t
-  :diminish org-indent-mode
-  :config
-  (add-hook 'org-mode-hook (lambda () (org-indent-mode +1))))
-
-(setq org-capture-templates
-      '(("a" "Action Item" entry (file+headline "~/organizer/main.org" "Action Items")
-         "* TODO %?\n  %i")
-        ("c" "Calendar" entry (file+headline "~/organizer/main.org" "Calendar")
-         "* %?\n %^T\n %i")
-        ("r" "Reference" entry (file "~/organizer/reference.org")
-         "* %?\n  %i\n%^{prompt|Description}\n\n:PROPERTIES:\n:RecordDate:\t%T\n:END:"
-         :prepend t
-         :empty-lines 1)))
-
-(global-key "<f6>" 'org-capture)
-(global-key "C-c c" 'org-capture)
-
-(setq org-refile-targets '((org-agenda-files . (:maxlevel . 6))))
-
-(diminish 'org-src-mode " ")
-
 (use-package irony
   :ensure t
   :init
@@ -601,6 +571,31 @@ Start `ielm' if it's not already running."
 (define-key emacs-lisp-mode-map (kbd "C-c C-b") 'eval-buffer)
 (define-key emacs-lisp-mode-map (kbd "C-c C-r") 'eval-region)
 
+(use-package macrostep
+  :ensure t
+  :config
+  (mode-key emacs-lisp-mode-map "C-c m" #'macrostep-mode))
+
+(use-package eval-expr
+  :ensure t
+  :config
+  (global-key "M-:" #'eval-expr)
+  (setq eval-expr-print-function 'pp
+        eval-expr-print-level 20
+        eval-expr-print-length 100)
+
+  (defun eval-expr-minibuffer-setup ()
+    (set-syntax-table emacs-lisp-mode-syntax-table)
+    (local-set-key (kbd "<tab>") #'counsel-el)))
+
+(use-package redshank
+  :load-path "third_party/redshank"
+  :defer t
+  :diminish redshank-mode
+  :config
+  (progn
+    (add-hook 'lisp-mode-hook #'(lambda () (redshank-mode +1)))))
+
 (add-to-list 'flycheck-ghc-search-path (expand-file-name "~/.xmonad/lib"))
 
 (use-package meghanda
@@ -608,6 +603,8 @@ Start `ielm' if it's not already running."
   :config
   (progn
     (add-hook 'java-mode-hook #'(lambda () (meghanada-mode +1)))))
+
+(add-hook 'java-mode-hook #'(lambda () (setq fill-column 100)))
 
 (use-package protobuf-mode
   :ensure t
@@ -715,6 +712,39 @@ Start `ielm' if it's not already running."
          (define-key inferior-ess-mode-map [\C-x \t]
            'comint-dynamic-complete-filename)))))
 
+(setq org-agenda-files '("~/organizer/main.org"))
+
+(use-package org-bullets
+  :ensure t
+  :diminish org-bullets-mode
+  :config
+  (add-hook
+   'org-mode-hook
+   (lambda () (org-bullets-mode +1))))
+
+(use-package org-indent
+  :ensure t
+  :diminish org-indent-mode
+  :config
+  (add-hook 'org-mode-hook (lambda () (org-indent-mode +1))))
+
+(setq org-capture-templates
+      '(("a" "Action Item" entry (file+headline "~/organizer/main.org" "Action Items")
+         "* TODO %?\n  %i")
+        ("c" "Calendar" entry (file+headline "~/organizer/main.org" "Calendar")
+         "* %?\n %^T\n %i")
+        ("r" "Reference" entry (file "~/organizer/reference.org")
+         "* %?\n  %i\n%^{prompt|Description}\n\n:PROPERTIES:\n:RecordDate:\t%T\n:END:"
+         :prepend t
+         :empty-lines 1)))
+
+(global-key "<f6>" 'org-capture)
+(global-key "C-c c" 'org-capture)
+
+(setq org-refile-targets '((org-agenda-files . (:maxlevel . 6))))
+
+(diminish 'org-src-mode " ")
+
 (use-package stickyfunc-enhance
   :ensure t)
 
@@ -756,6 +786,9 @@ Start `ielm' if it's not already running."
     (mode-key prog-mode-map "M-RET" #'emr-show-refactor-menu)))
 
 (which-function-mode +1)
+(setq which-func-unknown "")
+
+(prefixed-key "ii" 'counsel-imenu)
 
 (use-package ag
   :ensure t)
@@ -766,7 +799,34 @@ Start `ielm' if it's not already running."
 (use-package anzu
   :ensure t
   :diminish anzu-mode
-  :config (global-anzu-mode +1))
+  :config
+  (progn
+    (global-anzu-mode +1)
+    (global-set-key [remap query-replace] #'anzu-query-replace)
+    (global-set-key [remap query-replace-regexp] #'anzu-query-replace-regexp)
+    (prefixed-keys
+     ("srr" . #'anzu-query-replace-regexp)
+     ("sr." . #'anzu-query-replace-at-cursor-thing))))
+
+(require 'iedit)
+
+(defun iedit-dwim (arg)
+  "Starts iedit but uses \\[narrow-to-defun] to limit its scope."
+  (interactive "P")
+  (if arg
+      (iedit-mode)
+    (save-excursion
+      (save-restriction
+        (widen)
+        ;; this function determines the scope of `iedit-start'.
+        (if iedit-mode
+            (iedit-done)
+          ;; `current-word' can of course be replaced by other
+          ;; functions.
+          (narrow-to-defun)
+          (iedit-start (current-word) (point-min) (point-max)))))))
+
+(prefixed-key "sri" #'iedit-dwim)
 
 (use-package evil
   :ensure t)

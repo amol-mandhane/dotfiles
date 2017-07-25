@@ -22,4 +22,6 @@ emacs.wip/.emacs.d/*
 !emacs.wip/.emacs.d/config.org
 !emacs.wip/.emacs.d/lisp
 !emacs.wip/.emacs.d/lisp/*.el
+!emacs.wip/.emacs.d/third_party
+!emacs.wip/.emacs.d/third_party/*
 emacs.wip/.emacs.d/srecode-map.el
