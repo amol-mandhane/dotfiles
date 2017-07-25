@@ -115,6 +115,7 @@
 (global-linum-mode t)
 (global-auto-revert-mode nil)
 (diminish 'auto-revert-mode)
+(diminish 'abbrev-mode)
 
 (line-number-mode t)
 (column-number-mode t)
@@ -198,13 +199,6 @@ IGNORE: ignore."
       which-key-side-window-max-width 0.33
       which-key-idle-delay 0.05))
 
-(use-package anti-zenburn-theme
-  :ensure t
-  :config (load-theme 'anti-zenburn t))
-
-(require 'theme-enhancement)
-(theme-enhancement/apply)
-
 (rename-mnemonic-key-prefix "g" "VCS")
 (rename-mnemonic-key-prefix "e" "Errors")
 (rename-mnemonic-key-prefix "p" "Projects")
@@ -269,20 +263,9 @@ IGNORE: ignore."
   :config
   (global-eldoc-mode +1))
 
-;; (use-package spaceline
-;;   :ensure t
-;;  :config
-;;    (require 'spaceline-config)
-;;    (spaceline-emacs-theme))
-
-(use-package smart-mode-line
-  :ensure t
-  :config
-    (setq sml/no-confirm-load-theme t)
-    (sml/setup))
-
 (use-package flycheck
   :ensure t
+  :diminish flycheck-mode
   :init
   (setq flycheck-keymap-prefix (kbd (concat +keybinding/mnemonic-prefix+ " e")))
   :config
@@ -290,6 +273,12 @@ IGNORE: ignore."
     (global-flycheck-mode t)
     (rename-mnemonic-key-prefix "e" "Errors")
     (setq flycheck-mode-line-prefix "!")))
+
+(use-package flycheck-pos-tip
+  :ensure t
+  :after flycheck
+  :config
+  (flycheck-pos-tip-mode +1))
 
 ; (electric-pair-mode +1)
 
@@ -310,7 +299,7 @@ IGNORE: ignore."
 
 (use-package smartparens-config
   :ensure smartparens
-  :diminish (smartparens-mode . " ✓")
+  :diminish (smartparens-mode . " ")
   :config
   (smartparens-global-mode +1)
 
@@ -373,6 +362,11 @@ IGNORE: ignore."
   :ensure t
   :config
     (key-chord-define-global "jj" 'avy-goto-word-1))
+
+(use-package window-numbering
+  :ensure t
+  :config
+  (window-numbering-mode +1))
 
 (setq savehist-additional-variables '(kill-ring search-ring regexp-search-ring))
 (setq savehist-file "~/.emacs.d/tmp/history")
@@ -438,13 +432,14 @@ _p_rev	_m_ine	_E_diff	_=_: mine-other	_RET_: current
 
 (use-package projectile
   :ensure t
+  :diminish projectile-mode
   :init
   (progn
     (setq projectile-enable-caching t)
     (setq projectile-keymap-prefix (kbd (concat +keybinding/mnemonic-prefix+ " p"))))
   :config
   (progn
-    (projectile-global-mode +1)
+    (projectile-mode +1)
     (setq projectile-completion-system 'ivy)
     (setq projectile-mode-line '(:eval (format " P[%s]" (projectile-project-name))))))
 
@@ -465,12 +460,13 @@ _p_rev	_m_ine	_E_diff	_=_: mine-other	_RET_: current
 
 (use-package flyspell
   :ensure t
-  :diminish (flyspell-mode . " _")
+  :diminish (flyspell-mode . " ")
   :config
   (progn
     (setq ispell-program-name (locate-file "aspell" exec-path))
     (setq ispell-list-command "--list")
-    (add-hook 'text-mode-hook #'(lambda () (flyspell-mode +1)))))
+    (add-hook 'text-mode-hook #'(lambda () (flyspell-mode +1)))
+    (flyspell-prog-mode)))
 
 (setq org-agenda-files '("~/organizer/main.org"))
 
@@ -502,6 +498,8 @@ _p_rev	_m_ine	_E_diff	_=_: mine-other	_RET_: current
 (global-key "C-c c" 'org-capture)
 
 (setq org-refile-targets '((org-agenda-files . (:maxlevel . 6))))
+
+(diminish 'org-src-mode " ")
 
 (use-package irony
   :ensure t
@@ -757,6 +755,8 @@ Start `ielm' if it's not already running."
     (add-hook 'prog-mode-hook 'emr-initialize)
     (mode-key prog-mode-map "M-RET" #'emr-show-refactor-menu)))
 
+(which-function-mode +1)
+
 (use-package ag
   :ensure t)
 
@@ -774,5 +774,38 @@ Start `ielm' if it's not already running."
 (use-package undo-tree
   :ensure t
   :diminish undo-tree-mode)
+
+(use-package powerline :ensure t)
+(use-package let-alist :ensure t)
+(use-package all-the-icons :ensure t)
+
+(use-package anti-zenburn-theme
+  :ensure t
+  :config (load-theme 'anti-zenburn t))
+
+;; (use-package spaceline
+;;   :ensure t
+;;  :config
+;;    (require 'spaceline-config)
+;;    (spaceline-emacs-theme))
+
+;; (use-package smart-mode-line
+;;    :ensure t
+;;    :config
+;;      (setq sml/no-confirm-load-theme t)
+;;      (sml/setup))
+
+(use-package helium-modeline
+  :after powerline
+  :after let-alist
+  :after projectile
+  :after flycheck
+  :after window-numbering
+  :after
+  :config
+  (powerline-helium-theme))
+
+(require 'theme-enhancement)
+(theme-enhancement/apply)
 
 (load-file "~/.emacs.machine.el")

@@ -164,6 +164,7 @@ Approach to evolve interface framework
   (global-linum-mode t)
   (global-auto-revert-mode nil)
   (diminish 'auto-revert-mode)
+  (diminish 'abbrev-mode)
 
   (line-number-mode t)
   (column-number-mode t)
@@ -273,19 +274,6 @@ This snippet disables FCI when company mode is on.
       which-key-idle-delay 0.05))
 #+END_SRC
 
-* Theme
-#+BEGIN_SRC emacs-lisp
-  (use-package anti-zenburn-theme
-    :ensure t
-    :config (load-theme 'anti-zenburn t))
-#+END_SRC
-
-Enhance the loaded theme.
-#+BEGIN_SRC emacs-lisp
-(require 'theme-enhancement)
-(theme-enhancement/apply)
-#+END_SRC
-
 * Key prefix names
 #+BEGIN_SRC emacs-lisp
   (rename-mnemonic-key-prefix "g" "VCS")
@@ -359,28 +347,11 @@ Enhance the loaded theme.
     :config
     (global-eldoc-mode +1))
 #+END_SRC
-* Spaceline
-#+BEGIN_SRC emacs-lisp
-
-;; (use-package spaceline
-;;   :ensure t
-;;  :config
-;;    (require 'spaceline-config)
-;;    (spaceline-emacs-theme))
-#+END_SRC
-
-* Smart mode line
-#+BEGIN_SRC emacs-lisp
-  (use-package smart-mode-line
-    :ensure t
-    :config
-      (setq sml/no-confirm-load-theme t)
-      (sml/setup))
-#+END_SRC
 * Syntax Checking
 #+BEGIN_SRC emacs-lisp
   (use-package flycheck
     :ensure t
+    :diminish flycheck-mode
     :init
     (setq flycheck-keymap-prefix (kbd (concat +keybinding/mnemonic-prefix+ " e")))
     :config
@@ -428,7 +399,7 @@ paredit, wrap-region, AST navigation etc.
 
   (use-package smartparens-config
     :ensure smartparens
-    :diminish (smartparens-mode . " ✓")
+    :diminish (smartparens-mode . " ")
     :config
     (smartparens-global-mode +1)
 
@@ -497,6 +468,14 @@ Avy is used to jump around the file.
     :ensure t
     :config
       (key-chord-define-global "jj" 'avy-goto-word-1))
+#+END_SRC
+* Window management
+** Window numbering
+#+BEGIN_SRC emacs-lisp
+  (use-package window-numbering
+    :ensure t
+    :config
+    (window-numbering-mode +1))
 #+END_SRC
 * Persistent history
 ** Minibuffer, M-x and ring history
@@ -583,13 +562,14 @@ Use `C-x v` prefixed commands for now.
 #+BEGIN_SRC emacs-lisp
   (use-package projectile
     :ensure t
+    :diminish projectile-mode
     :init
     (progn
       (setq projectile-enable-caching t)
       (setq projectile-keymap-prefix (kbd (concat +keybinding/mnemonic-prefix+ " p"))))
     :config
     (progn
-      (projectile-global-mode +1)
+      (projectile-mode +1)
       (setq projectile-completion-system 'ivy)
       (setq projectile-mode-line '(:eval (format " P[%s]" (projectile-project-name))))))
 #+END_SRC
@@ -617,12 +597,13 @@ Multi-colored parantheses are helpful, especially in lisp-like modes.
 #+BEGIN_SRC emacs-lisp
   (use-package flyspell
     :ensure t
-    :diminish (flyspell-mode . " _")
+    :diminish (flyspell-mode . " ")
     :config
     (progn
       (setq ispell-program-name (locate-file "aspell" exec-path))
       (setq ispell-list-command "--list")
-      (add-hook 'text-mode-hook #'(lambda () (flyspell-mode +1)))))
+      (add-hook 'text-mode-hook #'(lambda () (flyspell-mode +1)))
+      (flyspell-prog-mode)))
 #+END_SRC
 * Org mode setup
 ** Org agenda
@@ -665,6 +646,10 @@ Multi-colored parantheses are helpful, especially in lisp-like modes.
 ** Org refile
 #+BEGIN_SRC emacs-lisp
 (setq org-refile-targets '((org-agenda-files . (:maxlevel . 6))))
+#+END_SRC
+** Org source editing
+#+BEGIN_SRC emacs-lisp
+  (diminish 'org-src-mode " ")
 #+END_SRC
 * TODO Lang setup [7/14]
 ** DONE C/C++
@@ -1006,6 +991,10 @@ Insert shebang
       (mode-key prog-mode-map "M-RET" #'emr-show-refactor-menu)))
 #+END_SRC
 * TODO Tags
+* Which function mode
+#+BEGIN_SRC emacs-lisp
+  (which-function-mode +1)
+#+END_SRC
 * Search
 ** Ag
 #+BEGIN_SRC emacs-lisp
@@ -1041,6 +1030,52 @@ Don't use evil mode for general purpose. Current use of evil mode is for vim lik
 #+END_SRC
 * TODO Gnus
 * TODO ERC
+* Theming
+** Helper packages
+#+BEGIN_SRC emacs-lisp
+  (use-package powerline :ensure t)
+  (use-package let-alist :ensure t)
+  (use-package all-the-icons :ensure t)
+#+END_SRC
+
+** Color theme
+#+BEGIN_SRC emacs-lisp
+  (use-package anti-zenburn-theme
+    :ensure t
+    :config (load-theme 'anti-zenburn t))
+#+END_SRC
+
+** Modeline
+#+BEGIN_SRC emacs-lisp
+  ;; (use-package spaceline
+  ;;   :ensure t
+  ;;  :config
+  ;;    (require 'spaceline-config)
+  ;;    (spaceline-emacs-theme))
+
+  ;; (use-package smart-mode-line
+  ;;    :ensure t
+  ;;    :config
+  ;;      (setq sml/no-confirm-load-theme t)
+  ;;      (sml/setup))
+
+  (use-package helium-modeline
+    :after powerline
+    :after let-alist
+    :after projectile
+    :after flycheck
+    :after window-numbering
+    :after
+    :config
+    (powerline-helium-theme))
+#+END_SRC
+
+** Theme enhancements.
+Enhance the loaded theme.
+#+BEGIN_SRC emacs-lisp
+(require 'theme-enhancement)
+(theme-enhancement/apply)
+#+END_SRC
 * Load machine configuration
 #+BEGIN_SRC emacs-lisp
   (load-file "~/.emacs.machine.el")
