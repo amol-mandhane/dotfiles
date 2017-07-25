@@ -43,7 +43,7 @@
 
 (use-package smex
   :ensure t)
-(use-package ido-ubiquitous
+(use-package ido-completing-read+
   :ensure t)
 (use-package ido-vertical-mode
   :ensure t)
@@ -58,7 +58,7 @@
 (use-package ido
   :ensure t
   :after smex
-  :after ido-ubiquitous
+  :after ido-completing-read+
   :after ido-vertical-mode
   :config
   (progn
@@ -746,7 +746,7 @@ Start `ielm' if it's not already running."
    (lambda () (org-bullets-mode +1))))
 
 (use-package org-indent
-  :ensure t
+  :defer t
   :diminish org-indent-mode
   :config
   (add-hook 'org-mode-hook (lambda () (org-indent-mode +1))))

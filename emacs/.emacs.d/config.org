@@ -82,45 +82,45 @@ Approach to evolve interface framework
 
 ** IDO
 #+BEGIN_SRC emacs-lisp
-(use-package smex
-  :ensure t)
-(use-package ido-ubiquitous
-  :ensure t)
-(use-package ido-vertical-mode
-  :ensure t)
-(use-package flx
-  :ensure t)
-(use-package flx-ido
-  :ensure t
-  :after ido
-  :after flx
-  :config (flx-ido-mode +1))
+  (use-package smex
+    :ensure t)
+  (use-package ido-completing-read+
+    :ensure t)
+  (use-package ido-vertical-mode
+    :ensure t)
+  (use-package flx
+    :ensure t)
+  (use-package flx-ido
+    :ensure t
+    :after ido
+    :after flx
+    :config (flx-ido-mode +1))
 
-(use-package ido
-  :ensure t
-  :after smex
-  :after ido-ubiquitous
-  :after ido-vertical-mode
-  :config
-  (progn
-    (setq ido-enable-flex-matching t)
-    (setq ido-use-virtual-buffers t)
-    (setq ido-enable-regex t)
+  (use-package ido
+    :ensure t
+    :after smex
+    :after ido-completing-read+
+    :after ido-vertical-mode
+    :config
+    (progn
+      (setq ido-enable-flex-matching t)
+      (setq ido-use-virtual-buffers t)
+      (setq ido-enable-regex t)
 
-    (add-hook
-      'ido-setup-hook
-      (lambda () (mode-keys
-                   ido-completion-map
-                   ("<tab>" . 'ido-exit-minibuffer)
-                   ("<return>" . 'ido-exit-minibuffer))))
+      (add-hook
+        'ido-setup-hook
+        (lambda () (mode-keys
+                     ido-completion-map
+                     ("<tab>" . 'ido-exit-minibuffer)
+                     ("<return>" . 'ido-exit-minibuffer))))
 
-    (ido-mode +1)
-    (ido-everywhere +1)
-    (ido-ubiquitous-mode +1)
-    (ido-vertical-mode +1)
+      (ido-mode +1)
+      (ido-everywhere +1)
+      (ido-ubiquitous-mode +1)
+      (ido-vertical-mode +1)
 
-    (require 'smex)
-    (smex-initialize)))
+      (require 'smex)
+      (smex-initialize)))
 
 #+END_SRC
 
@@ -980,7 +980,7 @@ Insert shebang
 *** Org indent
 #+BEGIN_SRC emacs-lisp
   (use-package org-indent
-    :ensure t
+    :defer t
     :diminish org-indent-mode
     :config
     (add-hook 'org-mode-hook (lambda () (org-indent-mode +1))))
