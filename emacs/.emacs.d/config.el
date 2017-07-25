@@ -586,6 +586,8 @@ Start `ielm' if it's not already running."
 
   (defun eval-expr-minibuffer-setup ()
     (set-syntax-table emacs-lisp-mode-syntax-table)
+    (set (make-local-variable 'eldoc-documentation-function) #'elisp-eldoc-documentation-function)
+    (eldoc-mode +1)
     (local-set-key (kbd "<tab>") #'counsel-el)))
 
 (use-package redshank
