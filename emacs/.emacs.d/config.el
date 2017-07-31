@@ -145,15 +145,6 @@
 
 (add-hook 'before-save-hook 'delete-trailing-whitespace)
 
-(defhydra text-zoom ()
-  "zoom"
-  ("+" text-scale-increase "in")
-  ("=" text-scale-increase "in")
-  ("-" text-scale-decrease "out")
-  ("q" nil "quit"))
-
-(prefixed-key "zz" #'text-zoom/body)
-
 (setq-default custom-file "/dev/null")
 
 (rename-mnemonic-key-prefix "g" "VCS")
@@ -167,17 +158,31 @@
 (rename-mnemonic-key-prefix "!" "Terminal")
 (rename-mnemonic-key-prefix "t" "Tags")
 
-(defhydra windmove-hydra ()
-  "windmove"
-  ("<left>" windmove-left "left")
-  ("<right>" windmove-right "right")
-  ("<up>" windmove-up "up")
-  ("<down>" windmove-down "down")
-  ("h" windmove-left "left")
-  ("j" windmove-down "down")
-  ("k" windmove-up "up")
-  ("l" windmove-right "right")
-  ("q" nil "quit"))
+(defhydra windows-hydra ()
+  "
+^Windows^				^Window^		^Zoom^
+--------------------------------------------------------------------------
+_<left>_ _h_: windmove-left		_w_: enlarge	_-_: zoom out
+_<down>_ _j_: windmove-down		_s_: shrink	_+_ _=_: zoom in
+_<up>_ _k_: windmove-up		_a_: widen	_0_: reset
+_<right>_ _l_: windmove-right	_d_: tighten	_q_: quit"
+  ("<left>" windmove-left)
+  ("<right>" windmove-right)
+  ("<up>" windmove-up)
+  ("<down>" windmove-down)
+  ("h" windmove-left)
+  ("j" windmove-down)
+  ("k" windmove-up)
+  ("l" windmove-right)
+  ("+" text-scale-increase)
+  ("=" text-scale-increase)
+  ("-" text-scale-decrease)
+  ("w" enlarge-window)
+  ("a" enlarge-window-horizontally)
+  ("s" shrink-window)
+  ("d" shrink-window-horizontally)
+  ("0" (text-scale-increase 0))
+  ("q" nil))
 
 (prefixed-keys
   ("bb" . 'switch-to-buffer)
@@ -190,7 +195,7 @@
   ("wD" . 'delete-other-window)
   ("wh" . 'split-window-horizontally)
   ("wv" . 'split-window-vertically)
-  ("ww" . #'windmove-hydra/body))
+  ("ww" . #'windows-hydra/body))
 
 (global-keys
   ("C-S-j" . #'join-next-line)
@@ -257,6 +262,26 @@ IGNORE: ignore."
 (add-hook 'company-completion-started-hook 'company-turn-off-fci)
 (add-hook 'company-completion-finished-hook 'company-maybe-turn-on-fci)
 (add-hook 'company-completion-cancelled-hook 'company-maybe-turn-on-fci)
+
+(use-package highlight-indent-guides
+  :ensure t
+  :init
+  (progn
+    (setq highlight-indent-guides-auto-odd-face-perc 2)
+    (setq highlight-indent-guides-auto-even-face-perc 4))
+  :config
+  (add-hook 'prog-mode-hook 'highlight-indent-guides-mode))
+
+(use-package expand-region
+  :ensure t
+  :config
+  (global-key "C-=" #'er/expand-region))
+
+(use-package hungry-delete
+  :ensure t
+  :diminish hungry-delete-mode
+  :config
+  (global-hungry-delete-mode +1))
 
 (use-package company
   :ensure t
@@ -753,7 +778,7 @@ Start `ielm' if it's not already running."
 
 (setq org-capture-templates
       '(("a" "Action Item" entry (file+headline "~/organizer/main.org" "Action Items")
-         "* TODO %?\n  %i")
+         "* TODO [#B] %?\n  %i")
         ("c" "Calendar" entry (file+headline "~/organizer/main.org" "Calendar")
          "* %?\n %^T\n %i")
         ("r" "Reference" entry (file "~/organizer/reference.org")
@@ -766,7 +791,34 @@ Start `ielm' if it's not already running."
 
 (setq org-refile-targets '((org-agenda-files . (:maxlevel . 6))))
 
+(setq org-outline-path-complete-in-steps nil)
+(setq org-refile-use-outline-path t)
+
 (diminish 'org-src-mode " ")
+
+(defadvice org-capture-finalize
+    (after delete-capture-frame activate)
+  "Advise capture-finalize to close the frame."
+  (if (equal "capture" (frame-parameter nil 'name))
+    (delete-frame)))
+
+(defadvice org-capture-destroy
+    (after delete-capture-frame activate)
+  "Advise capture-destroy to close the frame."
+  (if (equal "capture" (frame-parameter nil 'name))
+    (delete-frame)))
+
+(use-package noflet
+  :ensure t)
+
+(defun make-capture-frame ()
+  "Create a new frame and run `org-capture'."
+  (interactive)
+  (make-frame '((name . "capture")))
+  (select-frame-by-name "capture")
+  (delete-other-windows)
+  (noflet ((switch-to-buffer-other-window (buf) (switch-to-buffer buf)))
+    (org-capture)))
 
 (use-package stickyfunc-enhance
   :ensure t)
@@ -811,7 +863,7 @@ Start `ielm' if it's not already running."
 (which-function-mode +1)
 (setq which-func-unknown "")
 
-(prefixed-key "ii" 'counsel-imenu)
+(prefixed-key "tt" 'counsel-imenu)
 
 (use-package ag
   :ensure t)

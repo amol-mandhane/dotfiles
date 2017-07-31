@@ -200,18 +200,6 @@ Approach to evolve interface framework
 (add-hook 'before-save-hook 'delete-trailing-whitespace)
 #+END_SRC
 
-** Text zoom
-#+BEGIN_SRC emacs-lisp
-  (defhydra text-zoom ()
-    "zoom"
-    ("+" text-scale-increase "in")
-    ("=" text-scale-increase "in")
-    ("-" text-scale-decrease "out")
-    ("q" nil "quit"))
-
-  (prefixed-key "zz" #'text-zoom/body)
-#+END_SRC
-
 ** Don't use `custom`
 #+BEGIN_SRC emacs-lisp
 (setq-default custom-file "/dev/null")
@@ -230,20 +218,37 @@ Approach to evolve interface framework
   (rename-mnemonic-key-prefix "!" "Terminal")
   (rename-mnemonic-key-prefix "t" "Tags")
 #+END_SRC
+** General Hydras
+*** Window management and zoom
+ #+BEGIN_SRC emacs-lisp
+   (defhydra windows-hydra ()
+     "
+   ^Windows^				^Window^		^Zoom^
+   --------------------------------------------------------------------------
+   _<left>_ _h_: windmove-left		_w_: enlarge	_-_: zoom out
+   _<down>_ _j_: windmove-down		_s_: shrink	_+_ _=_: zoom in
+   _<up>_ _k_: windmove-up		_a_: widen	_0_: reset
+   _<right>_ _l_: windmove-right	_d_: tighten	_q_: quit"
+     ("<left>" windmove-left)
+     ("<right>" windmove-right)
+     ("<up>" windmove-up)
+     ("<down>" windmove-down)
+     ("h" windmove-left)
+     ("j" windmove-down)
+     ("k" windmove-up)
+     ("l" windmove-right)
+     ("+" text-scale-increase)
+     ("=" text-scale-increase)
+     ("-" text-scale-decrease)
+     ("w" enlarge-window)
+     ("a" enlarge-window-horizontally)
+     ("s" shrink-window)
+     ("d" shrink-window-horizontally)
+     ("0" (text-scale-increase 0))
+     ("q" nil))
+ #+END_SRC
 ** General Keybindings
 #+BEGIN_SRC emacs-lisp
-  (defhydra windmove-hydra ()
-    "windmove"
-    ("<left>" windmove-left "left")
-    ("<right>" windmove-right "right")
-    ("<up>" windmove-up "up")
-    ("<down>" windmove-down "down")
-    ("h" windmove-left "left")
-    ("j" windmove-down "down")
-    ("k" windmove-up "up")
-    ("l" windmove-right "right")
-    ("q" nil "quit"))
-
   (prefixed-keys
     ("bb" . 'switch-to-buffer)
     ("bd" . 'kill-this-buffer)
@@ -255,7 +260,7 @@ Approach to evolve interface framework
     ("wD" . 'delete-other-window)
     ("wh" . 'split-window-horizontally)
     ("wv" . 'split-window-vertically)
-    ("ww" . #'windmove-hydra/body))
+    ("ww" . #'windows-hydra/body))
 
   (global-keys
     ("C-S-j" . #'join-next-line)
@@ -280,6 +285,7 @@ Approach to evolve interface framework
 
   (prefixed-key "!!" #'crux-visit-term-buffer)
 #+END_SRC
+
 * General packages
 ** Annoying arrows
 #+BEGIN_SRC emacs-lisp
@@ -345,6 +351,34 @@ This snippet disables FCI when company mode is on.
   (add-hook 'company-completion-cancelled-hook 'company-maybe-turn-on-fci)
 #+END_SRC
 
+** Indent guides
+ #+BEGIN_SRC emacs-lisp
+   (use-package highlight-indent-guides
+     :ensure t
+     :init
+     (progn
+       (setq highlight-indent-guides-auto-odd-face-perc 2)
+       (setq highlight-indent-guides-auto-even-face-perc 4))
+     :config
+     (add-hook 'prog-mode-hook 'highlight-indent-guides-mode))
+ #+END_SRC
+
+** Expand-region
+#+BEGIN_SRC emacs-lisp
+  (use-package expand-region
+    :ensure t
+    :config
+    (global-key "C-=" #'er/expand-region))
+#+END_SRC
+
+** Hungry delete
+   #+BEGIN_SRC emacs-lisp
+     (use-package hungry-delete
+       :ensure t
+       :diminish hungry-delete-mode
+       :config
+       (global-hungry-delete-mode +1))
+   #+END_SRC
 * Auto-completion
 #+BEGIN_SRC emacs-lisp
   (use-package company
@@ -989,7 +1023,7 @@ Insert shebang
 #+BEGIN_SRC emacs-lisp
   (setq org-capture-templates
         '(("a" "Action Item" entry (file+headline "~/organizer/main.org" "Action Items")
-           "* TODO %?\n  %i")
+           "* TODO [#B] %?\n  %i")
           ("c" "Calendar" entry (file+headline "~/organizer/main.org" "Calendar")
            "* %?\n %^T\n %i")
           ("r" "Reference" entry (file "~/organizer/reference.org")
@@ -1002,13 +1036,42 @@ Insert shebang
 #+END_SRC
 *** Org refile
 #+BEGIN_SRC emacs-lisp
-(setq org-refile-targets '((org-agenda-files . (:maxlevel . 6))))
+  (setq org-refile-targets '((org-agenda-files . (:maxlevel . 6))))
+
+  (setq org-outline-path-complete-in-steps nil)
+  (setq org-refile-use-outline-path t)
 #+END_SRC
 *** Org source editing
 #+BEGIN_SRC emacs-lisp
   (diminish 'org-src-mode " ")
 #+END_SRC
+*** Org capture system-wide shortcut helper
+Copied from [[http://cestlaz.github.io/posts/using-emacs-24-capture-2][C'est la Z blog]].
+#+BEGIN_SRC emacs-lisp
+  (defadvice org-capture-finalize
+      (after delete-capture-frame activate)
+    "Advise capture-finalize to close the frame."
+    (if (equal "capture" (frame-parameter nil 'name))
+      (delete-frame)))
 
+  (defadvice org-capture-destroy
+      (after delete-capture-frame activate)
+    "Advise capture-destroy to close the frame."
+    (if (equal "capture" (frame-parameter nil 'name))
+      (delete-frame)))
+
+  (use-package noflet
+    :ensure t)
+
+  (defun make-capture-frame ()
+    "Create a new frame and run `org-capture'."
+    (interactive)
+    (make-frame '((name . "capture")))
+    (select-frame-by-name "capture")
+    (delete-other-windows)
+    (noflet ((switch-to-buffer-other-window (buf) (switch-to-buffer buf)))
+      (org-capture)))
+#+END_SRC
 * Code Semantics
 ** Semantic
 *** Stickyfunc
@@ -1070,7 +1133,7 @@ Insert shebang
 #+END_SRC
 ** Imenu
 #+BEGIN_SRC emacs-lisp
-  (prefixed-key "ii" 'counsel-imenu)
+  (prefixed-key "tt" 'counsel-imenu)
 #+END_SRC
 * Search/Replace
 ** Ag
@@ -1136,7 +1199,6 @@ Don't use evil mode for general purpose. Current use of evil mode is for vim lik
 #+END_SRC
 * TODO Gnus
 * TODO ERC
-* TODO Indent guides
 * TODO Crosshairs-mode
 * Theming
 ** Helper packages
@@ -1191,3 +1253,7 @@ Enhance the loaded theme.
 #+BEGIN_SRC emacs-lisp
   (load-file "~/.emacs.machine.el")
 #+END_SRC
+
+# Local Variables:
+# eval: (setq-local org-refile-targets '(("~/.emacs.d/config.org" :maxlevel . 9)))
+# End:

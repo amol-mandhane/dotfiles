@@ -6,6 +6,11 @@
 ;;; Code:
 (package-initialize)
 (require 'ob-tangle)
-(org-babel-load-file "~/.emacs.d/config.org")
+
+(let
+    ((enable-local-eval t)
+     (inhibit-message t)
+     (gc-cons-threshold 640000000))
+  (org-babel-load-file "~/.emacs.d/config.org"))
 (provide 'init)
 ;;; init.el ends here
