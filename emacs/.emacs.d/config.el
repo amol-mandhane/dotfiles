@@ -21,10 +21,13 @@
 
 (add-hook 'after-init-hook #'(lambda () (server-start)))
 
-(use-package hydra :ensure t)
+(use-package hydra
+  :ensure t)
 
-(global-unset-key (kbd "M-m"))
-(require 'keybinding)
+(use-package keybinding
+  :demand t
+  :init
+  (global-unset-key (kbd "M-m")))
 
 (use-package key-chord
   :ensure t
@@ -103,7 +106,8 @@
       ("C-c M-x" . 'execute-extended-command)
       ("C-x C-f" . 'counsel-find-file))))
 
-(require 'helper-functions)
+(use-package helper-functions
+  :demand t)
 
 (setq delete-old-versions -1)
 (setq version-control t)
@@ -111,38 +115,43 @@
 (setq backup-directory-alist `(("." . "~/.emacs.d/backups")))
 (setq vc-follow-symlinks t)
 (setq auto-save-file-name-transforms '((".*" "~/.emacs.d/auto-save-list/" t)))
+
 (setq inhibit-startup-screen t)
+(setq initial-scratch-message ";;; Lisp Interaction Mode\n")
+(setq initial-major-mode 'lisp-interaction-mode)
+
 (setq coding-system-for-read 'utf-8)
 (setq coding-system-for-write 'utf-8)
-(setq sentence-end-double-space nil)
+
 (setq-default fill-column 80)
 (setq visible-bell t)
 
+(setq ns-use-srgb-colorspace nil)
+
 (scroll-bar-mode -1)
 (tool-bar-mode -1)
-
 (global-linum-mode t)
 (global-auto-revert-mode t)
 (diminish 'auto-revert-mode)
 (diminish 'abbrev-mode)
-
-(line-number-mode t)
-(column-number-mode t)
-(size-indication-mode t)
-(global-hl-line-mode t)
+(line-number-mode -1)
+(column-number-mode -1)
+(size-indication-mode -1)
+;; (global-hl-line-mode t)
+(use-package hl-line
+  :demand t
+  :config
+  (enable-minor-mode-globally hl-line-mode))
 
 (defalias 'yes-or-no-p 'y-or-n-p)
 
-(setq ns-use-srgb-colorspace nil)
-
-(setq require-final-newline t)
-
 (set-frame-font "Inconsolata-18")
-(setq default-frame-alist '((font . "Inconsolata-18")))
+;; (setq default-frame-alist '((font . "Inconsolata-18")))
 
 (setq-default cursor-type 'bar)
 (blink-cursor-mode 0)
 
+(setq require-final-newline t)
 (add-hook 'before-save-hook 'delete-trailing-whitespace)
 
 (setq-default custom-file "/dev/null")
@@ -222,16 +231,19 @@ _<right>_ _l_: windmove-right	_d_: tighten	_q_: quit"
 
 (use-package annoying-arrows-mode
   :ensure t
+  :defer 5
   :diminish annoying-arrows-mode
   :config
   (global-annoying-arrows-mode +1))
 
 (use-package beacon
   :ensure t
-  :config
-  (global-key "C-\\" 'beacon-blink))
+  :commands beacon-blink
+  :init
+  (global-key "C-\\" #'beacon-blink))
 
-(use-package crux :ensure t)
+(use-package crux
+  :ensure t)
 
 (show-paren-mode +1)
 
@@ -265,16 +277,17 @@ IGNORE: ignore."
 
 (use-package highlight-indent-guides
   :ensure t
+  :commands highlight-indent-guides-mode
   :init
   (progn
     (setq highlight-indent-guides-auto-odd-face-perc 2)
-    (setq highlight-indent-guides-auto-even-face-perc 4))
-  :config
-  (add-hook 'prog-mode-hook 'highlight-indent-guides-mode))
+    (setq highlight-indent-guides-auto-even-face-perc 4)
+    (add-hook 'prog-mode-hook 'highlight-indent-guides-mode)))
 
 (use-package expand-region
   :ensure t
-  :config
+  :commands er/expand-region
+  :init
   (global-key "C-=" #'er/expand-region))
 
 (use-package hungry-delete
@@ -318,13 +331,14 @@ IGNORE: ignore."
 
 (use-package flyspell
   :ensure t
+  :commands (flyspell-mode flyspell-prog-mode)
   :diminish (flyspell-mode . " ")
-  :config
+  :init
   (progn
     (setq ispell-program-name (locate-file "aspell" exec-path))
     (setq ispell-list-command "--list")
     (add-hook 'text-mode-hook #'(lambda () (flyspell-mode +1)))
-    (flyspell-prog-mode)))
+    (add-hook 'prog-mode-hook #'flyspell-prog-mode)))
 
 ; (electric-pair-mode +1)
 
@@ -402,11 +416,15 @@ IGNORE: ignore."
              ;; ("C-c C-w `" . sp/wrap-with-back-quotes)
              ))
 
-(electric-indent-mode +1)
+(use-package electric
+  :demand t
+  :config
+  (electric-indent-mode +1))
 
 (use-package avy
   :ensure t
-  :config
+  :commands avy-goto-word-1
+  :init
     (key-chord-define-global "jj" 'avy-goto-word-1))
 
 (use-package window-numbering
@@ -419,15 +437,18 @@ IGNORE: ignore."
 
 (savehist-mode +1)
 
-(require 'recentf)
-(recentf-mode +1)
-(setq recentf-max-menu-items 25)
+(use-package recentf
+  :demand t
+  :config
+  (progn
+    (recentf-mode +1)
+    (setq recentf-max-menu-items 25)
 
-;; Save recent files every few minutes.
-(run-at-time nil (* 5 60) 'recentf-save-list)
+    ;; Save recent files every few minutes.
+    (run-at-time nil (* 5 60) 'recentf-save-list)
 
-;; Silent the saved recent files message
-(silence-function 'recentf-save-list)
+    ;; Silent the saved recent files message
+    (silence-function 'recentf-save-list)))
 
 (use-package magit
   :ensure t
@@ -499,6 +520,7 @@ _p_rev	_m_ine	_E_diff	_=_: mine-other	_RET_: current
 
 (use-package irony
   :ensure t
+  :commands irony-mode
   :init
   (progn
     (add-hook 'c++-mode-hook 'irony-mode)
@@ -509,16 +531,18 @@ _p_rev	_m_ine	_E_diff	_=_: mine-other	_RET_: current
 
 (use-package company-irony
   :ensure t
+  :commands company-irony
   :after company
   :after irony
-  :config
+  :init
   (add-to-list 'company-backends 'company-irony))
 
 (use-package company-irony-c-headers
   :ensure t
+  :commands company-irony-c-headers
   :after company
   :after irony
-  :config
+  :init
   (add-to-list 'company-backends 'company-irony-c-headers))
 
 ;; Company-clang doesn't work well with the work setup.
@@ -526,24 +550,27 @@ _p_rev	_m_ine	_E_diff	_=_: mine-other	_RET_: current
 
 (use-package flycheck-irony
   :ensure t
+  :commands flycheck-irony-setup
   :after flycheck
   :after irony
-  :config
-  (add-hook 'flycheck-mode-hook #'flycheck-irony-setup))
+  :init
+  (add-hook 'c-mode-common-hook #'flycheck-irony-setup))
 
 (use-package irony-eldoc
   :ensure t
+  :commands irony-eldoc
   :after irony
-  :config
+  :init
   (add-hook 'irony-mode-hook #'irony-eldoc))
 
 (use-package google-c-style
   :ensure t
-  :config
+  :commands google-set-c-style
+  :init
   (add-hook 'c-mode-common-hook 'google-set-c-style))
 
 (use-package rtags
-  :ensure t
+  :disabled
   :config
   (progn
     ;; Can't do it since this is not compatible with work. Also, irony-mode is pretty good.
@@ -553,13 +580,13 @@ _p_rev	_m_ine	_E_diff	_=_: mine-other	_RET_: current
     (rtags-enable-standard-keybindings)))
 
 ;; Maybe someday.
-;;
-;; (use-package company-rtags
-;;   :ensure t
-;;   :after company
-;;   :after rtags
-;;   :config
-;;   (add-to-list 'company-backends 'company-rtags))
+
+(use-package company-rtags
+  :disabled
+  :after company
+  :after rtags
+  :config
+  (add-to-list 'company-backends 'company-rtags))
 
 ;; Helper functions.
 (defun elisp-visit-ielm ()
@@ -587,40 +614,45 @@ Start `ielm' if it's not already running."
 
 (use-package elisp-slime-nav
   :ensure t
+  :commands turn-on-elisp-slime-nav-mode
   :diminish elisp-slime-nav-mode
   :config
   (dolist (hook '(emacs-lisp-mode-hook ielm-mode-hook))
     (add-hook hook 'turn-on-elisp-slime-nav-mode)))
 
-(define-key emacs-lisp-mode-map (kbd "C-c C-z") 'elisp-visit-ielm)
-(define-key emacs-lisp-mode-map (kbd "C-c C-c") 'eval-defun)
-(define-key emacs-lisp-mode-map (kbd "C-c C-b") 'eval-buffer)
-(define-key emacs-lisp-mode-map (kbd "C-c C-r") 'eval-region)
+(mode-keys
+ emacs-lisp-mode-map
+ ("C-c C-z" . #'elisp-visit-ielm)
+ ("C-c C-c" . 'eval-defun)
+ ("C-c C-b" . 'eval-buffer)
+ ("C-c C-r" . 'eval-region))
 
 (use-package macrostep
   :ensure t
-  :config
+  :commands macrostep-mode
+  :init
   (mode-key emacs-lisp-mode-map "C-c m" #'macrostep-mode))
 
 (use-package eval-expr
   :ensure t
   :config
-  (global-key "M-:" #'eval-expr)
-  (setq eval-expr-print-function 'pp
-        eval-expr-print-level 20
-        eval-expr-print-length 100)
+  (progn
+    (global-key "M-:" #'eval-expr)
+    (setq eval-expr-print-function 'pp
+          eval-expr-print-level 20
+          eval-expr-print-length 100)
 
-  (defun eval-expr-minibuffer-setup ()
-    (set-syntax-table emacs-lisp-mode-syntax-table)
-    (set (make-local-variable 'eldoc-documentation-function) #'elisp-eldoc-documentation-function)
-    (eldoc-mode +1)
-    (local-set-key (kbd "<tab>") #'counsel-el)))
+    (defun eval-expr-minibuffer-setup ()
+      (set-syntax-table emacs-lisp-mode-syntax-table)
+      (set (make-local-variable 'eldoc-documentation-function) #'elisp-eldoc-documentation-function)
+      (eldoc-mode +1)
+      (local-set-key (kbd "<tab>") #'counsel-el))))
 
 (use-package redshank
   :load-path "third_party/redshank"
-  :defer t
+  :commands redshank-mode
   :diminish redshank-mode
-  :config
+  :init
   (progn
     (add-hook 'lisp-mode-hook #'(lambda () (redshank-mode +1)))))
 
@@ -628,7 +660,8 @@ Start `ielm' if it's not already running."
 
 (use-package meghanada
   :ensure t
-  :config
+  :commands meghanada-mode
+  :init
   (progn
     (add-hook 'java-mode-hook #'(lambda () (meghanada-mode +1)))))
 
@@ -636,6 +669,7 @@ Start `ielm' if it's not already running."
 
 (use-package protobuf-mode
   :ensure t
+  :mode "\\.proto\\'"
   :init
   (add-hook
    'protobuf-mode-hook
@@ -646,24 +680,27 @@ Start `ielm' if it's not already running."
 
 (use-package python
   :ensure t
-  :config
+  :mode ("\\.py\\'" . python-mode)
+  :init
   (setq python-shell-interpreter "ipython"
         python-shell-interpreter-args "--simple-prompt -i"))
 
 (use-package anaconda-mode
   :ensure t
+  :commands anaconda-mode
   :diminish anaconda-mode
   :diminish anaconda-eldoc-mode
-  :config
-  (anaconda-mode +1))
+  :init
+  (add-hook 'python-mode-hook #'(lambda () (anaconda-mode +1))))
 
 (use-package company-anaconda
   :ensure t
-  :config
+  :commands company-anaconda
+  :init
   (add-to-list 'company-backends 'company-anaconda))
 
 (use-package virtualenvwrapper
-  :ensure t
+  :disabled
   :config
   (progn
     (setq eshell-prompt-function
@@ -673,14 +710,17 @@ Start `ielm' if it's not already running."
 
 (use-package pyenv-mode
   :ensure t
+  :commands pyenv-mode
   :after virtualenvwrapper
-  :config
-  (pyenv-mode +1))
+  :init
+  (add-hook 'python-mode-hook #'(lambda () (pyenv-mode +1))))
 
 (use-package py-yapf
+  :commands py-yapf
   :ensure t)
 
 (use-package pytest
+  :commands pytest
   :ensure t)
 
 (defconst +zsh-filename-patterns+
@@ -694,7 +734,6 @@ Start `ielm' if it's not already running."
   "Filename patterns for Zsh script files.")
 
 (use-package sh-script
-  :defer t
   :init
   (progn
     (dolist (pattern +zsh-filename-patterns+)
@@ -710,8 +749,9 @@ Start `ielm' if it's not already running."
 
 (use-package company-shell
   :ensure t
+  :commands company-shell
   :after company
-  :config
+  :init
   (add-hook
    'sh-mode-hook
    #'(lambda ()
@@ -727,18 +767,14 @@ Start `ielm' if it's not already running."
     (remove-hook 'find-file-hook 'insert-shebang)))
 
 (use-package ess
-  :ensure t
+  :disabled
   :config
   (progn
-    (add-hook
-     'inferior-ess-mode-hook
-     #'(lambda nil
-         (define-key inferior-ess-mode-map [\C-up]
-           'comint-previous-matching-input-from-input)
-         (define-key inferior-ess-mode-map [\C-down]
-           'comint-next-matching-input-from-input)
-         (define-key inferior-ess-mode-map [\C-x \t]
-           'comint-dynamic-complete-filename)))))
+    (mode-keys
+     inferior-ess-mode-map
+     ("C-<up>". 'comint-previous-matching-input-from-input)
+     ("C-<down>" . 'comint-next-matching-input-from-input)
+     ("C-x t" . 'comint-dynamic-complete-filename))))
 
 (setq org-agenda-files '("~/organizer/main.org"))
 
@@ -764,17 +800,18 @@ Start `ielm' if it's not already running."
 
 (use-package org-bullets
   :ensure t
+  :commands org-bullets-mode
   :diminish org-bullets-mode
-  :config
+  :init
   (add-hook
    'org-mode-hook
-   (lambda () (org-bullets-mode +1))))
+   #'(lambda () (org-bullets-mode +1))))
 
 (use-package org-indent
-  :defer t
+  :commands org-indent-mode
   :diminish org-indent-mode
-  :config
-  (add-hook 'org-mode-hook (lambda () (org-indent-mode +1))))
+  :init
+  (add-hook 'org-mode-hook #'(lambda () (org-indent-mode +1))))
 
 (setq org-capture-templates
       '(("a" "Action Item" entry (file+headline "~/organizer/main.org" "Action Items")
@@ -809,6 +846,7 @@ Start `ielm' if it's not already running."
     (delete-frame)))
 
 (use-package noflet
+  :commands noflet
   :ensure t)
 
 (defun make-capture-frame ()
@@ -826,42 +864,44 @@ Start `ielm' if it's not already running."
 (use-package srefactor
   :ensure t)
 
-(setq semantic-default-submodes
-      '( ;; Perform semantic actions during idle time
-        global-semantic-idle-scheduler-mode
-        ;; Use a database of parsed tags
-        global-semanticdb-minor-mode
-        ;; Decorate buffers with additional semantic information
-        global-semantic-decoration-mode
-        ;; Highlight the name of the function you're currently in
-        global-semantic-highlight-func-mode
-        ;; show the name of the function at the top in a sticky
-        global-semantic-stickyfunc-mode
-        ;; Generate a summary of the current tag when idle
-        ; global-semantic-idle-summary-mode
+(use-package semantic
+  :demand t
+  :commands semantic-mode
+  :init
+  (progn
+    (setq semantic-default-submodes
+          '( ;; Perform semantic actions during idle time
+            global-semantic-idle-scheduler-mode
+            ;; Use a database of parsed tags
+            global-semanticdb-minor-mode
+            ;; Decorate buffers with additional semantic information
+            global-semantic-decoration-mode
+            ;; Highlight the name of the function you're currently in
+            global-semantic-highlight-func-mode
+            ;; show the name of the function at the top in a sticky
+            global-semantic-stickyfunc-mode
+            ;; Generate a summary of the current tag when idle
+                                        ; global-semantic-idle-summary-mode
 
-        ;; Show a breadcrumb of location during idle time
-        global-semantic-idle-breadcrumbs-mode
-        ;; Switch to recently changed tags with `semantic-mrub-switch-tags',
-        ;; or `C-x B'
-        global-semantic-mru-bookmark-mode))
+            ;; Show a breadcrumb of location during idle time
+            global-semantic-idle-breadcrumbs-mode
+            ;; Switch to recently changed tags with `semantic-mrub-switch-tags',
+            ;; or `C-x B'
+            global-semantic-mru-bookmark-mode))
 
-(add-hook 'emacs-lisp-mode-hook 'semantic-mode)
-(add-hook 'python-mode-hook 'semantic-mode)
-(add-hook 'java-mode-hook 'semantic-mode)
-(add-hook 'c-mode-hook 'semantic-mode)
-;; etc etc
-(add-hook 'prog-mode-hook 'semantic-mode)
+    (add-hook 'emacs-lisp-mode-hook 'semantic-mode)
+    (add-hook 'python-mode-hook 'semantic-mode)
+    (add-hook 'java-mode-hook 'semantic-mode)
+    (add-hook 'c-mode-hook 'semantic-mode)
+    ;; etc etc
+    (add-hook 'prog-mode-hook 'semantic-mode)))
 
-(use-package emr
-  :ensure t
+(use-package which-func
+  :demand t
   :config
   (progn
-    (add-hook 'prog-mode-hook 'emr-initialize)
-    (mode-key prog-mode-map "M-RET" #'emr-show-refactor-menu)))
-
-(which-function-mode +1)
-(setq which-func-unknown "")
+    (which-function-mode +1)
+    (setq which-func-unknown "")))
 
 (prefixed-key "tt" 'counsel-imenu)
 
@@ -883,25 +923,28 @@ Start `ielm' if it's not already running."
      ("srr" . #'anzu-query-replace-regexp)
      ("sr." . #'anzu-query-replace-at-cursor-thing))))
 
-(require 'iedit)
+(use-package iedit
+  :demand t
+  :commands iedit-dwim
+  :init
+  (progn
+    (defun iedit-dwim (arg)
+      "Starts iedit but uses \\[narrow-to-defun] to limit its scope."
+      (interactive "P")
+      (if arg
+          (iedit-mode)
+        (save-excursion
+          (save-restriction
+            (widen)
+            ;; this function determines the scope of `iedit-start'.
+            (if iedit-mode
+                (iedit-done)
+              ;; `current-word' can of course be replaced by other
+              ;; functions.
+              (narrow-to-defun)
+              (iedit-start (current-word) (point-min) (point-max)))))))
 
-(defun iedit-dwim (arg)
-  "Starts iedit but uses \\[narrow-to-defun] to limit its scope."
-  (interactive "P")
-  (if arg
-      (iedit-mode)
-    (save-excursion
-      (save-restriction
-        (widen)
-        ;; this function determines the scope of `iedit-start'.
-        (if iedit-mode
-            (iedit-done)
-          ;; `current-word' can of course be replaced by other
-          ;; functions.
-          (narrow-to-defun)
-          (iedit-start (current-word) (point-min) (point-max)))))))
-
-(prefixed-key "sri" #'iedit-dwim)
+    (prefixed-key "sri" #'iedit-dwim)))
 
 (use-package evil
   :ensure t)
@@ -917,21 +960,19 @@ Start `ielm' if it's not already running."
 (use-package color-theme-sanityinc-tomorrow
   :ensure t
   :config
-  (progn
-    (load-theme 'sanityinc-tomorrow-night t)
-    (set-face-background 'linum "#282a2e")))
+  (load-theme 'sanityinc-tomorrow-night t))
 
-;; (use-package spaceline
-;;   :ensure t
-;;  :config
-;;    (require 'spaceline-config)
-;;    (spaceline-emacs-theme))
+(use-package spaceline
+  :disabled
+  :config
+  (require 'spaceline-config)
+  (spaceline-emacs-theme))
 
-;; (use-package smart-mode-line
-;;    :ensure t
-;;    :config
-;;      (setq sml/no-confirm-load-theme t)
-;;      (sml/setup))
+(use-package smart-mode-line
+  :disabled
+  :config
+  (setq sml/no-confirm-load-theme t)
+  (sml/setup))
 
 (use-package helium-modeline
   :after powerline
@@ -943,7 +984,24 @@ Start `ielm' if it's not already running."
   :config
   (powerline-helium-theme))
 
-(require 'theme-enhancement)
-(theme-enhancement/apply)
+(use-package theme-enhancement
+  :demand t
+  :config
+  (theme-enhancement/apply))
+
+(use-package linum
+  :config
+  (progn
+    (setq-default linum-format " %4d ")
+
+    (set-face-attribute
+     'linum
+     nil
+     :background "#282a2e"
+     :bold nil
+     :weight 'normal
+     :height 0.9
+     :slant 'normal
+     :box nil)))
 
 (load-file "~/.emacs.machine.el")

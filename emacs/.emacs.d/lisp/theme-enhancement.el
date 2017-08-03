@@ -103,6 +103,7 @@
   '(font-lock-comment-face
     font-lock-doc-face))
 
+(require 'org)
 (defun theme-enhancement--org-mode ()
   "Apply theme enhancements to `org-mode' faces.
 

@@ -11,6 +11,8 @@
     ((enable-local-eval t)
      (inhibit-message t)
      (gc-cons-threshold 640000000))
-  (org-babel-load-file "~/.emacs.d/config.org"))
+  (if (file-newer-than-file-p "~/.emacs.d/config.org" "~/.emacs.d/config.el")
+      (org-babel-load-file "~/.emacs.d/config.org")
+    (load-file "~/.emacs.d/config.el")))
 (provide 'init)
 ;;; init.el ends here

@@ -25,3 +25,4 @@ emacs/.emacs.d/*
 !emacs/.emacs.d/third_party
 !emacs/.emacs.d/third_party/*
 emacs/.emacs.d/srecode-map.el
+*.elc
