@@ -12,6 +12,7 @@ if [[ -z $EMACS ]]; then
     export EDITOR='vim'
 else
     export EDITOR='emacsclient -n'
+    ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=6'
 fi
 
 compinit -u
