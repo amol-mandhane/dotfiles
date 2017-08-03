@@ -1,88 +1,10 @@
-" vundle settings {{{
-set nocompatible
-filetype off
-set rtp+=~/.vim/bundle/Vundle.vim
-call vundle#begin()
-" }}}
-
-" VIM Plugins {{{
-Plugin 'gmarik/Vundle.vim'
-Plugin 'ctrlpvim/ctrlp.vim'
-Plugin 'Raimondi/delimitMate'
-Plugin 'sjl/badwolf'
-
-if !filereadable(expand('~/.google-office'))
-  Plugin 'Valloric/YouCompleteMe'
-  let g:ycm_global_ycm_extra_conf = "~/.vim/.ycm_extra_conf.py"
+call plug#begin('~/.vim/bundle')
+Plug 'Shougo/unite.vim'
+Plug 'liuchengxu/vim-better-default'
+if !filereadable(expand('~/.google-office')) 
+  Plug 'Valloric/YouCompleteMe' 
 endif
-" }}}
+call plug#end()
 
-" General settings {{{
-set mouse=a
-set clipboard=unnamedplus
-set autoread               " Autoreload
-set number                 " Line numbers
-set relativenumber
-set colorcolumn=80
-set showcmd
-set wildmenu            " visual autocomplete for command menu
-set backspace=indent,eol,start    " Backspace in normal mode
-set history=700
-set undolevels=700
-set cursorline
-set cursorcolumn
-syntax on
-syntax sync minlines=256
-autocmd BufWritePre * :%s/\s\+$//e      " Trim trailing whitespaces
-" }}}
-
-" Indentation {{{
-set autoindent
-set smartindent
-set smarttab
-set shiftwidth=4
-set softtabstop=4
-set tabstop=4
-set expandtab
-filetype plugin indent on
-" }}}
-
-" Swap backup {{{
-set backup
-set backupdir=~/.vim-tmp//,~/.tmp//,~/tmp//,/var/tmp//,/tmp//
-set backupskip=/tmp/*,/private/tmp/*
-set directory=~/.vim-tmp//,~/.tmp//,~/tmp//,/var/tmp//,/tmp//
-set writebackup
-" }}}
-
-" Searching {{{
-set hlsearch
-set incsearch
-set ignorecase
-set smartcase
-" }}}
-
-" Color scheme {{{
-set t_Co=256
-let g:badwolf_darkgutter = 1
-colorscheme badwolf
-set background=dark
-
-" Highlight VCS conflict markers {{{
-call matchadd('ErrorMsg', '^\(<\|=\|>\)\{7\}\([^=].\+\)\?$')
-" }}}
-
-" Machine specific settings {{{
+let g:vim_better_default_minimum = 1
 source ~/.machine_vimrc
-" }}}
-
-set runtimepath^=~/.vim/bundle/ctrlp.vim
-
-" YouCompleteMe {{{
-let g:ycm_key_list_select_completion = ['<TAB>']
-let g:ycm_key_list_previous_completion = ['<S-TAB>']
-let g:ycm_add_preview_to_completeopt = 1
-let g:ycm_autoclose_preview_window_after_completion = 1
-let g:ycm_complete_in_comments = 1
-let g:ycm_collect_identifiers_from_tags_files = 1
-" }}}

@@ -10,8 +10,9 @@ xmonad/.xmonad/conky_utilities/tomorrow_badge.py
 *.o
 *.hi
 
-vim/.vim/bundle/
-.netrwhist
+# vim
+vim/.vim/*
+!vim/.vim/vimrc
 
 # Emacs
 # Emacs generates a bunch of files in .emacs.d directory which do not need
