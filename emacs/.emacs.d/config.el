@@ -663,6 +663,16 @@ Start `ielm' if it's not already running."
     (mode-key emacs-lisp-mode-map "C-c C-v" #'erefactor-map)
     (add-hook 'emacs-lisp-mode-hook 'erefactor-lazy-highlight-turn-on)))
 
+(use-package litable
+  :ensure t
+  :commands litable-mode
+  :init
+  (progn
+    (mode-key emacs-lisp-mode-map "C-c l" #'litable-mode)
+    (mode-key lisp-interaction-mode-map "C-c l" #'litable-mode))
+  :config
+  (mode-key litable-mode-map "C-c p" #'litable-accept-as-pure))
+
 (use-package eval-expr
   :ensure t
   ;; Use `pp-eval-expression'. Retain the config for minibuffer setup example.
@@ -806,10 +816,12 @@ Start `ielm' if it's not already running."
      ("C-<down>" . 'comint-next-matching-input-from-input)
      ("C-x t" . 'comint-dynamic-complete-filename))))
 
-(mode-keys
- org-mode-map
- ("C-<up>" . 'org-move-subtree-up)
- ("C-<down>" . 'org-move-subtree-down))
+(add-hook
+ 'org-mode-hook
+ #'(lambda () (mode-keys
+               org-mode-map
+               ("C-<up>" . 'org-move-subtree-up)
+               ("C-<down>" . 'org-move-subtree-down))))
 
 (setq org-agenda-files '("~/organizer/main.org"))
 

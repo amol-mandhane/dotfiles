@@ -178,13 +178,6 @@ NO-ERROR-FACE: Face to use to display \"no errors\" information."
          (define-key map [mode-line down-mouse-1] flycheck-mode-menu-map)
          map)))))
 
-(defun helium--erc-track ()
-  "Create the mode-line section of `erc-track'."
-  (if (and
-       (boundp 'erc-track-minor-mode) erc-track-minor-mode)
-    erc-modified-channels-object
-    ""))
-
 (defun helium--make-block-xpm (&rest args)
   "Create an XPM bitmap for left side block.
 
@@ -206,6 +199,8 @@ ARGS: Unused arguments."
 
 (defun helium--update-faces ()
   "Update the colors of the helium-modeline faces."
+  (set-face-attribute 'mode-line nil :height 0.9)
+  (set-face-attribute 'mode-line-inactive nil :height 0.9)
   (set-face-foreground 'helium-mode-line-colored (face-foreground 'helium-mode-line-color-1 nil 'default))
   (set-face-foreground 'helium-mode-line-colored-bold (face-foreground 'helium-mode-line-color-1 nil 'default))
   (set-face-foreground 'helium-mode-line-active-block (face-background 'helium-mode-line-color-1 nil 'default))
@@ -260,12 +255,9 @@ ACTIVE-P: Boolean representing whether the modeline is active or not."
                (powerline-vc .vc-face)))
              (rhs
               (list
-               (powerline-raw (helium--erc-track) .error-face 'r)
-               (when (and (boundp 'which-function-mode) which-function-mode)
-                 (powerline-raw which-func-current .highlight-face 'r))
                (powerline-minor-modes .default-face 'r)
-               (powerline-raw global-mode-string .error-face 'r)
-               (powerline-raw " " .default-face)))
+               (powerline-raw mode-line-misc-info .error-face 'r)
+               (powerline-raw mode-line-end-spaces .default-face)))
              (merged-rhs (append center
                                  (list (powerline-raw " " .default-face))
                                  rhs)))

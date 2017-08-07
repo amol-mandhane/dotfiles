@@ -859,6 +859,19 @@ Macrostep is for incremental macro expansion.
       (mode-key emacs-lisp-mode-map "C-c C-v" #'erefactor-map)
       (add-hook 'emacs-lisp-mode-hook 'erefactor-lazy-highlight-turn-on)))
 #+END_SRC
+**** Litable
+Use litable to evaluate code in the margin. Helpful for quick iteration
+#+BEGIN_SRC emacs-lisp
+  (use-package litable
+    :ensure t
+    :commands litable-mode
+    :init
+    (progn
+      (mode-key emacs-lisp-mode-map "C-c l" #'litable-mode)
+      (mode-key lisp-interaction-mode-map "C-c l" #'litable-mode))
+    :config
+    (mode-key litable-mode-map "C-c p" #'litable-accept-as-pure))
+#+END_SRC
 **** Pretty print eval-expression
 `eval-expr` is a replacement for `eval-expression` with prettified output.
 #+BEGIN_SRC emacs-lisp
@@ -1057,10 +1070,12 @@ Add libraries for XMonad.
 ** DONE Org mode setup
 *** Keybindings
 #+BEGIN_SRC emacs-lisp
-  (mode-keys
-   org-mode-map
-   ("C-<up>" . 'org-move-subtree-up)
-   ("C-<down>" . 'org-move-subtree-down))
+  (add-hook
+   'org-mode-hook
+   #'(lambda () (mode-keys
+                 org-mode-map
+                 ("C-<up>" . 'org-move-subtree-up)
+                 ("C-<down>" . 'org-move-subtree-down))))
 #+END_SRC
 *** Org agenda
 #+BEGIN_SRC emacs-lisp
