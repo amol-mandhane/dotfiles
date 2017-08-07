@@ -455,9 +455,13 @@ Show errors in tooltip
 *** Electric-pair mode
 Electric-pair mode closes parenthesis automatically. However, if I'm using
 Smartparens/Paredit, no need to use electric pair mode.
-#+BEGIN_SRC emacs-lisp
-; (electric-pair-mode +1)
 
+Turns out smartparens is too much in text mode. So use electric pair mode in text.
+#+BEGIN_SRC emacs-lisp
+  (use-package elec-pair
+    :commands (electric-pair-mode electric-pair-local-mode)
+    :init
+    (add-hook 'text-mode-hook #'(lambda () (electric-pair-local-mode +1))))
 #+END_SRC
 
 *** Smartparens
@@ -483,7 +487,7 @@ paredit, wrap-region, AST navigation etc.
     :ensure smartparens
     :diminish (smartparens-mode . " ")
     :config
-    (smartparens-global-mode +1)
+    (add-hook 'prog-mode-hook #'(lambda () (smartparens-mode +1)))
 
     ;; Setup smartparens in minibuffer
     (setq sp-ignore-modes-list (delete 'minibuffer-inactive-mode sp-ignore-modes-list))
@@ -517,6 +521,7 @@ paredit, wrap-region, AST navigation etc.
                ("C-M-k" . 'sp-kill-sexp)
                ("C-k" . 'sp-kill-hybrid-sexp)
                ("M-k" . 'sp-backward-kill-sexp)
+               ("C-M-<up>" . 'sp-raise-sexp)
 
                ;; Unknown
                ;; ("C-M-t" . sp-transpose-sexp)
@@ -671,7 +676,7 @@ Use `C-x v` prefixed commands for now.
       (yas-global-mode +1)
       (prefixed-key "is" #'yas-expand)))
 #+END_SRC
-* TODO Major mode setup [8/15]
+* TODO Major mode setup [7/13]
 ** DONE C/C++
 *** Irony Mode
 Irony mode is clang based autocompletion and syntax checker. It is like YouCompleteMe, but only for C-family and better.
@@ -769,9 +774,32 @@ Still, good to have in config.
 *** TODO Explore cmake-ide
 
 *** TODO Set up debugger
-** TODO common-lisp
-** DONE Emacs Lisp
-*** Basic setup
+** Lisp
+*** Lisp common settings
+**** Define ~lisp-family-mode-hook~
+#+BEGIN_SRC emacs-lisp
+  (defvar lisp-family-mode-hook nil
+    "Hook for lisp family major modes.")
+
+  (add-hook 'emacs-lisp-mode-hook #'(lambda () (run-hooks 'lisp-family-mode-hook)))
+  (add-hook 'lisp-mode-hook #'(lambda () (run-hooks 'lisp-family-mode-hook)))
+#+END_SRC
+**** Strict Smartparens
+#+BEGIN_SRC emacs-lisp
+  (add-hook 'lisp-family-mode-hook 'smartparens-strict-mode)
+#+END_SRC
+**** Redshank
+#+BEGIN_SRC emacs-lisp
+  (use-package redshank
+    :load-path "third_party/redshank"
+    :commands redshank-mode
+    :diminish redshank-mode
+    :init
+    (progn
+      (add-hook 'lisp-family-mode-hook #'redshank-mode)))
+#+END_SRC
+*** DONE Emacs Lisp
+**** Basic setup
 #+BEGIN_SRC emacs-lisp
   ;; Helper functions.
   (defun elisp-visit-ielm ()
@@ -812,7 +840,7 @@ Still, good to have in config.
    ("C-c C-b" . 'eval-buffer)
    ("C-c C-r" . 'eval-region))
 #+END_SRC
-*** Macrostep
+**** Macrostep
 Macrostep is for incremental macro expansion.
 #+BEGIN_SRC emacs-lisp
   (use-package macrostep
@@ -821,11 +849,23 @@ Macrostep is for incremental macro expansion.
     :init
     (mode-key emacs-lisp-mode-map "C-c m" #'macrostep-mode))
 #+END_SRC
-*** eval-expr
+**** Erefactor
+#+BEGIN_SRC emacs-lisp
+  (use-package erefactor
+    :ensure t
+    :commands (erefactor-map erefactor-lazy-highlight-turn-on)
+    :init
+    (progn
+      (mode-key emacs-lisp-mode-map "C-c C-v" #'erefactor-map)
+      (add-hook 'emacs-lisp-mode-hook 'erefactor-lazy-highlight-turn-on)))
+#+END_SRC
+**** Pretty print eval-expression
 `eval-expr` is a replacement for `eval-expression` with prettified output.
 #+BEGIN_SRC emacs-lisp
   (use-package eval-expr
     :ensure t
+    ;; Use `pp-eval-expression'. Retain the config for minibuffer setup example.
+    :disabled
     :config
     (progn
       (global-key "M-:" #'eval-expr)
@@ -839,16 +879,19 @@ Macrostep is for incremental macro expansion.
         (eldoc-mode +1)
         (local-set-key (kbd "<tab>") #'counsel-el))))
 #+END_SRC
-*** Redshank
+
+Use ~pp-eval-expression~ instead of ~eval-expr~.
 #+BEGIN_SRC emacs-lisp
-  (use-package redshank
-    :load-path "third_party/redshank"
-    :commands redshank-mode
-    :diminish redshank-mode
-    :init
-    (progn
-      (add-hook 'lisp-mode-hook #'(lambda () (redshank-mode +1)))))
+  (global-key "M-:" 'pp-eval-expression)
 #+END_SRC
+**** Lisp interaction mode hook
+#+BEGIN_SRC emacs-lisp
+  (add-hook
+   'lisp-interaction-mode-hook
+   #'(lambda () (run-hooks 'emacs-lisp-mode-hook)))
+#+END_SRC
+*** TODO common-lisp
+*** TODO Clojure
 ** TODO Go
 ** TODO Haskell
 Add libraries for XMonad.
@@ -1012,6 +1055,13 @@ Add libraries for XMonad.
        ("C-x t" . 'comint-dynamic-complete-filename))))
 #+END_SRC
 ** DONE Org mode setup
+*** Keybindings
+#+BEGIN_SRC emacs-lisp
+  (mode-keys
+   org-mode-map
+   ("C-<up>" . 'org-move-subtree-up)
+   ("C-<down>" . 'org-move-subtree-down))
+#+END_SRC
 *** Org agenda
 #+BEGIN_SRC emacs-lisp
   (setq org-agenda-files '("~/organizer/main.org"))

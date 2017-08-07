@@ -342,7 +342,10 @@ IGNORE: ignore."
     (add-hook 'text-mode-hook #'(lambda () (flyspell-mode +1)))
     (add-hook 'prog-mode-hook #'flyspell-prog-mode)))
 
-; (electric-pair-mode +1)
+(use-package elec-pair
+  :commands (electric-pair-mode electric-pair-local-mode)
+  :init
+  (add-hook 'text-mode-hook #'(lambda () (electric-pair-local-mode +1))))
 
 (defmacro def-pair (pair)
   "Creates function sp/wrap-with-<PAIR>."
@@ -363,7 +366,7 @@ IGNORE: ignore."
   :ensure smartparens
   :diminish (smartparens-mode . " ")
   :config
-  (smartparens-global-mode +1)
+  (add-hook 'prog-mode-hook #'(lambda () (smartparens-mode +1)))
 
   ;; Setup smartparens in minibuffer
   (setq sp-ignore-modes-list (delete 'minibuffer-inactive-mode sp-ignore-modes-list))
@@ -397,6 +400,7 @@ IGNORE: ignore."
              ("C-M-k" . 'sp-kill-sexp)
              ("C-k" . 'sp-kill-hybrid-sexp)
              ("M-k" . 'sp-backward-kill-sexp)
+             ("C-M-<up>" . 'sp-raise-sexp)
 
              ;; Unknown
              ;; ("C-M-t" . sp-transpose-sexp)
@@ -590,6 +594,22 @@ _p_rev	_m_ine	_E_diff	_=_: mine-other	_RET_: current
   :config
   (add-to-list 'company-backends 'company-rtags))
 
+(defvar lisp-family-mode-hook nil
+  "Hook for lisp family major modes.")
+
+(add-hook 'emacs-lisp-mode-hook #'(lambda () (run-hooks 'lisp-family-mode-hook)))
+(add-hook 'lisp-mode-hook #'(lambda () (run-hooks 'lisp-family-mode-hook)))
+
+(add-hook 'lisp-family-mode-hook 'smartparens-strict-mode)
+
+(use-package redshank
+  :load-path "third_party/redshank"
+  :commands redshank-mode
+  :diminish redshank-mode
+  :init
+  (progn
+    (add-hook 'lisp-family-mode-hook #'redshank-mode)))
+
 ;; Helper functions.
 (defun elisp-visit-ielm ()
   "Switch to default `ielm' buffer.
@@ -635,8 +655,18 @@ Start `ielm' if it's not already running."
   :init
   (mode-key emacs-lisp-mode-map "C-c m" #'macrostep-mode))
 
+(use-package erefactor
+  :ensure t
+  :commands (erefactor-map erefactor-lazy-highlight-turn-on)
+  :init
+  (progn
+    (mode-key emacs-lisp-mode-map "C-c C-v" #'erefactor-map)
+    (add-hook 'emacs-lisp-mode-hook 'erefactor-lazy-highlight-turn-on)))
+
 (use-package eval-expr
   :ensure t
+  ;; Use `pp-eval-expression'. Retain the config for minibuffer setup example.
+  :disabled
   :config
   (progn
     (global-key "M-:" #'eval-expr)
@@ -650,13 +680,11 @@ Start `ielm' if it's not already running."
       (eldoc-mode +1)
       (local-set-key (kbd "<tab>") #'counsel-el))))
 
-(use-package redshank
-  :load-path "third_party/redshank"
-  :commands redshank-mode
-  :diminish redshank-mode
-  :init
-  (progn
-    (add-hook 'lisp-mode-hook #'(lambda () (redshank-mode +1)))))
+(global-key "M-:" 'pp-eval-expression)
+
+(add-hook
+ 'lisp-interaction-mode-hook
+ #'(lambda () (run-hooks 'emacs-lisp-mode-hook)))
 
 (add-to-list 'flycheck-ghc-search-path (expand-file-name "~/.xmonad/lib"))
 
@@ -777,6 +805,11 @@ Start `ielm' if it's not already running."
      ("C-<up>". 'comint-previous-matching-input-from-input)
      ("C-<down>" . 'comint-next-matching-input-from-input)
      ("C-x t" . 'comint-dynamic-complete-filename))))
+
+(mode-keys
+ org-mode-map
+ ("C-<up>" . 'org-move-subtree-up)
+ ("C-<down>" . 'org-move-subtree-down))
 
 (setq org-agenda-files '("~/organizer/main.org"))
 
