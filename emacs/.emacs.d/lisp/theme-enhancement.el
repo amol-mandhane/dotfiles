@@ -129,9 +129,9 @@ Currently these are borrowed from Cyberpunk theme."
   "Apply theme enhancements."
   (progn
     (cl-loop for f in +theme-enhancement/bold-faces+
-	     collect (ignore-errors (set-face-bold f t)))
+             collect (ignore-errors (set-face-bold f t)))
     (cl-loop for f in +theme-enhancement/italic-faces+
-	     collect (set-face-italic f t))
+             collect (set-face-italic f t))
     (theme-enhancement--org-mode)))
 
 (provide 'theme-enhancement)

@@ -37,7 +37,7 @@ MINOR-MODE: Symbol of minor mode to enable."
 ORIGINAL: Advice argument.
 ARGS: Advice argument."
   (let ((inhibit-message t)
-	(message-log-max nil))
+        (message-log-max nil))
     (apply original args)))
 
 (defmacro silence-function (func)

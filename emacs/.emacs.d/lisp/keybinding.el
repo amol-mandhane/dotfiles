@@ -47,8 +47,8 @@
 
   KEYS: conses of (`kbd' style keybinding string . function) for keybinding definition."
   `(progn ,@(cl-loop
-	     for keybd in keys
-	     collect `(global-key ,(car keybd) ,(cdr keybd)))))
+             for keybd in keys
+             collect `(global-key ,(car keybd) ,(cdr keybd)))))
 
 (defmacro mode-key (keymap key-string function)
   "Define keybinding for specific keymap.
@@ -65,8 +65,8 @@
   KEYMAP: Keymap to add the binding t
   KEYS: conses of (`kbd' style keybinding string . function) for keybinding definition."
   `(progn ,@(cl-loop
-	     for keybd in keys
-	     collect `(mode-key ,keymap ,(car keybd) ,(cdr keybd)))))
+             for keybd in keys
+             collect `(mode-key ,keymap ,(car keybd) ,(cdr keybd)))))
 
 (defmacro prefixed-key (key-string function)
   "Define key with mnemonic prefix.
@@ -80,8 +80,8 @@
 
   KEYS: conses of (`kbd' style keybinding string . function) for keybinding definition."
   `(progn ,@(cl-loop
-	     for keybd in keys
-	     collect `(prefixed-key ,(car keybd) ,(cdr keybd)))))
+             for keybd in keys
+             collect `(prefixed-key ,(car keybd) ,(cdr keybd)))))
 
 (defmacro prefixed-mode-key (keymap key-string function)
   "Define key with mnemonic prefix within the given keymap.
@@ -97,8 +97,8 @@
   KEYMAP: Keymap to add the binding to.
   KEYS: conses of (`kbd' style keybinding string . function) for keybinding definition."
   `(progn ,@(cl-loop
-	     for keybd in keys
-	     collect `(prefixed-mode-key ,keymap ,(car keybd) ,(cdr keybd)))))
+             for keybd in keys
+             collect `(prefixed-mode-key ,keymap ,(car keybd) ,(cdr keybd)))))
 
 (defun rename-mnemonic-key-prefix (key-string name)
   "Add label to the mnemonic keybinding prefix to be displayed in `which-key'.

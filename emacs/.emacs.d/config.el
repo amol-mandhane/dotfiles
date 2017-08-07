@@ -122,8 +122,10 @@
 
 (setq coding-system-for-read 'utf-8)
 (setq coding-system-for-write 'utf-8)
+(prefer-coding-system 'utf-8)
 
 (setq-default fill-column 80)
+(setq-default indent-tabs-mode nil)
 (setq visible-bell t)
 
 (setq ns-use-srgb-colorspace nil)
@@ -898,6 +900,7 @@ Start `ielm' if it's not already running."
 
 (use-package which-func
   :demand t
+  :disabled
   :config
   (progn
     (which-function-mode +1)
