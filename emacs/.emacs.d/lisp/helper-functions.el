@@ -22,15 +22,15 @@ Repeated invocations toggle between the two most recently open buffers."
   (forward-line)
   (join-line))
 
-(defmacro enable-minor-mode-globally (minor-mode)
+(defmacro enable-minor-mode-globally (minor-mode-to-enable)
   "Enables the minor mode globally.
 MINOR-MODE: Symbol of minor mode to enable."
   `(progn
      (define-globalized-minor-mode
-       ,(intern (concat "globalized-" (symbol-name minor-mode)))
-       ,minor-mode
-       (lambda () (,minor-mode +1)))
-     (,(intern (concat "globalized-" (symbol-name minor-mode))) +1)))
+       ,(intern (concat "globalized-" (symbol-name minor-mode-to-enable)))
+       ,minor-mode-to-enable
+       (lambda () (,minor-mode-to-enable +1)))
+     (,(intern (concat "globalized-" (symbol-name minor-mode-to-enable))) +1)))
 
 (defun silence-function-message-advice (original &rest args)
   "Advice function for silencing message outputs of a function.

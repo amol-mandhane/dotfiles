@@ -1,6 +1,40 @@
 (setq user-full-name "Amol Mandhane"
       user-mail-address "amol.mandhane@gmail.com")
 
+(setq ad-redefinition-action 'accept)
+
+(defalias 'yes-or-no-p 'y-or-n-p)
+
+(setq inhibit-startup-screen t)
+(setq initial-scratch-message ";;; Lisp Interaction Mode\n")
+(setq initial-major-mode 'lisp-interaction-mode)
+
+(setq coding-system-for-read 'utf-8)
+(setq coding-system-for-write 'utf-8)
+(prefer-coding-system 'utf-8)
+
+(setq-default fill-column 80)
+(setq-default indent-tabs-mode nil)
+(setq visible-bell t)
+
+(setq ns-use-srgb-colorspace nil)
+
+(scroll-bar-mode -1)
+(tool-bar-mode -1)
+(line-number-mode -1)
+(column-number-mode -1)
+(size-indication-mode -1)
+
+(unless (frame-parameter nil 'fullscreen)
+  (if
+      (eq system-type 'darwin)
+      (toggle-frame-fullscreen)
+    (toggle-frame-maximized)))
+(add-to-list 'default-frame-alist '(fullscreen . maximized))
+
+(setq-default cursor-type 'bar)
+(blink-cursor-mode 0)
+
 (require 'package)
 (package-initialize)
 (setq package-archives '(("gnu" . "https://elpa.gnu.org/packages/")
@@ -21,13 +55,34 @@
 
 (add-hook 'after-init-hook #'(lambda () (server-start)))
 
+(use-package which-key
+  :ensure t
+  :diminish which-key-mode
+  :init (which-key-mode t)
+  :config
+  (setq which-key-sort-order 'which-key-key-order-alpha
+        which-key-side-window-max-width 0.33
+        which-key-idle-delay 0.05))
+
 (use-package hydra
   :ensure t)
 
 (use-package keybinding
   :demand t
   :init
-  (global-unset-key (kbd "M-m")))
+  (global-unset-key (kbd "M-m"))
+  :config
+  (progn
+    (rename-mnemonic-key-prefix "g" "VCS")
+    (rename-mnemonic-key-prefix "e" "Errors")
+    (rename-mnemonic-key-prefix "p" "Projects")
+    (rename-mnemonic-key-prefix "f" "Files")
+    (rename-mnemonic-key-prefix "b" "Buffers")
+    (rename-mnemonic-key-prefix "w" "Windows")
+    (rename-mnemonic-key-prefix "s" "Search/Replace")
+    (rename-mnemonic-key-prefix "sr" "Replace")
+    (rename-mnemonic-key-prefix "!" "Terminal")
+    (rename-mnemonic-key-prefix "t" "Tags")))
 
 (use-package key-chord
   :ensure t
@@ -35,22 +90,38 @@
   (progn (setq key-chord-two-keys-delay 0.05))
   :config (key-chord-mode +1))
 
-(use-package which-key
-  :ensure t
-  :diminish which-key-mode
-  :init (which-key-mode t)
-  :config
-    (setq which-key-sort-order 'which-key-key-order-alpha
-      which-key-side-window-max-width 0.33
-      which-key-idle-delay 0.05))
-
 (use-package smex
-  :ensure t)
+  :ensure t
+  :defer t)
+(use-package ido
+  :ensure t
+  :config
+  (progn
+    (setq ido-enable-flex-matching t)
+    (setq ido-use-virtual-buffers t)
+    (setq ido-enable-regexp t)
+
+    (add-hook
+     'ido-setup-hook
+     #'(lambda () (mode-keys
+                   ido-completion-map
+                   ("<tab>" . 'ido-exit-minibuffer)
+                   ("<return>" . 'ido-exit-minibuffer))))
+
+    (ido-mode +1)
+    (ido-vertical-mode +1)))
 (use-package ido-completing-read+
-  :ensure t)
+  :ensure t
+  :after ido
+  :config
+  (ido-ubiquitous-mode +1))
 (use-package ido-vertical-mode
-  :ensure t)
+  :ensure t
+  :after ido
+  :config
+  (ido-vertical-mode +1))
 (use-package flx
+  :defer t
   :ensure t)
 (use-package flx-ido
   :ensure t
@@ -58,38 +129,10 @@
   :after flx
   :config (flx-ido-mode +1))
 
-(use-package ido
-  :ensure t
-  :after smex
-  :after ido-completing-read+
-  :after ido-vertical-mode
-  :config
-  (progn
-    (setq ido-enable-flex-matching t)
-    (setq ido-use-virtual-buffers t)
-    (setq ido-enable-regex t)
-
-    (add-hook
-      'ido-setup-hook
-      (lambda () (mode-keys
-                   ido-completion-map
-                   ("<tab>" . 'ido-exit-minibuffer)
-                   ("<return>" . 'ido-exit-minibuffer))))
-
-    (ido-mode +1)
-    (ido-everywhere +1)
-    (ido-ubiquitous-mode +1)
-    (ido-vertical-mode +1)
-
-    (require 'smex)
-    (smex-initialize)))
-
 (use-package counsel
   :ensure t)
 (use-package ivy
   :ensure t
-  :after flx
-  :after counsel
   :diminish ivy-mode
   :config
   (progn
@@ -109,6 +152,19 @@
 (use-package helper-functions
   :demand t)
 
+(use-package autorevert
+  :diminish auto-revert-mode
+  :config
+  (global-auto-revert-mode t))
+
+(use-package abbrev
+  :diminish abbrev-mode)
+
+;; (global-hl-line-mode t)
+(use-package hl-line
+  :config
+  (enable-minor-mode-globally hl-line-mode))
+
 (setq delete-old-versions -1)
 (setq version-control t)
 (setq vc-make-backup-files t)
@@ -116,120 +172,82 @@
 (setq vc-follow-symlinks t)
 (setq auto-save-file-name-transforms '((".*" "~/.emacs.d/auto-save-list/" t)))
 
-(setq inhibit-startup-screen t)
-(setq initial-scratch-message ";;; Lisp Interaction Mode\n")
-(setq initial-major-mode 'lisp-interaction-mode)
-
-(setq coding-system-for-read 'utf-8)
-(setq coding-system-for-write 'utf-8)
-(prefer-coding-system 'utf-8)
-
-(setq-default fill-column 80)
-(setq-default indent-tabs-mode nil)
-(setq visible-bell t)
-
-(setq ns-use-srgb-colorspace nil)
-
-(scroll-bar-mode -1)
-(tool-bar-mode -1)
-(global-linum-mode t)
-(global-auto-revert-mode t)
-(diminish 'auto-revert-mode)
-(diminish 'abbrev-mode)
-(line-number-mode -1)
-(column-number-mode -1)
-(size-indication-mode -1)
-;; (global-hl-line-mode t)
-(use-package hl-line
-  :demand t
-  :config
-  (enable-minor-mode-globally hl-line-mode))
-
-(defalias 'yes-or-no-p 'y-or-n-p)
-
-(set-frame-font "Inconsolata-18")
-;; (setq default-frame-alist '((font . "Inconsolata-18")))
-
-(setq-default cursor-type 'bar)
-(blink-cursor-mode 0)
-
 (setq require-final-newline t)
 (add-hook 'before-save-hook 'delete-trailing-whitespace)
 
 (setq-default custom-file "/dev/null")
 
-(rename-mnemonic-key-prefix "g" "VCS")
-(rename-mnemonic-key-prefix "e" "Errors")
-(rename-mnemonic-key-prefix "p" "Projects")
-(rename-mnemonic-key-prefix "f" "Files")
-(rename-mnemonic-key-prefix "b" "Buffers")
-(rename-mnemonic-key-prefix "w" "Windows")
-(rename-mnemonic-key-prefix "s" "Search/Replace")
-(rename-mnemonic-key-prefix "sr" "Replace")
-(rename-mnemonic-key-prefix "!" "Terminal")
-(rename-mnemonic-key-prefix "t" "Tags")
-
-(defhydra windows-hydra ()
-  "
+(use-package hydra
+  :ensure t
+  :config
+  (defhydra windows-hydra ()
+    "
 ^Windows^				^Window^		^Zoom^
 --------------------------------------------------------------------------
 _<left>_ _h_: windmove-left		_w_: enlarge	_-_: zoom out
 _<down>_ _j_: windmove-down		_s_: shrink	_+_ _=_: zoom in
 _<up>_ _k_: windmove-up		_a_: widen	_0_: reset
 _<right>_ _l_: windmove-right	_d_: tighten	_q_: quit"
-  ("<left>" windmove-left)
-  ("<right>" windmove-right)
-  ("<up>" windmove-up)
-  ("<down>" windmove-down)
-  ("h" windmove-left)
-  ("j" windmove-down)
-  ("k" windmove-up)
-  ("l" windmove-right)
-  ("+" text-scale-increase)
-  ("=" text-scale-increase)
-  ("-" text-scale-decrease)
-  ("w" enlarge-window)
-  ("a" enlarge-window-horizontally)
-  ("s" shrink-window)
-  ("d" shrink-window-horizontally)
-  ("0" (text-scale-increase 0))
-  ("q" nil))
+    ("<left>" windmove-left)
+    ("<right>" windmove-right)
+    ("<up>" windmove-up)
+    ("<down>" windmove-down)
+    ("h" windmove-left)
+    ("j" windmove-down)
+    ("k" windmove-up)
+    ("l" windmove-right)
+    ("+" text-scale-increase)
+    ("=" text-scale-increase)
+    ("-" text-scale-decrease)
+    ("w" enlarge-window)
+    ("a" enlarge-window-horizontally)
+    ("s" shrink-window)
+    ("d" shrink-window-horizontally)
+    ("0" (text-scale-increase 0))
+    ("q" nil)))
 
-(prefixed-keys
-  ("bb" . 'switch-to-buffer)
-  ("bd" . 'kill-this-buffer)
-  ("C-i" . #'crux-switch-to-previous-buffer)
-  ("bn" . 'next-buffer)
-  ("bp" . 'previous-buffer)
-  ("ff" . 'counsel-find-file)
-  ("wd" . 'delete-window)
-  ("wD" . 'delete-other-window)
-  ("wh" . 'split-window-horizontally)
-  ("wv" . 'split-window-vertically)
-  ("ww" . #'windows-hydra/body))
+(use-package keybinding
+  :config
+  (progn
+    (prefixed-keys
+     ("bb" . 'switch-to-buffer)
+     ("bd" . 'kill-this-buffer)
+     ("C-i" . #'crux-switch-to-previous-buffer)
+     ("bn" . 'next-buffer)
+     ("bp" . 'previous-buffer)
+     ("ff" . 'counsel-find-file)
+     ("wd" . 'delete-window)
+     ("wD" . 'delete-other-window)
+     ("wh" . 'split-window-horizontally)
+     ("wv" . 'split-window-vertically)
+     ("ww" . #'windows-hydra/body))
 
-(global-keys
-  ("C-S-j" . #'join-next-line)
-  ("C-S-k" . #'join-line)
-  ("C-S-y" . #'crux-duplicate-current-line-or-region))
-(global-key "C-x C-b" 'ibuffer)
-(global-key "M-/" 'hippie-expand)
+    (global-keys
+     ("C-S-j" . #'join-next-line)
+     ("C-S-k" . #'join-line)
+     ("C-S-y" . #'crux-duplicate-current-line-or-region))
+    (global-key "C-x C-b" 'ibuffer)
+    (global-key "M-/" 'hippie-expand)
 
-(global-keys
- ("C-s" . 'isearch-forward-regexp)
- ("C-r" . 'isearch-backward-regexp)
- ("C-M-s" . 'isearch-forward)
- ("C-M-r" . 'isearch-backward))
+    (global-keys
+     ("C-s" . 'isearch-forward-regexp)
+     ("C-r" . 'isearch-backward-regexp)
+     ("C-M-s" . 'isearch-forward)
+     ("C-M-r" . 'isearch-backward))
 
-(global-key "C-a" #'crux-move-beginning-of-line)
-(global-keys
- ("C-o" . #'crux-smart-open-line)
- ("C-S-o" . #'crux-smart-open-line-above)
- ("C-S-d" . #'crux-kill-whole-line))
+    (global-key "C-a" #'crux-move-beginning-of-line)
+    (global-keys
+     ("C-o" . #'crux-smart-open-line)
+     ("C-S-o" . #'crux-smart-open-line-above)
+     ("C-S-d" . #'crux-kill-whole-line))
 
-(global-key "C-c =" #'crux-indent-defun)
+    (global-key "C-c =" #'crux-indent-defun)
 
-(prefixed-key "!!" #'crux-visit-term-buffer)
+    (prefixed-key "!!" #'crux-visit-term-buffer)))
+
+(use-package f :ensure t :defer t)
+(use-package s :ensure t :defer t)
+(use-package dash :ensure t :defer t)
 
 (use-package annoying-arrows-mode
   :ensure t
@@ -423,7 +441,6 @@ IGNORE: ignore."
              ))
 
 (use-package electric
-  :demand t
   :config
   (electric-indent-mode +1))
 
@@ -438,16 +455,21 @@ IGNORE: ignore."
   :config
   (window-numbering-mode +1))
 
-(setq savehist-additional-variables '(kill-ring search-ring regexp-search-ring))
-(setq savehist-file "~/.emacs.d/tmp/history")
-
-(savehist-mode +1)
-
-(use-package recentf
-  :demand t
+(use-package savehist
+  :commands savehist-mode
+  :init
+  (add-hook 'after-init-hook 'savehist-mode)
   :config
   (progn
-    (recentf-mode +1)
+    (setq savehist-additional-variables '(kill-ring search-ring regexp-search-ring))
+    (setq savehist-file "~/.emacs.d/tmp/history")))
+
+(use-package recentf
+  :commands recentf-mode
+  :init
+  (add-hook 'after-init-hook #'recentf-mode)
+  :config
+  (progn
     (setq recentf-max-menu-items 25)
 
     ;; Save recent files every few minutes.
@@ -476,32 +498,37 @@ IGNORE: ignore."
     (enable-minor-mode-globally diff-hl-flydiff-mode)
     (add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh)))
 
-(defhydra hydra-smerge
-  (:color green)
-  "
+(use-package smerge-mode
+  :after hydra
+  :after keybinding
+  :config
+  (progn
+    (defhydra hydra-smerge
+      (:color green)
+      "
 ^Move^	^Keep^	^Aux^	^Diff^
 ------------------------------------------------------
-_n_ext	_b_ase	_R_efine	_<_: base-mine	_q_uit
-_p_rev	_m_ine	_E_diff	_=_: mine-other	_RET_: current
-^ ^	_o_ther	_C_ombine	_>_: base-other
+_n_ext	_b_ase	_R_efine	_<_: base-upper	_q_uit
+_p_rev	_u_pper	_E_diff	_=_: upper-lower	_RET_: current
+^ ^	_l_ower	_C_ombine	_>_: base-lower
 ^ ^	_a_ll	_r_esolve"
-  ("RET" smerge-keep-current)
-  ("C" smerge-combine-with-next)
-  ("E" smerge-ediff)
-  ("R" smerge-refine)
-  ("a" smerge-keep-all)
-  ("b" smerge-keep-base)
-  ("m" smerge-keep-mine)
-  ("n" smerge-next)
-  ("o" smerge-keep-other)
-  ("p" smerge-prev)
-  ("r" smerge-resolve)
-  ("<" smerge-diff-base-mine)
-  ("=" smerge-diff-mine-other)
-  (">" smerge-diff-base-other)
-  ("q" nil :color red))
+      ("RET" smerge-keep-current)
+      ("C" smerge-combine-with-next)
+      ("E" smerge-ediff)
+      ("R" smerge-refine)
+      ("a" smerge-keep-all)
+      ("b" smerge-keep-base)
+      ("u" smerge-keep-upper)
+      ("n" smerge-next)
+      ("l" smerge-keep-lower)
+      ("p" smerge-prev)
+      ("r" smerge-resolve)
+      ("<" smerge-diff-base-upper)
+      ("=" smerge-diff-upper-lower)
+      (">" smerge-diff-base-lower)
+      ("q" nil :color red))
 
-(prefixed-mode-key smerge-mode-map "m" #'hydra-smerge/body)
+    (prefixed-mode-key smerge-mode-map "m" #'hydra-smerge/body)))
 
 (use-package projectile
   :ensure t
@@ -906,13 +933,14 @@ Start `ielm' if it's not already running."
     (org-capture)))
 
 (use-package stickyfunc-enhance
-  :ensure t)
+  :ensure t
+  :defer t)
 
 (use-package srefactor
-  :ensure t)
+  :ensure t
+  :defer t)
 
 (use-package semantic
-  :demand t
   :commands semantic-mode
   :init
   (progn
@@ -944,7 +972,6 @@ Start `ielm' if it's not already running."
     (add-hook 'prog-mode-hook 'semantic-mode)))
 
 (use-package which-func
-  :demand t
   :disabled
   :config
   (progn
@@ -954,7 +981,8 @@ Start `ielm' if it's not already running."
 (prefixed-key "tt" 'counsel-imenu)
 
 (use-package ag
-  :ensure t)
+  :ensure t
+  :defer 5)
 
 (prefixed-key "ss" 'swiper)
 (key-chord-define-global "??" 'swiper)
@@ -972,7 +1000,6 @@ Start `ielm' if it's not already running."
      ("sr." . #'anzu-query-replace-at-cursor-thing))))
 
 (use-package iedit
-  :demand t
   :commands iedit-dwim
   :init
   (progn
@@ -995,20 +1022,24 @@ Start `ielm' if it's not already running."
     (prefixed-key "sri" #'iedit-dwim)))
 
 (use-package evil
-  :ensure t)
+  :ensure t
+  :defer 10)
 
 (use-package undo-tree
   :ensure t
   :diminish undo-tree-mode)
 
-(use-package powerline :ensure t)
-(use-package let-alist :ensure t)
-(use-package all-the-icons :ensure t)
+(use-package powerline :ensure t :defer t)
+(use-package let-alist :ensure t :defer t)
+(use-package all-the-icons :ensure t :defer t)
 
 (use-package color-theme-sanityinc-tomorrow
   :ensure t
   :config
-  (load-theme 'sanityinc-tomorrow-night t))
+  (progn
+    (load-theme 'sanityinc-tomorrow-night t)
+    (set-frame-font "Inconsolata-18"())))
+  ;; (setq default-frame-alist '((font . "Inconsolata-18")))))
 
 (use-package spaceline
   :disabled
@@ -1033,13 +1064,13 @@ Start `ielm' if it's not already running."
   (powerline-helium-theme))
 
 (use-package theme-enhancement
-  :demand t
   :config
   (theme-enhancement/apply))
 
 (use-package linum
   :config
   (progn
+    (global-linum-mode)
     (setq-default linum-format " %4d ")
 
     (set-face-attribute
@@ -1053,3 +1084,5 @@ Start `ielm' if it's not already running."
      :box nil)))
 
 (load-file "~/.emacs.machine.el")
+
+(provide 'config)

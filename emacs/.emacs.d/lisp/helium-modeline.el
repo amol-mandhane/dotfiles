@@ -27,7 +27,6 @@
 (require 'powerline)
 (require 'projectile)
 (require 'flycheck)
-(require 'erc-track)
 (require 'let-alist)
 (require 'all-the-icons)
 
