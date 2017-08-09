@@ -704,7 +704,7 @@ Use `C-x v` prefixed commands for now.
       (yas-global-mode +1)
       (prefixed-key "is" #'yas-expand)))
 #+END_SRC
-* TODO Major mode setup [7/13]
+* TODO Major mode setup [8/13]
 ** DONE C/C++
 *** Irony Mode
 Irony mode is clang based autocompletion and syntax checker. It is like YouCompleteMe, but only for C-family and better.
@@ -898,7 +898,9 @@ Use litable to evaluate code in the margin. Helpful for quick iteration
       (mode-key emacs-lisp-mode-map "C-c l" #'litable-mode)
       (mode-key lisp-interaction-mode-map "C-c l" #'litable-mode))
     :config
-    (mode-key litable-mode-map "C-c p" #'litable-accept-as-pure))
+    (progn
+      (setq litable-list-file "~/.emacs.d/tmp/litable-lists.el")
+      (mode-key litable-mode-map "C-c p" #'litable-accept-as-pure)))
 #+END_SRC
 **** Pretty print eval-expression
 `eval-expr` is a replacement for `eval-expression` with prettified output.
@@ -933,7 +935,69 @@ Use ~pp-eval-expression~ instead of ~eval-expr~.
 #+END_SRC
 *** TODO common-lisp
 *** TODO Clojure
-** TODO Go
+** DONE Go
+*** Mode Setup
+#+BEGIN_SRC emacs-lisp
+  (use-package go-mode
+    :ensure t
+    :mode "\\.go\\'"
+    :config
+    (progn
+      (defun go-mode-setup ()
+        (add-hook 'before-save-hook #'gofmt-before-save)
+        (setq gofmt-command "goimports")
+        (go-guru-hl-identifier-mode +1))
+      (add-hook 'go-mode-hook #'go-mode-setup)
+      (mode-key go-mode-map "M-." #'godef-jump)))
+#+END_SRC
+*** Completion
+#+BEGIN_SRC emacs-lisp
+  (use-package company-go
+    :ensure t
+    :after company
+    :after go-mode
+    :commands company-go
+    :init
+    (add-to-list 'company-backends 'company-go)
+    :config
+    (setq company-go-show-annotation t))
+#+END_SRC
+*** Syntax Checker
+#+BEGIN_SRC emacs-lisp
+  (use-package flycheck-gometalinter
+    :ensure t
+    :after flycheck
+    :after go-mode
+    :commands flycheck-gometalinter-setup
+    :config
+    (add-hook 'go-mode-hook #'flycheck-gometalinter-setup))
+#+END_SRC
+*** Documentation
+#+BEGIN_SRC emacs-lisp
+  (use-package go-eldoc
+    :ensure t
+    :commands go-eldoc-setup
+    :init
+    (add-hook 'go-mode-hook #'go-eldoc-setup))
+#+END_SRC
+*** ~go-guru~
+#+BEGIN_SRC emacs-lisp
+  (use-package go-guru
+    :ensure t
+    :after go-mode
+    :commands go-guru-hl-identifier-mode
+    :init
+    (add-hook 'go-mode-hook #'go-guru-hl-identifier-mode))
+#+END_SRC
+*** ~go-rename~
+#+BEGIN_SRC emacs-lisp
+  (use-package go-rename
+    :ensure t
+    :commands go-rename
+    :init
+    (mode-key go-mode-map "C-c r" #'go-rename))
+#+END_SRC
+*** TODO Compilation and Debugger
 ** TODO Haskell
 Add libraries for XMonad.
 #+BEGIN_SRC emacs-lisp
@@ -1349,7 +1413,7 @@ Don't use evil mode for general purpose. Current use of evil mode is for vim lik
     :config
     (progn
       (load-theme 'sanityinc-tomorrow-night t)
-      (set-frame-font "Inconsolata-18"())))
+      (set-frame-font "Inconsolata-18")))
     ;; (setq default-frame-alist '((font . "Inconsolata-18")))))
 #+END_SRC
 

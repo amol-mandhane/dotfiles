@@ -17,3 +17,7 @@ fi
 
 compinit -u
 source ~/.machine_zshrc
+
+# Golang setup
+export GOPATH=$HOME/gopackages
+export PATH=$PATH:$GOPATH/bin

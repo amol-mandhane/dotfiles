@@ -698,7 +698,9 @@ Start `ielm' if it's not already running."
     (mode-key emacs-lisp-mode-map "C-c l" #'litable-mode)
     (mode-key lisp-interaction-mode-map "C-c l" #'litable-mode))
   :config
-  (mode-key litable-mode-map "C-c p" #'litable-accept-as-pure))
+  (progn
+    (setq litable-list-file "~/.emacs.d/tmp/litable-lists.el")
+    (mode-key litable-mode-map "C-c p" #'litable-accept-as-pure)))
 
 (use-package eval-expr
   :ensure t
@@ -722,6 +724,55 @@ Start `ielm' if it's not already running."
 (add-hook
  'lisp-interaction-mode-hook
  #'(lambda () (run-hooks 'emacs-lisp-mode-hook)))
+
+(use-package go-mode
+  :ensure t
+  :mode "\\.go\\'"
+  :config
+  (progn
+    (defun go-mode-setup ()
+      (add-hook 'before-save-hook #'gofmt-before-save)
+      (setq gofmt-command "goimports")
+      (go-guru-hl-identifier-mode +1))
+    (add-hook 'go-mode-hook #'go-mode-setup)
+    (mode-key go-mode-map "M-." #'godef-jump)))
+
+(use-package company-go
+  :ensure t
+  :after company
+  :after go-mode
+  :commands company-go
+  :init
+  (add-to-list 'company-backends 'company-go)
+  :config
+  (setq company-go-show-annotation t))
+
+(use-package flycheck-gometalinter
+  :ensure t
+  :after flycheck
+  :after go-mode
+  :commands flycheck-gometalinter-setup
+  :config
+  (add-hook 'go-mode-hook #'flycheck-gometalinter-setup))
+
+(use-package go-eldoc
+  :ensure t
+  :commands go-eldoc-setup
+  :init
+  (add-hook 'go-mode-hook #'go-eldoc-setup))
+
+(use-package go-guru
+  :ensure t
+  :after go-mode
+  :commands go-guru-hl-identifier-mode
+  :init
+  (add-hook 'go-mode-hook #'go-guru-hl-identifier-mode))
+
+(use-package go-rename
+  :ensure t
+  :commands go-rename
+  :init
+  (mode-key go-mode-map "C-c r" #'go-rename))
 
 (add-to-list 'flycheck-ghc-search-path (expand-file-name "~/.xmonad/lib"))
 
@@ -1038,7 +1089,7 @@ Start `ielm' if it's not already running."
   :config
   (progn
     (load-theme 'sanityinc-tomorrow-night t)
-    (set-frame-font "Inconsolata-18"())))
+    (set-frame-font "Inconsolata-18")))
   ;; (setq default-frame-alist '((font . "Inconsolata-18")))))
 
 (use-package spaceline
