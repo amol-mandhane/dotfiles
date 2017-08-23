@@ -36,3 +36,6 @@ URxvt*scrollTtyKeypress: true
 URxvt.urlLauncher: sensible-browser
 URxvt.matcher.button: 1
 
+! Rofi config.
+rofi.levenshtein-sort: true
+rofi.regex: true
