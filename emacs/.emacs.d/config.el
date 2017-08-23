@@ -788,7 +788,15 @@ Start `ielm' if it's not already running."
 
 (use-package haskell-mode
   :ensure t
-  :mode "\\.hs'\\")
+  :mode "\\.hs\\'"
+  :config
+  (mode-keys haskell-mode-map
+             ("C-c d" . #'haskell-debug)
+             ("C-c i" . #'haskell-interactive-switch)
+             ("C-c t" . #'haskell-process-do-type)
+             ("C-c h" . #'haskell-process-do-info)
+             ("C-c fi" . #'haskell-add-import)
+             ("C-c ff" . #'haskell-mode-stylish-buffer)))
 
 (use-package hindent
   :ensure t
@@ -796,19 +804,17 @@ Start `ielm' if it's not already running."
   :init
   (add-hook 'haskell-mode-hook #'hindent-mode))
 
-(use-package stylish-haskell
-  :ensure t
-  :after haskell-mode
-  :commands haskell-mode-stylish-buffer
-  :init
-  (add-hook 'haskell-mode-hook #'(lambda ()
-  (mode-key haskell-mode-map "C-c =" #'haskell-mode-stylish-buffer))))
-
 (use-package hlint-refactor
   :ensure t
   :commands hlint-refactor-mode
   :init
   (add-hook 'haskell-mode-hook #'hlint-refactor-mode))
+
+(use-package shm
+  :ensure t
+  :commands structured-haskell-mode
+  :init
+  (add-hook 'haskell-mode-hook #'structured-haskell-mode))
 
 (use-package intero
   :ensure t

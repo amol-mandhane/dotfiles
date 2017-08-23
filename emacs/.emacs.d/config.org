@@ -1024,7 +1024,8 @@ Use ~pp-eval-expression~ instead of ~eval-expr~.
                ("C-c i" . #'haskell-interactive-switch)
                ("C-c t" . #'haskell-process-do-type)
                ("C-c h" . #'haskell-process-do-info)
-               ("C-c fi" . #'haskell-add-import)))
+               ("C-c fi" . #'haskell-add-import)
+               ("C-c ff" . #'haskell-mode-stylish-buffer)))
 #+END_SRC
 *** Helper packages
 HIndent
@@ -1034,19 +1035,6 @@ HIndent
     :commands hindent-mode
     :init
     (add-hook 'haskell-mode-hook #'hindent-mode))
-#+END_SRC
-
-Stylish haskell
-#+BEGIN_SRC emacs-lisp
-  (use-package stylish-haskell
-    :ensure t
-    :after haskell-mode
-    :commands haskell-mode-stylish-buffer
-    :init
-    (add-hook
-     'haskell-mode-hook
-     #'(lambda ()
-         (mode-key haskell-mode-map "C-c ff" #'haskell-mode-stylish-buffer))))
 #+END_SRC
 
 hlint-refactor

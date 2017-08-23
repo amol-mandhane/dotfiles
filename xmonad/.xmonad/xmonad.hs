@@ -46,7 +46,7 @@ trayerCommand = "trayer " ++
   " --height 16"
 
 dzenFont :: Int -> String
-dzenFont sz = "M+1m:size=" ++ (show sz)
+dzenFont sz = "Inconsolata:weight=bold:size=" ++ (show sz)
 
 -- Dzen
 dzenBarStyle :: String
@@ -170,7 +170,7 @@ customKeymap = [
   -- Alt-TAB
   ("M1-<Tab>", CycleWindows.cycleRecentWindows [X.xK_Alt_L] X.xK_Tab X.xK_Tab),
   -- Dmenu on S-RET
-  ("M-<Return>", X.spawn "dmenu_run -b"),
+  ("M-<Return>", X.spawn "rofi -show run"),
   -- S-f file browser
   ("M-f", X.spawn "nemo --no-desktop" ),
   -- Ctrl-Alt-L lock screen
@@ -198,7 +198,7 @@ main = do
     _ <- spawnPipe "~/.xmonad/startup.sh"
 
     X.xmonad $ EwmhDesktops.ewmh X.defaultConfig
-        { X.terminal = "gnome-terminal"
+        { X.terminal = "urxvt"
         , X.manageHook =
             windowRelocatorManageHook X.<+>
             ManageDocks.manageDocks X.<+>
