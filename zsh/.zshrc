@@ -20,4 +20,6 @@ source ~/.machine_zshrc
 
 # Golang setup
 export GOPATH=$HOME/gopackages
-export PATH=$PATH:$GOPATH/bin
+export PATH=$PATH:$GOPATH/bin:~/.local/bin
+
+# stack config set system-ghc --global true

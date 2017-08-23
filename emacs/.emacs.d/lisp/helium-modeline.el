@@ -200,6 +200,7 @@ ARGS: Unused arguments."
   "Update the colors of the helium-modeline faces."
   (set-face-attribute 'mode-line nil :height 0.9)
   (set-face-attribute 'mode-line-inactive nil :height 0.9)
+  (set-face-attribute 'helium-mode-line-color-2 nil :height 0.9)
   (set-face-foreground 'helium-mode-line-colored (face-foreground 'helium-mode-line-color-1 nil 'default))
   (set-face-foreground 'helium-mode-line-colored-bold (face-foreground 'helium-mode-line-color-1 nil 'default))
   (set-face-foreground 'helium-mode-line-active-block (face-background 'helium-mode-line-color-1 nil 'default))
@@ -255,8 +256,7 @@ ACTIVE-P: Boolean representing whether the modeline is active or not."
              (rhs
               (list
                (powerline-minor-modes .default-face 'r)
-               (powerline-raw mode-line-misc-info .error-face 'r)
-               (powerline-raw mode-line-end-spaces .default-face)))
+               (powerline-raw mode-line-misc-info .error-face 'r)))
              (merged-rhs (append center
                                  (list (powerline-raw " " .default-face))
                                  rhs)))

@@ -36,11 +36,13 @@
 (blink-cursor-mode 0)
 
 (require 'package)
-(package-initialize)
-(setq package-archives '(("gnu" . "https://elpa.gnu.org/packages/")
-                         ;; ("marmalade" . "http://marmalade-repo.org/packages/")
-                         ("melpa" . "https://melpa.org/packages/")
-                         ("org" . "http://orgmode.org/elpa/")))
+;; Package initialized in init.el
+;; (package-initialize)
+(setq package-archives
+      '(("gnu" . "https://elpa.gnu.org/packages/")
+        ;; ("marmalade" . "http://marmalade-repo.org/packages/")
+        ("melpa" . "https://melpa.org/packages/")
+        ("org" . "http://orgmode.org/elpa/")))
 
 (unless (package-installed-p 'use-package)
   (package-refresh-contents)
@@ -387,10 +389,13 @@ IGNORE: ignore."
   (add-hook 'prog-mode-hook #'(lambda () (smartparens-mode +1)))
 
   ;; Setup smartparens in minibuffer
+  (add-hook 'minibuffer-setup-hook #'(lambda () (smartparens-mode +1)))
   (setq sp-ignore-modes-list (delete 'minibuffer-inactive-mode sp-ignore-modes-list))
   (sp-local-pair 'minibuffer-inactive-mode "'" nil :actions nil)
 
   (mode-keys smartparens-mode-map
+             ;; Strict mode toggle
+             ("C-c C-s" . 'smartparens-strict-mode)
              ;; Navigation
              ("C-M-a" . 'sp-beginning-of-sexp)
              ("C-M-e" . 'sp-end-of-sexp)
@@ -408,8 +413,8 @@ IGNORE: ignore."
              ("C-S-b" . 'sp-backward-symbol)
 
              ;; AST re-arrange.
-             ;; ("C-)" . sp-forward-slurp-sexp)
-             ("C-)" . 'sp-slurp-hybrid-sexp)
+             ("C-)" . 'sp-forward-slurp-sexp)
+             ;; ("C-)" . 'sp-slurp-hybrid-sexp)
              ("C-}" . 'sp-forward-barf-sexp)
              ("C-(" . 'sp-backward-slurp-sexp)
              ("C-{" . 'sp-backward-barf-sexp)
@@ -449,6 +454,13 @@ IGNORE: ignore."
   :commands avy-goto-word-1
   :init
     (key-chord-define-global "jj" 'avy-goto-word-1))
+
+(use-package compile
+  :commands (compile recompile)
+  :init
+  (prefixed-keys
+   ("cc" . 'compile)
+   ("cr" . 'recompile)))
 
 (use-package window-numbering
   :ensure t
@@ -773,6 +785,54 @@ Start `ielm' if it's not already running."
   :commands go-rename
   :init
   (mode-key go-mode-map "C-c r" #'go-rename))
+
+(use-package haskell-mode
+  :ensure t
+  :mode "\\.hs'\\")
+
+(use-package hindent
+  :ensure t
+  :commands hindent-mode
+  :init
+  (add-hook 'haskell-mode-hook #'hindent-mode))
+
+(use-package stylish-haskell
+  :ensure t
+  :after haskell-mode
+  :commands haskell-mode-stylish-buffer
+  :init
+  (add-hook 'haskell-mode-hook #'(lambda ()
+  (mode-key haskell-mode-map "C-c =" #'haskell-mode-stylish-buffer))))
+
+(use-package hlint-refactor
+  :ensure t
+  :commands hlint-refactor-mode
+  :init
+  (add-hook 'haskell-mode-hook #'hlint-refactor-mode))
+
+(use-package intero
+  :ensure t
+  :commands intero-mode
+  :init
+  (add-hook 'haskell-mode-hook #'intero-mode))
+
+(use-package company-ghc
+  :ensure t
+  :commands company-ghc
+  :init
+  (add-to-list 'company-backends #'company-ghc))
+
+(use-package company-ghci
+  :ensure t
+  :commands company-ghci
+  :init
+  (add-to-list 'company-backends #'company-ghci))
+
+(use-package flycheck-haskell
+  :ensure t
+  :after flycheck
+  :commands flycheck-haskell-setup
+  :init (add-hook 'haskell-mode-hook #'flycheck-haskell-setup))
 
 (add-to-list 'flycheck-ghc-search-path (expand-file-name "~/.xmonad/lib"))
 
