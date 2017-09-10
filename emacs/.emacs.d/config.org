@@ -1494,11 +1494,11 @@ Don't use evil mode for general purpose. Current use of evil mode is for vim lik
 
 ** Color theme and font
 #+BEGIN_SRC emacs-lisp
-  (use-package color-theme-sanityinc-tomorrow
+  (use-package atom-one-dark-theme
     :ensure t
     :config
     (progn
-      (load-theme 'sanityinc-tomorrow-night t)
+      (load-theme 'atom-one-dark t)
       (set-frame-font "Inconsolata-18")))
     ;; (setq default-frame-alist '((font . "Inconsolata-18")))))
 #+END_SRC
@@ -1546,7 +1546,7 @@ Enhance the loaded theme.
       (set-face-attribute
        'linum
        nil
-       :background "#282a2e"
+       ;; :background "#282a2e"
        :bold nil
        :weight 'normal
        :height 0.9

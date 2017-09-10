@@ -1150,11 +1150,11 @@ Start `ielm' if it's not already running."
 (use-package let-alist :ensure t :defer t)
 (use-package all-the-icons :ensure t :defer t)
 
-(use-package color-theme-sanityinc-tomorrow
+(use-package atom-one-dark-theme
   :ensure t
   :config
   (progn
-    (load-theme 'sanityinc-tomorrow-night t)
+    (load-theme 'atom-one-dark t)
     (set-frame-font "Inconsolata-18")))
   ;; (setq default-frame-alist '((font . "Inconsolata-18")))))
 
@@ -1193,7 +1193,7 @@ Start `ielm' if it's not already running."
     (set-face-attribute
      'linum
      nil
-     :background "#282a2e"
+     ;; :background "#282a2e"
      :bold nil
      :weight 'normal
      :height 0.9
