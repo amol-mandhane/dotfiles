@@ -1,24 +1,60 @@
+
 URxvt.perl-ext-common: default,matcher
 
-urxvt*foreground: white
-urxvt*background: black
+! urxvt*foreground: white
+! urxvt*background: black
 
-*color0:  #2E3436
-*color1:  #a40000
-*color2:  #4E9A06
-*color3:  #C4A000
-*color4:  #3465A4
-*color5:  #75507B
-*color6:  #ce5c00
-*color7:  #babdb9
-*color8:  #555753
-*color9:  #EF2929
-*color10: #8AE234
-*color11: #FCE94F
-*color12: #729FCF
-*color13: #AD7FA8
-*color14: #fcaf3e
-*color15: #EEEEEC
+! *color0:  #2E3436
+! *color1:  #a40000
+! *color2:  #4E9A06
+! *color3:  #C4A000
+! *color4:  #3465A4
+! *color5:  #75507B
+! *color6:  #ce5c00
+! *color7:  #babdb9
+! *color8:  #555753
+! *color9:  #EF2929
+! *color10: #8AE234
+! *color11: #FCE94F
+! *color12: #729FCF
+! *color13: #AD7FA8
+! *color14: #fcaf3e
+! *color15: #EEEEEC
+
+urxvt*foreground:   #f9f7dd
+urxvt*background:   #2f2f2f
+
+!black
+urxvt*color0: #393939
+urxvt*color8: #474747
+
+!red
+urxvt*color1: #da4939
+urxvt*color9: #ff6c5c
+
+!green
+urxvt*color2 : #9acc79
+urxvt*color10: #8fb676
+
+!yellow
+urxvt*color3:  #d0d26b
+urxvt*color11: #c8bc45
+
+!blue
+urxvt*color4: #6d9cbe
+urxvt*color12: #d0d0ff
+
+!magenta
+urxvt*color5: #9f5079
+urxvt*color13: #a761c2
+
+!cyan
+urxvt*color6: #435d75
+urxvt*color14: #6e98a4
+
+!white
+urxvt*color7: #c2c2c2
+urxvt*color15: #c2c2c2
 
 URxvt*font: xft:Inconsolata:pixelsize=16
 URxvt*letterSpace: -1
@@ -36,6 +72,10 @@ URxvt*scrollTtyKeypress: true
 URxvt.urlLauncher: sensible-browser
 URxvt.matcher.button: 1
 
+URxvt.loginShell:           true
+URxvt.saveLines:            50
+URxvt.internalBorder:       16
+
 ! Rofi config.
 rofi.levenshtein-sort: true
-rofi.regex: true
+rofi.font: Roboto 12
