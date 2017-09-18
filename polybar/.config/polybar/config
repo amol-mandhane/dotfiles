@@ -1,0 +1,202 @@
+[colors]
+;background = ${xrdb:color0:#222}
+background = #2c3e50
+background-alt = #235
+;foreground = ${xrdb:color7:#222}
+foreground = #ecf0f1
+foreground-alt = #eff
+
+bg = #2c3e50
+fg = #ecf0f1
+lightGray = #828997
+darkGray = #3e4451
+blue = #3498db
+red = #e74c3c
+green = #29B980
+orange = #db9834
+yellow = #dbdb34
+purple = #9834db
+cyan = #56b6c2
+black = #000000
+
+[commonbar]
+width = 100%
+height = 27
+offset-x = 0
+offset-y = 0
+radius = 0
+fixed-center = true
+
+background = ${colors.bg}
+foreground = ${colors.fg}
+
+line-size = 3
+line-color = ${colors.red}
+
+border-size = 0
+border-color = #00000000
+
+padding-left = 2
+padding-right = 2
+
+module-margin-left = 1
+module-margin-right = 2
+
+font-0 = "Roboto:size=10;0"
+font-1 = "FontAwesome:size=10;1"
+font-2 = "FontAwesome;pixelsize=10;1"
+
+tray-position = right
+tray-padding = 1
+
+enable-ipc = false
+
+[bar/laptop]
+inherit = commonbar
+modules-left = xmonad
+modules-center = xwindow
+modules-right = battery volume cpu temperature memory swap date
+
+[bar/desktop]
+inherit = commonbar
+modules-left = xmonad
+modules-center = xwindow
+modules-right = volume cpu memory swap date
+
+[module/xmonad]
+type = custom/script
+exec = "dbus-monitor type='signal',path='/user/xmonad/log',interface='user.xmonad.log',member='DynamicLogWithPP' | sed -En -u 's/^.*string..([^:].*)\".*$/\1/p'"
+tail = true
+
+[module/xwindow]
+type = internal/xwindow
+label = %title:0:60:...%
+format-padding = 4
+format-underline = ${colors.lightGray}
+
+[module/cpu]
+type = internal/cpu
+interval = 1
+label = %percentage-cores%
+format = <ramp-coreload>
+format-underline = ${colors.yellow}
+format-padding = 1
+
+ramp-coreload-0 = "▁"
+ramp-coreload-1 = "▂"
+ramp-coreload-2 = "▃"
+ramp-coreload-3 = "▄"
+ramp-coreload-4 = "▅"
+ramp-coreload-5 = "▆"
+ramp-coreload-6 = "▇"
+ramp-coreload-7 = "█"
+; ramp-coreload-0-font = 2
+; ramp-coreload-1-font = 2
+; ramp-coreload-2-font = 2
+; ramp-coreload-3-font = 2
+; ramp-coreload-4-font = 2
+; ramp-coreload-5-font = 2
+; ramp-coreload-6-font = 2
+; ramp-coreload-7-font = 2
+ramp-coreload-2-foreground = ${colors.yellow}
+ramp-coreload-3-foreground = ${colors.yellow}
+ramp-coreload-4-foreground = ${colors.yellow}
+ramp-coreload-5-foreground = ${colors.yellow}
+ramp-coreload-6-foreground = ${colors.red}
+ramp-coreload-7-foreground = ${colors.red}
+
+
+[module/memory]
+type = internal/memory
+interval = 2
+
+format-prefix = " "
+format-prefix-foreground = ${colors.yellow}
+format-underline = ${colors.yellow}
+label = %percentage_used%% %gb_used%
+
+[module/swap]
+type = custom/script
+exec = "free | grep Swap | awk '{printf("%d%"), $3/$2 * 100}'"
+interval = 3
+format-underline = ${colors.yellow}
+
+[module/date]
+type = internal/date
+interval = 1
+
+date = "%A  %Y-%m-%d  %I:%M:%S %p"
+label = %date%
+
+format-padding = 2
+format-underline = ${colors.blue}
+
+[module/volume]
+type = internal/volume
+
+format-volume = <ramp-volume> <label-volume>
+format-volume-underline = ${colors.cyan}
+
+format-muted-underline = ${colors.lightGray}
+format-muted-prefix = " "
+format-muted-prefix-foreground = ${colors.lightGray}
+
+ramp-volume-0 = ""
+ramp-volume-1 = ""
+ramp-volume-2 = ""
+ramp-volume-0-foreground = ${colors.cyan}
+ramp-volume-1-foreground = ${colors.cyan}
+ramp-volume-2-foreground = ${colors.blue}
+
+label-muted = "%percentage%%"
+label-volume = "%percentage%%"
+
+[module/temperature]
+type = internal/temperature
+thermal-zone = 0
+warn-temperature = 65
+
+format = <label>
+format-prefix = "  "
+format-prefix-foreground = ${colors.cyan}
+format-underline = ${colors.cyan}
+format-warn = <label-warn>
+format-warn-prefix = "  "
+format-warn-foreground = ${colors.red}
+format-warn-underline = ${colors.red}
+
+label = %temperature%
+label-warn = %temperature%
+
+[module/battery]
+type = internal/battery
+poll-interval = 5
+
+full-at = 99
+
+battery = BAT1
+adapter = ACAD
+
+format-charging = <label-charging>
+format-charging-underline = ${colors.green}
+format-charging-prefix = " "
+format-charging-prefix-foreground = ${colors.green}
+format-discharging = <label-discharging>
+format-discharging-underline = ${colors.red}
+format-discharging-prefix = " "
+format-discharging-prefix-foreground = ${colors.red}
+format-full = <label-full>
+format-full-underline = ${colors.green}
+format-full-prefix = " "
+format-full-prefix-foreground = ${colors.green}
+
+label-charging = %percentage%%
+label-discharging = %percentage%%
+label-full = %percentage%%
+
+[settings]
+screenchange-reload = true
+
+[global/wm]
+margin-top = 0
+margin-bottom = 0
