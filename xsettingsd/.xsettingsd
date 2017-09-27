@@ -33,9 +33,9 @@ Net/DoubleClickTime 400
 Net/EnableEventSounds 1
 Net/EnableInputFeedbackSounds 0
 Net/FallbackIconTheme "gnome"
-Net/IconThemeName "ubuntu-mono-dark"
+Net/IconThemeName "Arc"
 Net/SoundThemeName "ubuntu"
-Net/ThemeName "Ambiance"
+Net/ThemeName "Arc"
 Xft/Antialias 1
 Xft/DPI 98304
 Xft/Hinting 1

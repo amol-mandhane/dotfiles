@@ -79,3 +79,11 @@ URxvt.internalBorder:       16
 ! Rofi config.
 rofi.levenshtein-sort: true
 rofi.font: Roboto 12
+
+Xft.dpi: 108
+Xft.autohint: 0
+Xft.lcdfilter: lcddefault
+Xft.hintstyle: hintfull
+Xft.hinting: 1
+Xft.antialias: 1
+Xft.rgba: rgb

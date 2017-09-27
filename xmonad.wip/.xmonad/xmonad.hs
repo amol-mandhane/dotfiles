@@ -3,6 +3,7 @@ import           Data.Monoid                      (All)
 import qualified DBus
 import qualified DBus.Client                      as DBusClient
 import           Graphics.X11.Xlib.Cursor         (xC_left_ptr)
+import           System.Directory                 (doesDirectoryExist)
 import qualified XMonad                           as X
 import           XMonad.Actions.CopyWindow        (copyToAll, kill1,
                                                    killAllOtherCopies,
@@ -11,7 +12,6 @@ import           XMonad.Core                      (ManageHook, WorkspaceId,
                                                    spawn)
 import           XMonad.Hooks.DynamicLog          (PP (..), dynamicLogWithPP)
 import           XMonad.Hooks.EwmhDesktops        (ewmh, ewmhDesktopsLogHook)
-import           XMonad.Hooks.FadeInactive        (fadeInactiveLogHook)
 import           XMonad.Hooks.ManageDocks         (avoidStruts, manageDocks)
 import           XMonad.Hooks.ManageHelpers       (composeOne, (-?>))
 import           XMonad.Hooks.SetWMName           (setWMName)
@@ -69,13 +69,14 @@ topBar  = 10
 main :: IO ()
 main = do
   dBusClient <- createDBusClient
+  isThisOnLaptop <- isLaptop
   X.xmonad
     $ ewmh
     $ withUrgencyHook LibNotifyUrgencyHook
-    $ myConfig dBusClient
+    $ myConfig dBusClient isThisOnLaptop
     `additionalKeysP` myKeys
 
-myConfig dBusClient = X.def {
+myConfig dBusClient isThisOnLaptop = X.def {
   X.terminal = "urxvt",
   X.borderWidth = 0,
   X.modMask = X.mod4Mask,
@@ -84,9 +85,12 @@ myConfig dBusClient = X.def {
   X.logHook = myLogHook dBusClient,
   X.manageHook = myManageHook,
   X.handleEventHook = myHandleEventHook,
-  X.startupHook = myStartupHook,
+  X.startupHook = myStartupHook isThisOnLaptop,
   X.focusFollowsMouse = False
 }
+
+isLaptop :: IO Bool
+isLaptop = doesDirectoryExist "/sys/module/battery"
 
 topBarTheme :: Theme
 topBarTheme = X.def {
@@ -133,9 +137,7 @@ myLayoutHook = showWName $
     topBar = noFrillsDeco shrinkText topBarTheme
 
 myLogHook :: DBusClient.Client -> X.X ()
-myLogHook dBusClient =
-  fadeInactiveLogHook 0.8 >>
-  polybarWorkspacesLogHook dBusClient
+myLogHook dBusClient = polybarWorkspacesLogHook dBusClient
 
 polybarWorkspacesLogHook :: DBusClient.Client -> X.X ()
 polybarWorkspacesLogHook dBusClient = do
@@ -162,11 +164,13 @@ myManageHook = manageDocks X.<+>
 myHandleEventHook :: X.Event -> X.X All
 myHandleEventHook = fullscreenEventHook X.<+> X.handleEventHook X.def
 
-myStartupHook :: X.X()
-myStartupHook = do
+myStartupHook :: Bool -> X.X()
+myStartupHook isThisOnLaptop = do
   setWMName "LG3D"
   setDefaultCursor xC_left_ptr
-  spawn "~/.config/polybar/polybar laptop"
+  spawn $ "~/.config/polybar/polybar " ++ if isThisOnLaptop
+                                             then "laptop"
+                                             else "desktop"
   spawn "~/.xmonad/startup.sh"
 
 myKeys :: [(String, X.X ())]
