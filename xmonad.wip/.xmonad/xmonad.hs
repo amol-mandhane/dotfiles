@@ -78,7 +78,9 @@ main = do
 
 myConfig dBusClient isThisOnLaptop = X.def {
   X.terminal = "urxvt",
-  X.borderWidth = 0,
+  X.borderWidth = 4,
+  X.focusedBorderColor = purple,
+  X.normalBorderColor = purple,
   X.modMask = X.mod4Mask,
   X.workspaces = workspaces,
   X.layoutHook = myLayoutHook,
