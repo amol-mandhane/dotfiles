@@ -1,0 +1,373 @@
+<html>
+    <head>
+        <style type="text/css">
+         body {
+             color: rgba(255, 255, 255, 0.9);
+             font-family: sans-serif;
+             overflow: hidden;
+         }
+         #covering_div {
+             position: absolute;
+             top: 0;
+             left: 0;
+             width: 0%;
+             height: 0%;
+             background: black;
+             z-index: 1000;
+         }
+         video#bgvid {
+             position: fixed;
+             top: 50%;
+             left: 50%;
+             min-width: 100%;
+             min-height: 100%;
+             width: auto;
+             height: auto;
+             z-index: -100;
+             -ms-transform: translateX(-50%) translateY(-50%);
+             -moz-transform: translateX(-50%) translateY(-50%);
+             -webkit-transform: translateX(-50%) translateY(-50%);
+             transform: translateX(-50%) translateY(-50%);
+             background-size: cover;
+         }
+
+         #password_div {
+             position: absolute;
+             bottom: 32px;
+             left: 32px;
+             display: inline-block;
+             padding: 0;
+         }
+
+         #password_div input {
+             color: rgba(255, 255, 255, 0.9);
+             background: rgba(0, 0, 0, 0);
+             border: 0px;
+             border-bottom: 2px solid rgba(255, 255, 255, 0.9);
+             padding: 8px 16px;
+             font-size: 32px;
+             width: 80%;
+             outline: none;
+             text-align: center;
+         }
+
+         #password_div input.invalid {
+             color: rgba(255, 0, 0, 0.9);
+             border-bottom: 2px solid rgba(255, 0, 0, 0.9);
+         }
+
+         #password_div input.disabled {
+             border-bottom: 2px solid rgba(255, 255, 255, 0.5) !important;
+             color: rgba(255, 255, 255, 0.5) !important;
+         }
+
+         #clock {
+             position: absolute;
+             top: 32px;
+             right: 32px;
+         }
+
+         #clock #time {
+             font-size: 72px;
+         }
+
+         #clock #datetime {
+             float: right;
+             font-size: 80%;
+         }
+
+         #user_wrapper {
+             width: 48%;
+             display: inline-block;
+             margin-right: 2%;
+             text-align: right;
+         }
+
+         #session_wrapper {
+             width: 30%;
+             text-align: left;
+             display: inline-block;
+         }
+
+         .scrollselect_div {
+             overflow: hidden;
+             position: relative;
+             height: 96px;
+             padding-bottom: 6px;
+         }
+
+         .scrollselect_div .scrollselect_scroller {
+             position: absolute;
+             left: 0;
+             width: 100%;
+             transition: top 0.5s;
+         }
+
+         .scrollselect_div .scrollselect_scroller .scrollselect_option {
+             position: relative;
+             width: 90%;
+             height: 32px;
+             line-height: 32px;
+             border-top: 1px solid gray;
+             background: rgba(255, 255, 255, 0.1);
+             opacity: 0.6;
+             padding-left: 5%;
+             padding-right: 5%;
+         }
+
+
+         .scrollselect_div .scrollselect_scroller .scrollselect_option.active {
+             border-top: 1px solid white;
+             border-bottom: 1px solid white;
+             background: rgba(255, 255, 255, 0.2);
+             opacity: 1.0;
+         }
+
+        </style>
+    </head>
+    <body oncontextmenu="return false;">
+        <div id="covering_div"></div>
+        <div id="password_div">
+            <div id="selectors">
+                <div id="user_wrapper"></div>
+                <div id="session_wrapper"></div>
+            </div>
+            <form action="javascript: provide_secret()">
+                <input id="password_entry" type="password" autofocus />
+            </form>
+        </div>
+        <div id="clock">
+            <div id="time_box">
+                <span id="time"></span>
+                <span id="ampm"></span>
+            </div>
+            <div id="datetime"></div>
+        </div>
+        <video playsinline autoplay muted loop id="bgvid" preload="auto">
+            <source src="" id="bgvid_src" type="video/mp4">
+        </video>
+        <script type="text/javascript">
+         var num_videos = 13;
+         var load_video = function() {
+             var video_num = Math.floor(Math.random() * num_videos);
+             document.getElementById("bgvid").children[0].src = "file:///dotfiles/lightdm/cinemagraphs/" + video_num + ".mp4";
+             document.getElementById("bgvid").oncanplaythrough = function() {
+                 var cover_div = document.getElementById("covering_div");
+                 cover_div.parentElement.removeChild(cover_div);
+             };
+         };
+         load_video();
+
+         document.getElementById("password_entry").onblur = function() {
+             document.getElementById("password_entry").focus();
+         };
+
+         var in_progress = false;
+         var animation_duration = 500;
+
+         var password_incorrect_alert = function () {
+             var password_box = document.getElementById("password_entry");
+             password_box.value = "";
+             password_box.classList.add("invalid");
+             password_box.oninput = function() {
+                 document.getElementById("password_entry").oninput = null;
+                 document.getElementById("password_entry").classList.remove("invalid");
+             }
+         };
+
+         var freeze_password_input = function () {
+             document.getElementById("password_entry").disabled = true;
+             document.getElementById("password_entry").classList.add("disabled");
+         };
+
+         var unfreeze_password_input = function () {
+             document.getElementById("password_entry").disabled = false;
+             document.getElementById("password_entry").classList.remove("disabled");
+         };
+
+         var authentication_complete = function () {
+             try {
+                 if (lightdm.is_authenticated) {
+                     var session_select = document.getElementById("session_select");
+                     var session = session_select.value;
+                     lightdm.login(lightdm.authentication_user, session);
+                 } else {
+                     password_incorrect_alert();
+                 }
+             } finally {
+                 unfreeze_password_input();
+             }
+         }
+
+         var start_authentication = function(username) {
+             lightdm.cancel_timed_login ();
+             lightdm.start_authentication(username);
+         }
+
+         var provide_secret = function () {
+             try {
+                 freeze_password_input();
+                 var username_select = document.getElementById("user_select");
+                 var username = username_select.value;
+                 start_authentication(username);
+                 setTimeout(function() {
+                     lightdm.provide_secret(document.getElementById("password_entry").value);
+                 }, 250);
+             } catch (err) {
+                 unfreeze_password_input();
+                 throw err;
+             }
+         };
+
+         var start_clock = function() {
+             var today = new Date();
+             var days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+             var months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+
+             var y = today.getFullYear();
+             var M = months[today.getMonth()];
+             var d = today.getDate();
+             var v = days[today.getDay()];
+             var h = today.getHours();
+             var m = today.getMinutes();
+             var s = today.getSeconds();
+
+             var sep = " : ";
+             sep = s % 2 == 0 ? "<span style=\"visibility: hidden\">" + sep + "</span>" : sep;
+             var i = (h % 12);
+             i = i == 0 ? 12 : i;
+             i = (i < 10 ? "0" : "") + i;
+             m = (m < 10 ? "0" : "") + m;
+
+             document.getElementById("time").innerHTML = i + sep + m;
+             document.getElementById("ampm").innerHTML = (h >= 12 ? "PM" : "AM");
+             document.getElementById("datetime").innerHTML = v + ", " + d + " " + M + " " + y;
+         };
+
+         var style_select_scroll = function (event, scroll_direction) {
+             if (in_progress) {
+                 return;
+             }
+
+             if (scroll_direction !== "up" && scroll_direction !== "down") {
+                 return;
+             }
+
+             var div = event.target;
+             var edge_div_pos = scroll_direction === "up" ? div.children[0].children.length - 1 : 0;
+             var cant_scroll = div.children[0].children[edge_div_pos].classList.contains("active");
+             if (cant_scroll) {
+                 return;
+             }
+
+             in_progress = true;
+
+             var position = parseFloat(div.children[0].style.top);
+             var new_position = scroll_direction === "up" ? position - 33.33 : position + 33.33;
+
+             var old_active = div.getElementsByClassName("active")[0];
+             var new_active = scroll_direction === "up" ? old_active.nextElementSibling : old_active.previousElementSibling;
+
+             var select = document.getElementById(div.getAttribute("data-select-id"));
+             select.value = new_active.getAttribute("data-option-value");
+
+             new_active.classList.add("to_activate");
+             old_active.classList.remove("active");
+             div.children[0].style.top = new_position;
+
+             setTimeout(function() {
+                 document.getElementsByClassName("to_activate")[0].classList.add("active");
+                 document.getElementsByClassName("to_activate")[0].classList.remove("to_activate");
+                 in_progress = false;
+             }, animation_duration);
+         };
+
+         var style_select_scroll_dispatcher = function(event) {
+             var new_event = {target: event.target};
+             while (!new_event.target.classList.contains("scrollselect_div")) {
+                 new_event.target = new_event.target.parentElement;
+             }
+             if (event.deltaY > 0) {
+                 style_select_scroll(new_event, "up");
+             } else if (event.deltaY < 0) {
+                 style_select_scroll(new_event, "down");
+             }
+         }
+
+         var style_selects = function() {
+             var selects = document.getElementsByClassName("scrollselect");
+
+             for (var i = 0; i < selects.length; i++) {
+                 var select = selects[i];
+                 select.style.visibility = 'hidden';
+                 select.style.display = 'none';
+
+                 var scrollselect_div = document.createElement("div");
+                 scrollselect_div.setAttribute("data-select-id", select.id);
+                 scrollselect_div.classList.add("scrollselect_div");
+                 scrollselect_div.onwheel = style_select_scroll_dispatcher;
+
+                 var scrollselect_scroller = document.createElement("div");
+                 scrollselect_scroller.classList.add("scrollselect_scroller");
+                 scrollselect_scroller.style.top = Math.max(0, 100 - select.children.length * 33.33) + select.selectedIndex * 33.33;
+                 scrollselect_div.appendChild(scrollselect_scroller);
+
+                 var options = select.children;
+                 var options_divs = [];
+                 for (var j = 0; j < options.length; j++) {
+                     var option = options[j];
+                     var option_div = document.createElement("div");
+                     option_div.classList.add("scrollselect_option");
+                     option_div.setAttribute("data-option-value", option.value);
+                     option_div.innerHTML = option.innerHTML;
+                     options_divs.push(option_div);
+                 }
+
+                 options_divs[select.selectedIndex].classList.add("active");
+                 options_divs.reverse();
+
+                 for (var j = 0; j < options_divs.length; j++) {
+                     scrollselect_scroller.appendChild(options_divs[j]);
+                 }
+
+                 select.parentElement.appendChild(scrollselect_div);
+             }
+         };
+
+         var add_users_and_sessions = function() {
+             document.getElementById("user_wrapper").innerHTML = "<select id=\"user_select\" name=\"user_select\" class=\"scrollselect\"></select>";
+             document.getElementById("session_wrapper").innerHTML = "<select id=\"session_select\" name=\"session_select\" class=\"scrollselect\"></select>";
+             var users = lightdm.users;
+             users.push({name: "root", display_name: "root"});
+             for (var i = 0; i < users.length; i++) {
+                 if (users[i].name == lightdm.select_user_hint) {
+                     var option = "<option value=\"" + users[i].name + "\" selected>" + users[i].display_name +"</option>";
+                 } else {
+                     var option = "<option value=\"" + users[i].name + "\">" + users[i].display_name +"</option>";
+                 }
+                 document.getElementById("user_select").innerHTML += option;
+             }
+
+             var sessions = lightdm.sessions;
+             var sessions_html = ""
+             for (var i = 0; i < sessions.length; i++) {
+                 if (sessions[i].key == users[0].session) {
+                     sessions_html += "<option value=\"" + sessions[i].key + "\" selected>" + sessions[i].name +"</option>";
+                 } else {
+                     sessions_html += "<option value=\"" + sessions[i].key + "\">" + sessions[i].name +"</option>";
+                 }
+             }
+             document.getElementById("session_select").innerHTML = sessions_html ;
+
+             style_selects();
+         };
+
+         document.addEventListener('DOMContentLoaded', add_users_and_sessions, false);
+
+        </script>
+        <script type="text/javascript">
+         start_clock();
+         setInterval(start_clock, 1000);
+        </script>
+    </body>
+</html>
