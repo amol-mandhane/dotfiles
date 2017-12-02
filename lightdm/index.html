@@ -3,8 +3,13 @@
         <style type="text/css">
          body {
              color: rgba(255, 255, 255, 0.9);
-             font-family: sans-serif;
+             font-family: 'IBM Plex Sans', 'Roboto', 'Open Sans', sans-serif;
+             font-size: 120%;
+             font-weight: 500;
              overflow: hidden;
+             cursor: pointer;
+             -webkit-user-select: none;
+             user-select: none;
          }
          #covering_div {
              position: absolute;
@@ -69,6 +74,8 @@
 
          #clock #time {
              font-size: 72px;
+             font-weight: 300;
+             text-shadow: 0 0 2px black;
          }
 
          #clock #datetime {
@@ -159,7 +166,9 @@
          load_video();
 
          document.getElementById("password_entry").onblur = function() {
-             document.getElementById("password_entry").focus();
+             setTimeout(function() {
+                 document.getElementById("password_entry").focus();
+             }, 10);
          };
 
          var in_progress = false;
