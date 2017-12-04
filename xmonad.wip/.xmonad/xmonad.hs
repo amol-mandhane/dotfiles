@@ -173,6 +173,7 @@ myStartupHook isThisOnLaptop = do
   spawn $ "~/.config/polybar/polybar " ++ if isThisOnLaptop
                                              then "laptop"
                                              else "desktop"
+  spawn "dunst -conf ~/.dunstrc"
   spawn "~/.xmonad/startup.sh"
 
 myKeys :: [(String, X.X ())]
@@ -197,7 +198,10 @@ myKeys = [
   -- Keyboard Volume buttons
   ("<XF86AudioMute>", spawn "amixer -q sset Master toggle"),
   ("<XF86AudioRaiseVolume>", spawn "amixer -q sset Master 1%+"),
-  ("<XF86AudioLowerVolume>", spawn "amixer -q sset Master 1%-")
+  ("<XF86AudioLowerVolume>", spawn "amixer -q sset Master 1%-"),
+  -- Keyboard brightness buttons
+  ("<XF86MonBrightnessUp>", spawn "xbacklight -inc 5"),
+  ("<XF86MonBrightnessDown>", spawn "xbacklight -dec 5")
   ]
 
 -- Send desktop notifications on urgency

@@ -78,7 +78,7 @@ URxvt.internalBorder:       16
 
 ! Rofi config.
 rofi.levenshtein-sort: true
-rofi.font: Roboto 12
+rofi.font: IBM Plex Sans 12
 
 Xft.dpi: 108
 Xft.autohint: 0
