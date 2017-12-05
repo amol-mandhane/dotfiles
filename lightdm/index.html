@@ -318,7 +318,7 @@
 
                  var scrollselect_scroller = document.createElement("div");
                  scrollselect_scroller.classList.add("scrollselect_scroller");
-                 scrollselect_scroller.style.top = Math.max(0, 100 - select.children.length * 33.33) + select.selectedIndex * 33.33;
+                 scrollselect_scroller.style.top = (3 + select.selectedIndex - select.children.length) * 33.33;
                  scrollselect_div.appendChild(scrollselect_scroller);
 
                  var options = select.children;
