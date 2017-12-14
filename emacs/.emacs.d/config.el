@@ -127,8 +127,7 @@
   :ensure t)
 (use-package flx-ido
   :ensure t
-  :after ido
-  :after flx
+  :after (ido flx)
   :config (flx-ido-mode +1))
 
 (use-package counsel
@@ -449,6 +448,10 @@ IGNORE: ignore."
   :config
   (electric-indent-mode +1))
 
+(use-package paredit
+  :ensure t
+  :disabled t)
+
 (use-package avy
   :ensure t
   :commands avy-goto-word-1
@@ -563,6 +566,15 @@ _p_rev	_u_pper	_E_diff	_=_: upper-lower	_RET_: current
     (yas-global-mode +1)
     (prefixed-key "is" #'yas-expand)))
 
+(use-package lsp-mode
+  :ensure t)
+
+(use-package company-lsp
+  :ensure t
+  :after (lsp-mode company)
+  :config
+  (push 'company-lsp company-backends))
+
 (use-package irony
   :ensure t
   :commands irony-mode
@@ -585,8 +597,7 @@ _p_rev	_u_pper	_E_diff	_=_: upper-lower	_RET_: current
 (use-package company-irony-c-headers
   :ensure t
   :commands company-irony-c-headers
-  :after company
-  :after irony
+  :after (company irony)
   :init
   (add-to-list 'company-backends 'company-irony-c-headers))
 
@@ -596,8 +607,7 @@ _p_rev	_u_pper	_E_diff	_=_: upper-lower	_RET_: current
 (use-package flycheck-irony
   :ensure t
   :commands flycheck-irony-setup
-  :after flycheck
-  :after irony
+  :after (flycheck irony)
   :init
   (add-hook 'c-mode-common-hook #'flycheck-irony-setup))
 
@@ -643,6 +653,7 @@ _p_rev	_u_pper	_E_diff	_=_: upper-lower	_RET_: current
 
 (use-package redshank
   :load-path "third_party/redshank"
+  :after paredit
   :commands redshank-mode
   :diminish redshank-mode
   :init
@@ -751,8 +762,7 @@ Start `ielm' if it's not already running."
 
 (use-package company-go
   :ensure t
-  :after company
-  :after go-mode
+  :after (company go-mode)
   :commands company-go
   :init
   (add-to-list 'company-backends 'company-go)
@@ -761,8 +771,7 @@ Start `ielm' if it's not already running."
 
 (use-package flycheck-gometalinter
   :ensure t
-  :after flycheck
-  :after go-mode
+  :after (flycheck go-mode)
   :commands flycheck-gometalinter-setup
   :config
   (add-hook 'go-mode-hook #'flycheck-gometalinter-setup))
@@ -783,7 +792,8 @@ Start `ielm' if it's not already running."
 (use-package go-rename
   :ensure t
   :commands go-rename
-  :init
+  :disabled t
+  :config
   (mode-key go-mode-map "C-c r" #'go-rename))
 
 (use-package haskell-mode
@@ -1171,12 +1181,8 @@ Start `ielm' if it's not already running."
   (sml/setup))
 
 (use-package helium-modeline
-  :after powerline
-  :after let-alist
-  :after projectile
-  :after flycheck
-  :after window-numbering
-  :after
+  :demand t
+  ;;:after (powerline let-alist projectile flycheck window-numbering)
   :config
   (powerline-helium-theme))
 

@@ -169,8 +169,7 @@ Approach to evolve interface framework
     :ensure t)
   (use-package flx-ido
     :ensure t
-    :after ido
-    :after flx
+    :after (ido flx)
     :config (flx-ido-mode +1))
 #+END_SRC
 
@@ -574,6 +573,13 @@ paredit, wrap-region, AST navigation etc.
     :config
     (electric-indent-mode +1))
 #+END_SRC
+*** paredit
+Redshank needs paredit
+#+BEGIN_SRC emacs-lisp
+  (use-package paredit
+    :ensure t
+    :disabled t)
+#+END_SRC
 ** Avy
 Avy is used to jump around the file.
 #+BEGIN_SRC emacs-lisp
@@ -719,6 +725,18 @@ Use ~C-x v~ prefixed commands for now.
       (prefixed-key "is" #'yas-expand)))
 #+END_SRC
 * TODO Major mode setup [9/13]
+** LSP
+#+BEGIN_SRC emacs-lisp
+  (use-package lsp-mode
+    :ensure t)
+
+  (use-package company-lsp
+    :ensure t
+    :after (lsp-mode company)
+    :config
+    (push 'company-lsp company-backends))
+#+END_SRC
+
 ** DONE C/C++
 *** Irony Mode
 Irony mode is clang based autocompletion and syntax checker. It is like YouCompleteMe, but only for C-family and better.
@@ -750,8 +768,7 @@ I've had many problems with the YCM setup at work.
   (use-package company-irony-c-headers
     :ensure t
     :commands company-irony-c-headers
-    :after company
-    :after irony
+    :after (company irony)
     :init
     (add-to-list 'company-backends 'company-irony-c-headers))
 
@@ -764,8 +781,7 @@ I've had many problems with the YCM setup at work.
   (use-package flycheck-irony
     :ensure t
     :commands flycheck-irony-setup
-    :after flycheck
-    :after irony
+    :after (flycheck irony)
     :init
     (add-hook 'c-mode-common-hook #'flycheck-irony-setup))
 #+END_SRC
@@ -834,6 +850,7 @@ Still, good to have in config.
 #+BEGIN_SRC emacs-lisp
   (use-package redshank
     :load-path "third_party/redshank"
+    :after paredit
     :commands redshank-mode
     :diminish redshank-mode
     :init
@@ -968,8 +985,7 @@ Use ~pp-eval-expression~ instead of ~eval-expr~.
 #+BEGIN_SRC emacs-lisp
   (use-package company-go
     :ensure t
-    :after company
-    :after go-mode
+    :after (company go-mode)
     :commands company-go
     :init
     (add-to-list 'company-backends 'company-go)
@@ -980,8 +996,7 @@ Use ~pp-eval-expression~ instead of ~eval-expr~.
 #+BEGIN_SRC emacs-lisp
   (use-package flycheck-gometalinter
     :ensure t
-    :after flycheck
-    :after go-mode
+    :after (flycheck go-mode)
     :commands flycheck-gometalinter-setup
     :config
     (add-hook 'go-mode-hook #'flycheck-gometalinter-setup))
@@ -1008,7 +1023,8 @@ Use ~pp-eval-expression~ instead of ~eval-expr~.
   (use-package go-rename
     :ensure t
     :commands go-rename
-    :init
+    :disabled t
+    :config
     (mode-key go-mode-map "C-c r" #'go-rename))
 #+END_SRC
 *** TODO Compilation and Debugger
@@ -1518,12 +1534,8 @@ Don't use evil mode for general purpose. Current use of evil mode is for vim lik
     (sml/setup))
 
   (use-package helium-modeline
-    :after powerline
-    :after let-alist
-    :after projectile
-    :after flycheck
-    :after window-numbering
-    :after
+    :demand t
+    ;;:after (powerline let-alist projectile flycheck window-numbering)
     :config
     (powerline-helium-theme))
 #+END_SRC
