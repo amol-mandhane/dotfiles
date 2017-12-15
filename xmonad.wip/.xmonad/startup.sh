@@ -25,7 +25,11 @@ if [ -x "$(command -v synclient)" ]; then
   synclient AreaLeftEdge=700
   synclient AreaRightEdge=3350
 
-  xinput --set-prop 14 "Synaptics Finger" 25 60 0
+  # xinput --set-prop 14 "Synaptics Finger" 25 60 0
 
   xbacklight -set 25
+fi
+
+if [ -x "$(command -v xautolock)" ]; then
+  xautolock -time 3 -locker "dm-tool lock" &
 fi

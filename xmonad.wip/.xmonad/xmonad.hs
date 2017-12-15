@@ -12,7 +12,8 @@ import           XMonad.Core                      (ManageHook, WorkspaceId,
                                                    spawn)
 import           XMonad.Hooks.DynamicLog          (PP (..), dynamicLogWithPP)
 import           XMonad.Hooks.EwmhDesktops        (ewmh, ewmhDesktopsLogHook)
-import           XMonad.Hooks.ManageDocks         (avoidStruts, manageDocks)
+import           XMonad.Hooks.ManageDocks         (avoidStruts, docks,
+                                                   manageDocks)
 import           XMonad.Hooks.ManageHelpers       (composeOne, (-?>))
 import           XMonad.Hooks.SetWMName           (setWMName)
 import           XMonad.Hooks.UrgencyHook         (UrgencyHook, urgencyHook,
@@ -72,6 +73,7 @@ main = do
   isThisOnLaptop <- isLaptop
   X.xmonad
     $ ewmh
+    $ docks
     $ withUrgencyHook LibNotifyUrgencyHook
     $ myConfig dBusClient isThisOnLaptop
     `additionalKeysP` myKeys
@@ -170,9 +172,9 @@ myStartupHook :: Bool -> X.X()
 myStartupHook isThisOnLaptop = do
   setWMName "LG3D"
   setDefaultCursor xC_left_ptr
-  spawn $ "~/.config/polybar/polybar " ++ if isThisOnLaptop
-                                             then "laptop"
-                                             else "desktop"
+  spawn $ "polybar " ++ if isThisOnLaptop
+    then "laptop"
+    else "desktop"
   spawn "dunst -conf ~/.dunstrc"
   spawn "~/.xmonad/startup.sh"
 
