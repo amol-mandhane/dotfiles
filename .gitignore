@@ -19,11 +19,14 @@ vim/.vim/*
 # to be tracked. Instead of blacklisting all of them, whitelist selected
 # config files.
 emacs/.emacs.d/*
-!emacs/.emacs.d/*.el
+!emacs/.emacs.d/init.el
+!emacs/.emacs.d/config.el
 !emacs/.emacs.d/config.org
 !emacs/.emacs.d/lisp
 !emacs/.emacs.d/lisp/*.el
 !emacs/.emacs.d/third_party
 !emacs/.emacs.d/third_party/*
-emacs/.emacs.d/srecode-map.el
 *.elc
+
+# Fonts cruft
+fonts/.fonts/google-drive/*
