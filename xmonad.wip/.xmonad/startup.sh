@@ -20,10 +20,8 @@ xmodmap -e "keysym Caps_Lock = NoSymbol"
 
 
 if [ -x "$(command -v synclient)" ]; then
-  synclient AreaBottomEdge=1600
-  synclient AreaTopEdge=400
-  synclient AreaLeftEdge=700
-  synclient AreaRightEdge=3350
+  synclient AreaLeftEdge=2071
+  synclient AreaRightEdge=3871
 
   # xinput --set-prop 14 "Synaptics Finger" 25 60 0
 

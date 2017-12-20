@@ -1,10 +1,9 @@
 .DS_Store
 
 # xmonad
-xmonad/.xmonad/*.jpg
-xmonad/.xmonad/xmonad*
-!xmonad/.xmonad/xmonad.hs
-xmonad/.xmonad/conky_utilities/tomorrow_badge.py
+xmonad.wip/.xmonad/*.jpg
+xmonad.wip/.xmonad/xmonad*
+!xmonad.wip/.xmonad/xmonad.hs
 
 *.pyc
 *.o
