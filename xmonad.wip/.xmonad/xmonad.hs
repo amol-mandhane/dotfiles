@@ -21,6 +21,7 @@ import           XMonad.Hooks.UrgencyHook         (UrgencyHook, urgencyHook,
 import           XMonad.Layout.Fullscreen         (fullscreenEventHook,
                                                    fullscreenFull,
                                                    fullscreenManageHook)
+import           XMonad.Layout.LayoutHints        (layoutHintsToCenter)
 import           XMonad.Layout.NoBorders          (noBorders)
 import           XMonad.Layout.NoFrillsDecoration (noFrillsDeco)
 import           XMonad.Layout.ShowWName          (showWName)
@@ -63,22 +64,21 @@ purple = "#a761c2"
 cyan = "#6e98a4"
 black = "#000000"
 
-roboto  = "xft:Roboto:size=10"
+roboto  = "xft:Roboto:pixelsize=14"
 gap     = 10
 topBar  = 10
 
 main :: IO ()
 main = do
   dBusClient <- createDBusClient
-  isThisOnLaptop <- isLaptop
   X.xmonad
     $ ewmh
     $ docks
     $ withUrgencyHook LibNotifyUrgencyHook
-    $ myConfig dBusClient isThisOnLaptop
+    $ myConfig dBusClient
     `additionalKeysP` myKeys
 
-myConfig dBusClient isThisOnLaptop = X.def {
+myConfig dBusClient = X.def {
   X.terminal = "urxvt",
   X.borderWidth = 4,
   X.focusedBorderColor = purple,
@@ -89,25 +89,23 @@ myConfig dBusClient isThisOnLaptop = X.def {
   X.logHook = myLogHook dBusClient,
   X.manageHook = myManageHook,
   X.handleEventHook = myHandleEventHook,
-  X.startupHook = myStartupHook isThisOnLaptop,
+  X.startupHook = myStartupHook,
   X.focusFollowsMouse = False
 }
 
-isLaptop :: IO Bool
-isLaptop = doesDirectoryExist "/sys/module/battery"
-
 topBarTheme :: Theme
 topBarTheme = X.def {
+  fontName = roboto,
   activeBorderColor = blue,
   activeColor = blue,
-  activeTextColor = blue,
+  activeTextColor = black,
   inactiveColor = darkGray,
-  inactiveTextColor = darkGray,
+  inactiveTextColor = black,
   inactiveBorderColor = darkGray,
   urgentColor = red,
-  urgentTextColor = red,
+  urgentTextColor = black,
   urgentBorderColor = red,
-  decoHeight = topBar
+  decoHeight = 24
 }
 
 tabTheme :: Theme
@@ -135,6 +133,7 @@ myLayoutHook = showWName $
   addTabs shrinkText tabTheme $
   subLayout [] Simplest $
   -- End Tabs
+  layoutHintsToCenter $
   smartSpacing gap $
   myLayouts
   where
@@ -168,14 +167,10 @@ myManageHook = manageDocks X.<+>
 myHandleEventHook :: X.Event -> X.X All
 myHandleEventHook = fullscreenEventHook X.<+> X.handleEventHook X.def
 
-myStartupHook :: Bool -> X.X()
-myStartupHook isThisOnLaptop = do
+myStartupHook :: X.X()
+myStartupHook = do
   setWMName "LG3D"
   setDefaultCursor xC_left_ptr
-  spawn $ "polybar " ++ if isThisOnLaptop
-    then "laptop"
-    else "desktop"
-  spawn "dunst -conf ~/.dunstrc"
   spawn "~/.xmonad/startup.sh"
 
 myKeys :: [(String, X.X ())]

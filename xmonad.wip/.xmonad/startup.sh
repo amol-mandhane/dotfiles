@@ -1,5 +1,25 @@
-feh --bg-scale /home/mandhane/Wallpaper.jpg
-xcompmgr -fF -D 5 &
+# Cleanup
+killall nm-applet compton xsettingsd xautolock polybar dunst
+
+# Start
+if [ -x "$(command -v dunst)" ]; then
+    dunst -conf ~/.dunstrc &
+else
+    echo "Dunst not present on PATH"
+fi
+
+if [ -x "$(command -v polybar)" ]; then
+    if [ -d "/sys/module/battery/" ]; then
+        polybar laptop &
+    else
+        polybar desktop &
+    fi
+else
+    echo "Polybar not found on PATH"
+fi
+
+feh --bg-scale ~/Wallpaper.jpg
+compton -fF -D 5 &
 
 if [ ! $(pgrep -x "nm-applet") > /dev/null ]; then
   nm-applet &

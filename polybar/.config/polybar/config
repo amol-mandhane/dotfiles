@@ -55,15 +55,15 @@ enable-ipc = false
 
 [bar/laptop]
 inherit = commonbar
-modules-left = xmonad
-modules-center = xwindow
-modules-right = battery volume cpu temperature memory swap date
+modules-left = cpu temperature memory swap
+modules-center = xmonad
+modules-right = battery volume date
 
 [bar/desktop]
 inherit = commonbar
-modules-left = xmonad
-modules-center = xwindow
-modules-right = volume cpu memory swap date
+modules-left = cpu memory swap
+modules-center = xmonad
+modules-right = volume date
 
 [module/xmonad]
 type = custom/script
