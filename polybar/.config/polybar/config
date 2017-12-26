@@ -57,7 +57,7 @@ enable-ipc = false
 inherit = commonbar
 modules-left = cpu temperature memory swap
 modules-center = xmonad
-modules-right = battery volume date
+modules-right = battery backlight volume date
 
 [bar/desktop]
 inherit = commonbar
@@ -129,6 +129,14 @@ interval = 1
 
 date = "%A  %Y-%m-%d  %I:%M:%S %p"
 label = %date%
+
+format-padding = 2
+format-underline = ${colors.blue}
+
+[module/backlight]
+type = internal/xbacklight
+
+label =  %percentage%%
 
 format-padding = 2
 format-underline = ${colors.blue}
