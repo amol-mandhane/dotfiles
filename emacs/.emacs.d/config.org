@@ -1520,6 +1520,7 @@ Don't use evil mode for general purpose. Current use of evil mode is for vim lik
 #+BEGIN_SRC emacs-lisp
   (use-package erc-config
     :demand t)
+    ;;:hook (after-init . erc-autoconnect-servers))
 #+END_SRC
 * TODO Gnus
 * Theming

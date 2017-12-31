@@ -1170,6 +1170,7 @@ Start `ielm' if it's not already running."
 
 (use-package erc-config
   :demand t)
+  ;;:hook (after-init . erc-autoconnect-servers))
 
 (use-package powerline :ensure t :defer t)
 (use-package let-alist :ensure t :defer t)

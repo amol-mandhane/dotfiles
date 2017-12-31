@@ -24,7 +24,6 @@ Usually what happens is that you add the bots to
 
 (use-package erc
   :commands (erc erc-tls)
-  :init (add-hook 'after-init-hook #'erc-autoconnect-servers)
   :config
   (progn
     (setq erc-server-coding-system '(utf-8 . utf-8)
@@ -48,32 +47,6 @@ Usually what happens is that you add the bots to
                     (setq erc-insert-this nil))))
 
     (add-hook 'kill-emacs-hook #'(lambda () (erc-cmd-GQUIT "")))))
-
-(defun erc-autoconnect-servers ()
-  "Connect to `erc-autoconnect-servers-list'."
-  (interactive)
-  (cl-mapcar
-   #'(lambda
-       (spec)
-       (let*
-           ((inhibit-message t)
-            (server (car spec))
-            (port (cadr spec))
-            (requires-auth (caddr spec))
-            (authdata
-             (car (auth-source-search :host server :port port))))
-         (if requires-auth
-             (erc-tls
-              :server server
-              :port port
-              :nick (plist-get authdata :user)
-              :password (funcall (plist-get authdata :secret)))
-           (erc-tls
-            :server server
-            :port port
-            :nick (plist-get authdata :user)))))
-   erc-autoconnect-servers-list)
-  (switch-to-buffer "*scratch*"))
 
 (defmacro use-erc-module (module &rest args)
   "Use-package wrapper for loading erc MODULE with additional ARGS."
@@ -209,6 +182,32 @@ Usually what happens is that you add the bots to
 ;; Colorize ERC buffers.
 (use-erc-module colorize
   :ensure t)
+
+(defun erc-autoconnect-servers ()
+  "Connect to `erc-autoconnect-servers-list'."
+  (interactive)
+  (cl-mapcar
+   #'(lambda
+       (spec)
+       (let*
+           ((inhibit-message t)
+            (server (car spec))
+            (port (cadr spec))
+            (requires-auth (caddr spec))
+            (authdata
+             (car (auth-source-search :host server :port port))))
+         (if requires-auth
+             (erc-tls
+              :server server
+              :port port
+              :nick (plist-get authdata :user)
+              :password (funcall (plist-get authdata :secret)))
+           (erc-tls
+            :server server
+            :port port
+            :nick (plist-get authdata :user)))))
+   erc-autoconnect-servers-list)
+  (switch-to-buffer "*scratch*"))
 
 (provide 'erc-config)
 ;;; erc-config.el ends here
