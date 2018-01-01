@@ -23,8 +23,6 @@ emacs/.emacs.d/*
 !emacs/.emacs.d/config.org
 !emacs/.emacs.d/lisp
 !emacs/.emacs.d/lisp/*.el
-!emacs/.emacs.d/third_party
-!emacs/.emacs.d/third_party/*
 *.elc
 
 # Fonts cruft

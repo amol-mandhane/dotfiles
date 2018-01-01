@@ -4,8 +4,8 @@
 ** Identity
 
 #+BEGIN_SRC emacs-lisp
-(setq user-full-name "Amol Mandhane"
-      user-mail-address "amol.mandhane@gmail.com")
+(setq user-full-name ""
+      user-mail-address "")
 #+END_SRC
 ** Eager basic config
 #+BEGIN_SRC emacs-lisp
@@ -49,9 +49,10 @@
   ;; (package-initialize)
   (setq package-archives
         '(("gnu" . "https://elpa.gnu.org/packages/")
+          ("org" . "http://orgmode.org/elpa/")
+          ("melpa-stable" . "https://stable.melpa.org/packages/")
           ;; ("marmalade" . "http://marmalade-repo.org/packages/")
-          ("melpa" . "https://melpa.org/packages/")
-          ("org" . "http://orgmode.org/elpa/")))
+          ("melpa" . "https://melpa.org/packages/")))
 
   (unless (package-installed-p 'use-package)
     (package-refresh-contents)
@@ -357,42 +358,30 @@ Fill column indicator for showing right ruler.
 #+BEGIN_SRC emacs-lisp
   (use-package fill-column-indicator
     :ensure t
+    :commands fci-mode
+    :init (enable-minor-mode-globally fci-mode)
     :config
-    (enable-minor-mode-globally fci-mode))
-#+END_SRC
-
-Fill column indicator interferes with company mode to create UI breakages.
-This snippet disables FCI when company mode is on.
-#+BEGIN_SRC emacs-lisp
-  (defvar-local company-fci-mode-on-p nil)
-
-  (defun company-turn-off-fci (&rest ignore)
-    "Turn off FCI for company mode.
-  IGNORE: ignore."
-    (when (boundp 'fci-mode)
-      (setq company-fci-mode-on-p fci-mode)
-      (when fci-mode (fci-mode -1))))
-
-  (defun company-maybe-turn-on-fci (&rest ignore)
-    "Turn on FCI when company mode is off.
-  IGNORE: ignore."
-    (when company-fci-mode-on-p (fci-mode +1)))
-
-  (add-hook 'company-completion-started-hook 'company-turn-off-fci)
-  (add-hook 'company-completion-finished-hook 'company-maybe-turn-on-fci)
-  (add-hook 'company-completion-cancelled-hook 'company-maybe-turn-on-fci)
+    (progn
+      ;;Fill column indicator interferes with company mode to create UI breakages.
+      ;;This snippet disables FCI when company mode is on.
+      (advice-add
+       'company-call-frontends
+       :before
+       #'(lambda (command)
+           (cond
+            ((string= "show" command) (turn-off-fci-mode))
+            ((string= "hide" command) (turn-on-fci-mode)))))))
 #+END_SRC
 
 ** Indent guides
  #+BEGIN_SRC emacs-lisp
    (use-package highlight-indent-guides
      :ensure t
-     :commands highlight-indent-guides-mode
+     :hook (prog-mode . highlight-indent-guides-mode)
      :init
      (progn
        (setq highlight-indent-guides-auto-odd-face-perc 2)
-       (setq highlight-indent-guides-auto-even-face-perc 4)
-       (add-hook 'prog-mode-hook 'highlight-indent-guides-mode)))
+       (setq highlight-indent-guides-auto-even-face-perc 4)))
  #+END_SRC
 
 ** Expand-region
@@ -585,7 +574,7 @@ Avy is used to jump around the file.
     :ensure t
     :commands avy-goto-word-1
     :init
-      (key-chord-define-global "jj" 'avy-goto-word-1))
+      (key-chord-define-global "jj" #'avy-goto-word-1))
 #+END_SRC
 * Compilation
 #+BEGIN_SRC emacs-lisp
@@ -593,8 +582,8 @@ Avy is used to jump around the file.
     :commands (compile recompile)
     :init
     (prefixed-keys
-     ("cc" . 'compile)
-     ("cr" . 'recompile)))
+     ("cc" . #'compile)
+     ("cr" . #'recompile)))
 #+END_SRC
 * Window management
 ** Window numbering
@@ -608,10 +597,7 @@ Avy is used to jump around the file.
 ** Minibuffer, M-x and ring history
 #+BEGIN_SRC emacs-lisp
   (use-package savehist
-    :demand t
-    :commands savehist-mode
-    :init
-    (add-hook 'after-init-hook 'savehist-mode)
+    :hook (after-init . savehist-mode)
     :config
     (progn
       (setq savehist-additional-variables '(kill-ring search-ring regexp-search-ring))
@@ -620,9 +606,7 @@ Avy is used to jump around the file.
 ** Recent files
 #+BEGIN_SRC emacs-lisp
   (use-package recentf
-    :commands recentf-mode
-    :init
-    (add-hook 'after-init-hook #'recentf-mode)
+    :hook (after-init . recentf-mode)
     :config
     (progn
       (setq recentf-max-menu-items 25)
@@ -848,13 +832,10 @@ Still, good to have in config.
 **** Redshank
 #+BEGIN_SRC emacs-lisp
   (use-package redshank
-    :load-path "third_party/redshank"
+    :ensure t
     :after paredit
-    :commands redshank-mode
     :diminish redshank-mode
-    :init
-    (progn
-      (add-hook 'lisp-family-mode-hook #'redshank-mode)))
+    :hook (lisp-family-mode . redshank-mode))
 #+END_SRC
 *** DONE Emacs Lisp
 **** Basic setup

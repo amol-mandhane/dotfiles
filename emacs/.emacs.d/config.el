@@ -1,5 +1,5 @@
-(setq user-full-name "Amol Mandhane"
-      user-mail-address "amol.mandhane@gmail.com")
+(setq user-full-name ""
+      user-mail-address "")
 
 (setq ad-redefinition-action 'accept)
 
@@ -39,9 +39,10 @@
 ;; (package-initialize)
 (setq package-archives
       '(("gnu" . "https://elpa.gnu.org/packages/")
+        ("org" . "http://orgmode.org/elpa/")
+        ("melpa-stable" . "https://stable.melpa.org/packages/")
         ;; ("marmalade" . "http://marmalade-repo.org/packages/")
-        ("melpa" . "https://melpa.org/packages/")
-        ("org" . "http://orgmode.org/elpa/")))
+        ("melpa" . "https://melpa.org/packages/")))
 
 (unless (package-installed-p 'use-package)
   (package-refresh-contents)
@@ -273,35 +274,27 @@ _<right>_ _l_: windmove-right	_d_: tighten	_q_: quit"
 
 (use-package fill-column-indicator
   :ensure t
+  :commands fci-mode
+  :init (enable-minor-mode-globally fci-mode)
   :config
-  (enable-minor-mode-globally fci-mode))
-
-(defvar-local company-fci-mode-on-p nil)
-
-(defun company-turn-off-fci (&rest ignore)
-  "Turn off FCI for company mode.
-IGNORE: ignore."
-  (when (boundp 'fci-mode)
-    (setq company-fci-mode-on-p fci-mode)
-    (when fci-mode (fci-mode -1))))
-
-(defun company-maybe-turn-on-fci (&rest ignore)
-  "Turn on FCI when company mode is off.
-IGNORE: ignore."
-  (when company-fci-mode-on-p (fci-mode +1)))
-
-(add-hook 'company-completion-started-hook 'company-turn-off-fci)
-(add-hook 'company-completion-finished-hook 'company-maybe-turn-on-fci)
-(add-hook 'company-completion-cancelled-hook 'company-maybe-turn-on-fci)
+  (progn
+    ;;Fill column indicator interferes with company mode to create UI breakages.
+    ;;This snippet disables FCI when company mode is on.
+    (advice-add
+     'company-call-frontends
+     :before
+     #'(lambda (command)
+         (cond
+          ((string= "show" command) (turn-off-fci-mode))
+          ((string= "hide" command) (turn-on-fci-mode)))))))
 
 (use-package highlight-indent-guides
   :ensure t
-  :commands highlight-indent-guides-mode
+  :hook (prog-mode . highlight-indent-guides-mode)
   :init
   (progn
     (setq highlight-indent-guides-auto-odd-face-perc 2)
-    (setq highlight-indent-guides-auto-even-face-perc 4)
-    (add-hook 'prog-mode-hook 'highlight-indent-guides-mode)))
+    (setq highlight-indent-guides-auto-even-face-perc 4)))
 
 (use-package expand-region
   :ensure t
@@ -454,14 +447,14 @@ IGNORE: ignore."
   :ensure t
   :commands avy-goto-word-1
   :init
-    (key-chord-define-global "jj" 'avy-goto-word-1))
+    (key-chord-define-global "jj" #'avy-goto-word-1))
 
 (use-package compile
   :commands (compile recompile)
   :init
   (prefixed-keys
-   ("cc" . 'compile)
-   ("cr" . 'recompile)))
+   ("cc" . #'compile)
+   ("cr" . #'recompile)))
 
 (use-package window-numbering
   :ensure t
@@ -469,19 +462,14 @@ IGNORE: ignore."
   (window-numbering-mode +1))
 
 (use-package savehist
-  :demand t
-  :commands savehist-mode
-  :init
-  (add-hook 'after-init-hook 'savehist-mode)
+  :hook (after-init . savehist-mode)
   :config
   (progn
     (setq savehist-additional-variables '(kill-ring search-ring regexp-search-ring))
     (setq savehist-file "~/.emacs.d/tmp/history")))
 
 (use-package recentf
-  :commands recentf-mode
-  :init
-  (add-hook 'after-init-hook #'recentf-mode)
+  :hook (after-init . recentf-mode)
   :config
   (progn
     (setq recentf-max-menu-items 25)
@@ -651,13 +639,10 @@ _p_rev	_u_pper	_E_diff	_=_: upper-lower	_RET_: current
 (add-hook 'lisp-family-mode-hook 'smartparens-strict-mode)
 
 (use-package redshank
-  :load-path "third_party/redshank"
+  :ensure t
   :after paredit
-  :commands redshank-mode
   :diminish redshank-mode
-  :init
-  (progn
-    (add-hook 'lisp-family-mode-hook #'redshank-mode)))
+  :hook (lisp-family-mode . redshank-mode))
 
 ;; Helper functions.
 (defun elisp-visit-ielm ()
