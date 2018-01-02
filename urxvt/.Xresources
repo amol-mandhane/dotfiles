@@ -33,7 +33,7 @@ urxvt*color1: #da4939
 urxvt*color9: #ff6c5c
 
 !green
-urxvt*color2 : #9acc79
+urxvt*color2 : #86cb92
 urxvt*color10: #8fb676
 
 !yellow
@@ -41,7 +41,7 @@ urxvt*color3:  #d0d26b
 urxvt*color11: #c8bc45
 
 !blue
-urxvt*color4: #6d9cbe
+urxvt*color4: #07a0c3
 urxvt*color12: #d0d0ff
 
 !magenta

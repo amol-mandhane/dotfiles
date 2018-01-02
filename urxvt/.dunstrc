@@ -1,32 +1,35 @@
 [global]
   format = "<b>%a:</b> %s\n%b"
   allow_markup = yes
-  geometry = 400x3-16-36
+  markup = yes
+  geometry = 600x3-16-36
   sort = yes
   monitor = 0
   padding = 16
   horizontal_padding = 16
   icon_position = left
+  max_icon_size = 32
   font = IBM Plex Sans 16
   icon_folders = /usr/share/icons/Arc/:/usr/share/icons/Arc/emblems/32/:/usr/share/icons/Arc/status/32/:/usr/share/icons/gnome/32x32/status/
   transparency = 10
-  word_wrap = yes
+  word_wrap = false
+  startup_notification = true
 
 [frame]
   width = 2
   color = "#2f2f2f"
 
 [urgency_low]
-  background = "#f9f7dd"
-  foreground = "#9acc79"
+  background = "#3c3c3c"
+  foreground = "#86cb92"
   timeout = 10
 
 [urgency_normal]
-  background = "#f9f7dd"
-  foreground = "#2f2f2f"
+  background = "#3c3c3c"
+  foreground = "#f1f0cc"
   timeout = 15
 
 [urgency_critical]
-  background = "#f9f7dd"
-  foreground = "#da4939"
+  background = "#ff5a5f"
+  foreground = "#f1f0cc"
   timeout = 0

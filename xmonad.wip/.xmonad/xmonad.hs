@@ -56,15 +56,15 @@ bg = "#2f2f2f"
 lightGray = "#888888"
 midGray = "#676767"
 darkGray = "#474747"
-red = "#ff6c5c"
-green  = "#9acc79"
-yellow = "#d0d26b"
-blue = "#6d9cbe"
+red = "#ff5a5f"
+green  = "#86cb92"
+yellow = "#f1f0cc"
+blue = "#07a0c3"
 purple = "#a761c2"
 cyan = "#6e98a4"
 black = "#000000"
 
-roboto  = "xft:Roboto:pixelsize=14"
+roboto  = "xft:Roboto:size=12"
 gap     = 10
 topBar  = 10
 
@@ -81,8 +81,8 @@ main = do
 myConfig dBusClient = X.def {
   X.terminal = "urxvt",
   X.borderWidth = 4,
-  X.focusedBorderColor = purple,
-  X.normalBorderColor = purple,
+  X.focusedBorderColor = green,
+  X.normalBorderColor = midGray,
   X.modMask = X.mod4Mask,
   X.workspaces = workspaces,
   X.layoutHook = myLayoutHook,
@@ -147,7 +147,7 @@ polybarWorkspacesLogHook dBusClient = do
   ewmhDesktopsLogHook
   dynamicLogWithPP $ X.def {
     ppCurrent             = polybarWorkspaceFormat bg blue,
-    ppVisible             = polybarWorkspaceFormat bg cyan,
+    ppVisible             = polybarWorkspaceFormat bg yellow,
     ppUrgent              = polybarWorkspaceFormat bg red,
     ppHidden              = polybarWorkspaceFormat fg bg,
     ppHiddenNoWindows     = polybarWorkspaceFormat darkGray bg,
@@ -191,6 +191,7 @@ myKeys = [
   -- Launchers
   ("M-<Return>", spawn "rofi -show run"),
   ("M-f", spawn "nemo --no-desktop"),
+  ("M-C-<Delete>" , spawn "dm-tool lock"),
 
   -- Keyboard Volume buttons
   ("<XF86AudioMute>", spawn "amixer -q sset Master toggle"),
