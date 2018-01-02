@@ -554,13 +554,21 @@ _p_rev	_u_pper	_E_diff	_=_: upper-lower	_RET_: current
     (prefixed-key "is" #'yas-expand)))
 
 (use-package lsp-mode
-  :ensure t)
+  :load-path "lsp/lsp-mode"
+  :config
+  (require 'lsp-flycheck))
 
 (use-package company-lsp
-  :ensure t
+  :load-path "lsp/company-lsp"
   :after (lsp-mode company)
-  :config
-  (push 'company-lsp company-backends))
+  :commands company-lsp
+  :init
+  (progn
+    (push 'company-lsp company-backends)
+    (add-hook
+     'lsp-mode-hook
+     #'(lambda ()
+         (setq-local company-backends (remove 'company-capf company-backends))))))
 
 (use-package irony
   :ensure t
@@ -776,19 +784,15 @@ Start `ielm' if it's not already running."
   :ensure t
   :mode "\\.hs\\'"
   :config
-  (mode-keys haskell-mode-map
-             ("C-c d" . #'haskell-debug)
-             ("C-c i" . #'haskell-interactive-switch)
-             ("C-c t" . #'haskell-process-do-type)
-             ("C-c h" . #'haskell-process-do-info)
-             ("C-c fi" . #'haskell-add-import)
-             ("C-c ff" . #'haskell-mode-stylish-buffer)))
-
-(use-package hindent
-  :ensure t
-  :commands hindent-mode
-  :init
-  (add-hook 'haskell-mode-hook #'hindent-mode))
+  (progn
+    (add-hook 'haskell-mode-hook #'turn-on-haskell-indent)
+    (mode-keys haskell-mode-map
+               ("C-c d" . #'haskell-debug)
+               ("C-c i" . #'haskell-interactive-switch)
+               ("C-c t" . #'haskell-process-do-type)
+               ("C-c h" . #'haskell-process-do-info)
+               ("C-c fi" . #'haskell-add-import)
+               ("C-c ff" . #'haskell-mode-stylish-buffer))))
 
 (use-package hlint-refactor
   :ensure t
@@ -796,35 +800,11 @@ Start `ielm' if it's not already running."
   :init
   (add-hook 'haskell-mode-hook #'hlint-refactor-mode))
 
-(use-package shm
-  :ensure t
-  :commands structured-haskell-mode
-  :init
-  (add-hook 'haskell-mode-hook #'structured-haskell-mode))
-
 (use-package intero
   :ensure t
   :commands intero-mode
   :init
   (add-hook 'haskell-mode-hook #'intero-mode))
-
-(use-package company-ghc
-  :ensure t
-  :commands company-ghc
-  :init
-  (add-to-list 'company-backends #'company-ghc))
-
-(use-package company-ghci
-  :ensure t
-  :commands company-ghci
-  :init
-  (add-to-list 'company-backends #'company-ghci))
-
-(use-package flycheck-haskell
-  :ensure t
-  :after flycheck
-  :commands flycheck-haskell-setup
-  :init (add-hook 'haskell-mode-hook #'flycheck-haskell-setup))
 
 (add-to-list 'flycheck-ghc-search-path (expand-file-name "~/.xmonad/lib"))
 

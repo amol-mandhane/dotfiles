@@ -711,13 +711,21 @@ Use ~C-x v~ prefixed commands for now.
 ** LSP
 #+BEGIN_SRC emacs-lisp
   (use-package lsp-mode
-    :ensure t)
+    :load-path "lsp/lsp-mode"
+    :config
+    (require 'lsp-flycheck))
 
   (use-package company-lsp
-    :ensure t
+    :load-path "lsp/company-lsp"
     :after (lsp-mode company)
-    :config
-    (push 'company-lsp company-backends))
+    :commands company-lsp
+    :init
+    (progn
+      (push 'company-lsp company-backends)
+      (add-hook
+       'lsp-mode-hook
+       #'(lambda ()
+           (setq-local company-backends (remove 'company-capf company-backends))))))
 #+END_SRC
 
 ** DONE C/C++
@@ -1005,24 +1013,17 @@ Use ~pp-eval-expression~ instead of ~eval-expr~.
     :ensure t
     :mode "\\.hs\\'"
     :config
-    (mode-keys haskell-mode-map
-               ("C-c d" . #'haskell-debug)
-               ("C-c i" . #'haskell-interactive-switch)
-               ("C-c t" . #'haskell-process-do-type)
-               ("C-c h" . #'haskell-process-do-info)
-               ("C-c fi" . #'haskell-add-import)
-               ("C-c ff" . #'haskell-mode-stylish-buffer)))
+    (progn
+      (add-hook 'haskell-mode-hook #'turn-on-haskell-indent)
+      (mode-keys haskell-mode-map
+                 ("C-c d" . #'haskell-debug)
+                 ("C-c i" . #'haskell-interactive-switch)
+                 ("C-c t" . #'haskell-process-do-type)
+                 ("C-c h" . #'haskell-process-do-info)
+                 ("C-c fi" . #'haskell-add-import)
+                 ("C-c ff" . #'haskell-mode-stylish-buffer))))
 #+END_SRC
 *** Helper packages
-HIndent
-#+BEGIN_SRC emacs-lisp
-  (use-package hindent
-    :ensure t
-    :commands hindent-mode
-    :init
-    (add-hook 'haskell-mode-hook #'hindent-mode))
-#+END_SRC
-
 hlint-refactor
 #+BEGIN_SRC emacs-lisp
   (use-package hlint-refactor
@@ -1030,15 +1031,6 @@ hlint-refactor
     :commands hlint-refactor-mode
     :init
     (add-hook 'haskell-mode-hook #'hlint-refactor-mode))
-#+END_SRC
-
-SHM
-#+BEGIN_SRC emacs-lisp
-  (use-package shm
-    :ensure t
-    :commands structured-haskell-mode
-    :init
-    (add-hook 'haskell-mode-hook #'structured-haskell-mode))
 #+END_SRC
 *** Intero
 Intero works well with stack projects. But without stack, we still need other options.
@@ -1048,28 +1040,6 @@ Intero works well with stack projects. But without stack, we still need other op
     :commands intero-mode
     :init
     (add-hook 'haskell-mode-hook #'intero-mode))
-#+END_SRC
-*** Completion
-#+BEGIN_SRC emacs-lisp
-  (use-package company-ghc
-    :ensure t
-    :commands company-ghc
-    :init
-    (add-to-list 'company-backends #'company-ghc))
-
-  (use-package company-ghci
-    :ensure t
-    :commands company-ghci
-    :init
-    (add-to-list 'company-backends #'company-ghci))
-#+END_SRC
-*** Syntax check
-#+BEGIN_SRC emacs-lisp
-  (use-package flycheck-haskell
-    :ensure t
-    :after flycheck
-    :commands flycheck-haskell-setup
-    :init (add-hook 'haskell-mode-hook #'flycheck-haskell-setup))
 #+END_SRC
 *** Add libraries for XMonad.
 #+BEGIN_SRC emacs-lisp
