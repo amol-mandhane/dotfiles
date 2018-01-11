@@ -92,63 +92,79 @@
   (progn (setq key-chord-two-keys-delay 0.05))
   :config (key-chord-mode +1))
 
-(use-package smex
+(use-package helm
   :ensure t
-  :defer t)
-(use-package ido
-  :ensure t
+  :diminish helm-mode
   :config
   (progn
-    (setq ido-enable-flex-matching t)
-    (setq ido-use-virtual-buffers t)
-    (setq ido-enable-regexp t)
+    (require 'helm-config)
 
-    (add-hook
-     'ido-setup-hook
-     #'(lambda () (mode-keys
-                   ido-completion-map
-                   ("<tab>" . 'ido-exit-minibuffer)
-                   ("<return>" . 'ido-exit-minibuffer))))
+    (defun helm-hide-minibuffer-maybe ()
+      "Hide minibuffer in Helm session if we use the header line as input field."
+      (when (with-helm-buffer helm-echo-input-in-header-line)
+        (let ((ov (make-overlay (point-min) (point-max) nil nil t)))
+          (overlay-put ov 'window (selected-window))
+          (overlay-put ov 'face
+                       (let ((bg-color (face-background 'default nil)))
+                         `(:background ,bg-color :foreground ,bg-color)))
+          (setq-local cursor-type nil))))
 
-    (ido-mode +1)
-    (ido-vertical-mode +1)))
-(use-package ido-completing-read+
-  :ensure t
-  :after ido
-  :config
-  (ido-ubiquitous-mode +1))
-(use-package ido-vertical-mode
-  :ensure t
-  :after ido
-  :config
-  (ido-vertical-mode +1))
-(use-package flx
-  :defer t
-  :ensure t)
-(use-package flx-ido
-  :ensure t
-  :after (ido flx)
-  :config (flx-ido-mode +1))
+    (setq helm-move-to-line-cycle-in-source t
+          helm-ff-search-library-in-sexp t
+          helm-scroll-amount 8
+          helm-ff-file-name-history-use-recentf t
+          helm-echo-input-in-header-line t
 
-(use-package counsel
-  :ensure t)
-(use-package ivy
-  :ensure t
-  :diminish ivy-mode
-  :config
-  (progn
-    (setq ivy-use-virtual-buffers t)
-    (setq enable-recursive-minibuffers t)
-    (setq ivy-count-format "[%d / %d] ")
-    (ivy-mode +1)
-    (setq ivy-re-builders-alist
-          '((counsel-M-x . ivy--regex-fuzzy)
-            (counsel-find-file . ivy--regex-fuzzy)
-            (t . ivy--regex-plus)))
+          helm-buffers-fuzzy-matching t
+          helm-recentf-fuzzy-match t
+          helm-locate-fuzzy-match t
+          helm-M-x-fuzzy-match t
+          helm-semantic-fuzzy-match t
+          helm-imenu-fuzzy-match t
+          helm-apropos-fuzzy-match t
+          helm-lisp-fuzzy-completion t
+          helm-session-fuzzy-match t
+          helm-etags-fuzzy-match t
+          helm-mode-fuzzy-match t
+          helm-completion-in-region-fuzzy-match t
+          helm-candidate-number-limit 100
+
+          helm-autoresize-min-height 24
+          helm-autoresize-max-height 24)
+
+    (add-hook 'helm-minibuffer-set-up-hook #'helm-hide-minibuffer-maybe)
+
+    (global-unset-key (kbd "C-x c"))
+
+    (mode-keys
+     helm-map
+     ("C-i" . #'helm-execute-persistent-action) ; make TAB work in terminal
+     ("C-z" . #'helm-select-action))
+
     (global-keys
-      ("M-x" . 'counsel-M-x)
-      ("C-c M-x" . 'execute-extended-command)
-      ("C-x C-f" . 'counsel-find-file))))
+     ("C-c h" . #'helm-command-prefix)
+     ("M-x" . #'helm-M-x)
+     ("C-x C-f" . #'helm-find-files)
+     ("M-s o" . #'helm-occur))
+
+    (helm-autoresize-mode +1)
+    (helm-mode +1)))
+
+(use-package helm-projectile
+  :ensure t
+  :after (helm projectile)
+  :hook (after-init . helm-projectile-on)
+  :commands (helm-projectile)
+  :init (prefixed-key "pp" #'helm-projectile))
+
+(use-package helm-descbinds
+  :ensure t
+  :after helm
+  :hook (after-init . helm-descbinds-mode))
+
+(use-package helm-ag
+  :ensure t
+  :after helm)
 
 (use-package helper-functions
   :demand t)
@@ -211,17 +227,20 @@ _<right>_ _l_: windmove-right	_d_: tighten	_q_: quit"
   :config
   (progn
     (prefixed-keys
-     ("bb" . 'switch-to-buffer)
+     ("bb" . #'helm-mini)
      ("bd" . 'kill-this-buffer)
      ("C-i" . #'crux-switch-to-previous-buffer)
      ("bn" . 'next-buffer)
      ("bp" . 'previous-buffer)
-     ("ff" . 'counsel-find-file)
+     ("ff" . #'helm-find-files)
      ("wd" . 'delete-window)
      ("wD" . 'delete-other-window)
      ("wh" . 'split-window-horizontally)
      ("wv" . 'split-window-vertically)
      ("ww" . #'windows-hydra/body))
+
+    (prefixed-keys
+     ("ry" . #'helm-show-kill-ring))
 
     (global-keys
      ("C-S-j" . #'join-next-line)
@@ -723,8 +742,7 @@ Start `ielm' if it's not already running."
     (defun eval-expr-minibuffer-setup ()
       (set-syntax-table emacs-lisp-mode-syntax-table)
       (set (make-local-variable 'eldoc-documentation-function) #'elisp-eldoc-documentation-function)
-      (eldoc-mode +1)
-      (local-set-key (kbd "<tab>") #'counsel-el))))
+      (eldoc-mode +1))))
 
 (global-key "M-:" 'pp-eval-expression)
 
@@ -1061,14 +1079,22 @@ Start `ielm' if it's not already running."
     (which-function-mode +1)
     (setq which-func-unknown "")))
 
-(prefixed-key "tt" 'counsel-imenu)
+(prefixed-key "tt" #'helm-semantic-or-imenu)
 
 (use-package ag
   :ensure t
   :defer 5)
 
-(prefixed-key "ss" 'swiper)
-(key-chord-define-global "??" 'swiper)
+;;(prefixed-key "ss" 'swiper)
+;;(key-chord-define-global "??" 'swiper)
+(use-package swiper-helm
+  :ensure t
+  :after helm
+  :commands swiper-helm
+  :init
+  (progn
+    (prefixed-key "ss" #'swiper-helm)
+    (key-chord-define-global "??" #'swiper-helm)))
 
 (use-package anzu
   :ensure t
