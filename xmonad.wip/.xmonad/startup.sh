@@ -49,5 +49,5 @@ if [ -x "$(command -v synclient)" ]; then
 fi
 
 if [ -x "$(command -v xautolock)" ]; then
-  xautolock -time 3 -locker "dm-tool lock" &
+  xautolock -time 3 -locker "xsecurelock" &
 fi

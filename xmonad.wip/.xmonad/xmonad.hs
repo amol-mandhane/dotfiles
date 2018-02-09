@@ -191,7 +191,7 @@ myKeys = [
   -- Launchers
   ("M-<Return>", spawn "rofi -show run"),
   ("M-f", spawn "nemo --no-desktop"),
-  ("M-C-<Delete>" , spawn "dm-tool lock"),
+  ("M-C-<Delete>" , spawn "xautolock -locknow"),
 
   -- Keyboard Volume buttons
   ("<XF86AudioMute>", spawn "amixer -q sset Master toggle"),
