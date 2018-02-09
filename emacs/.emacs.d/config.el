@@ -39,7 +39,7 @@
 ;; (package-initialize)
 (setq package-archives
       '(("gnu" . "https://elpa.gnu.org/packages/")
-        ("org" . "http://orgmode.org/elpa/")
+        ("org" . "https://orgmode.org/elpa/")
         ("melpa-stable" . "https://stable.melpa.org/packages/")
         ;; ("marmalade" . "http://marmalade-repo.org/packages/")
         ("melpa" . "https://melpa.org/packages/")))
@@ -130,7 +130,10 @@
           helm-candidate-number-limit 100
 
           helm-autoresize-min-height 24
-          helm-autoresize-max-height 24)
+          helm-autoresize-max-height 24
+
+          helm-quick-update t
+          helm-ff-skip-boring-files t)
 
     (add-hook 'helm-minibuffer-set-up-hook #'helm-hide-minibuffer-maybe)
 
@@ -176,11 +179,6 @@
 
 (use-package abbrev
   :diminish abbrev-mode)
-
-;; (global-hl-line-mode t)
-(use-package hl-line
-  :config
-  (enable-minor-mode-globally hl-line-mode))
 
 (setq delete-old-versions -1)
 (setq version-control t)
@@ -757,10 +755,10 @@ Start `ielm' if it's not already running."
   (progn
     (defun go-mode-setup ()
       (add-hook 'before-save-hook #'gofmt-before-save)
+      (setq-local tab-width 4)
       (setq gofmt-command "goimports")
       (go-guru-hl-identifier-mode +1))
-    (add-hook 'go-mode-hook #'go-mode-setup)
-    (mode-key go-mode-map "M-." #'godef-jump)))
+    (add-hook 'go-mode-hook #'go-mode-setup)))
 
 (use-package company-go
   :ensure t
@@ -774,27 +772,15 @@ Start `ielm' if it's not already running."
 (use-package flycheck-gometalinter
   :ensure t
   :after (flycheck go-mode)
-  :commands flycheck-gometalinter-setup
-  :config
-  (add-hook 'go-mode-hook #'flycheck-gometalinter-setup))
+  :hook (go-mode . flycheck-gometalinter-setup))
 
 (use-package go-eldoc
   :ensure t
-  :commands go-eldoc-setup
-  :init
-  (add-hook 'go-mode-hook #'go-eldoc-setup))
-
-(use-package go-guru
-  :ensure t
-  :after go-mode
-  :commands go-guru-hl-identifier-mode
-  :init
-  (add-hook 'go-mode-hook #'go-guru-hl-identifier-mode))
+  :hook (go-mode . go-eldoc-setup))
 
 (use-package go-rename
-  :ensure t
+  :if (executable-find "gorename")
   :commands go-rename
-  :disabled t
   :config
   (mode-key go-mode-map "C-c r" #'go-rename))
 
@@ -812,19 +798,71 @@ Start `ielm' if it's not already running."
                ("C-c fi" . #'haskell-add-import)
                ("C-c ff" . #'haskell-mode-stylish-buffer))))
 
-(use-package hlint-refactor
+(use-package hindent
   :ensure t
-  :commands hlint-refactor-mode
-  :init
-  (add-hook 'haskell-mode-hook #'hlint-refactor-mode))
+  :if (executable-find "hindent")
+  :hook (haskell-mode . hindent-mode)
+  :config
+  ;; reformat the buffer using hindent on save
+  (setq hindent-reformat-buffer-on-save t))
 
 (use-package intero
   :ensure t
-  :commands intero-mode
-  :init
-  (add-hook 'haskell-mode-hook #'intero-mode))
+  :hook (haskell-mode . intero-mode))
 
 (add-to-list 'flycheck-ghc-search-path (expand-file-name "~/.xmonad/lib"))
+
+;; Copied from emacs web config.
+(use-package js2-mode
+  :ensure t
+  :mode
+  ("\\.js$" . js2-mode)
+  ("\\.json$" . js2-jsx-mode)
+  :config
+  (progn
+    (custom-set-variables '(js2-strict-inconsistent-return-warning nil))
+    (custom-set-variables '(js2-strict-missing-semi-warning nil))
+
+    (setq js-indent-level 2)
+    (setq js2-indent-level 2)
+    (setq js2-basic-offset 2)
+
+    (mode-keys
+     js2-mode-map
+     ("C-x C-e" . #'js-send-last-sexp)
+     ("C-M-x" . #'js-send-last-sexp-and-go)
+     ("C-c C-b" . #'js-send-buffer-and-go)
+     ("C-c C-l" . #'js-load-file-and-go))))
+
+;; tern :- IDE like features for javascript and completion
+;; http://ternjs.net/doc/manual.html#emacs
+(use-package tern
+  :ensure t
+  :hook (js2-mode . tern-mode))
+
+;; company backend for tern
+;; http://ternjs.net/doc/manual.html#emacs
+(use-package company-tern
+  :ensure t
+  :after (tern js2-mode)
+  :commands company-tern
+  :init
+  (add-to-list 'company-backends 'company-tern))
+
+;; Run a JavaScript interpreter in an inferior process window
+;; https://github.com/redguardtoo/js-comint
+(use-package js-comint
+  :ensure t
+  :config
+  (setq inferior-js-program-command "node"))
+
+;; js2-refactor :- refactoring options for emacs
+;; https://github.com/magnars/js2-refactor.el
+(use-package js2-refactor
+  :ensure t
+  :hook (js2-mode . js2-refactor-mode)
+  :config
+  (js2r-add-keybindings-with-prefix "C-c j r"))
 
 (use-package meghanada
   :ensure t
@@ -1201,17 +1239,11 @@ Start `ielm' if it's not already running."
   :config
   (progn
     (global-linum-mode)
-    (setq-default linum-format " %4d ")
+    (setq-default linum-format " %4d ")))
 
-    (set-face-attribute
-     'linum
-     nil
-     ;; :background "#282a2e"
-     :bold nil
-     :weight 'normal
-     :height 0.9
-     :slant 'normal
-     :box nil)))
+(use-package hlinum
+  :ensure t
+  :hook (after-init . hlinum-activate))
 
 (load-file "~/.emacs.machine.el")
 
