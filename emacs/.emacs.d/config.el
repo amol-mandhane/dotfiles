@@ -64,7 +64,7 @@
   :config
   (setq which-key-sort-order 'which-key-key-order-alpha
         which-key-side-window-max-width 0.33
-        which-key-idle-delay 0.05))
+        which-key-idle-delay 0.2))
 
 (use-package hydra
   :ensure t)
@@ -1146,27 +1146,17 @@ Start `ielm' if it's not already running."
      ("srr" . #'anzu-query-replace-regexp)
      ("sr." . #'anzu-query-replace-at-cursor-thing))))
 
-(use-package iedit
-  :commands iedit-dwim
-  :init
-  (progn
-    (defun iedit-dwim (arg)
-      "Starts iedit but uses \\[narrow-to-defun] to limit its scope."
-      (interactive "P")
-      (if arg
-          (iedit-mode)
-        (save-excursion
-          (save-restriction
-            (widen)
-            ;; this function determines the scope of `iedit-start'.
-            (if iedit-mode
-                (iedit-done)
-              ;; `current-word' can of course be replaced by other
-              ;; functions.
-              (narrow-to-defun)
-              (iedit-start (current-word) (point-min) (point-max)))))))
+(use-package wgrep
+  :ensure t
+  :defer 5)
 
-    (prefixed-key "sri" #'iedit-dwim)))
+(use-package wgrep-ag
+  :ensure t
+  :defer 5)
+
+(use-package iedit
+  :commands iedit-mode
+  :init (global-key "C-'" #'iedit-mode))
 
 (use-package evil
   :ensure t
