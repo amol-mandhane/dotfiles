@@ -322,57 +322,49 @@ _<right>_ _l_: windmove-right	_d_: tighten	_q_: quit"
 (use-package hungry-delete
   :ensure t
   :diminish hungry-delete-mode
-  :config
-  (global-hungry-delete-mode +1))
+  :hook (after-init . global-hungry-delete-mode))
 
 (use-package company
   :ensure t
+  :hook (after-init . global-company-mode)
   :config
-  (progn
-    (global-company-mode t)
-    (setq company-show-numbers t)))
+  (progn (setq company-show-numbers t)))
 
 (use-package company-quickhelp
   :ensure t
   :after company
-  :config (company-quickhelp-mode +1))
+  :hook (after-init . company-quickhelp-mode))
 
 (use-package eldoc
   :ensure t
   :diminish eldoc-mode
-  :config
-  (global-eldoc-mode +1))
+  :hook (after-init . global-eldoc-mode))
 
 (use-package flycheck
   :ensure t
   :diminish flycheck-mode
+  :hook (after-init . global-flycheck-mode)
   :init
-  (setq flycheck-keymap-prefix (kbd (concat +keybinding/mnemonic-prefix+ " e")))
-  :config
-  (progn
-    (global-flycheck-mode t)))
+  (setq flycheck-keymap-prefix (kbd (concat +keybinding/mnemonic-prefix+ " e"))))
 
 (use-package flycheck-pos-tip
   :ensure t
   :after flycheck
-  :config
-  (flycheck-pos-tip-mode +1))
+  :hook (after-init . flycheck-pos-tip-mode))
 
 (use-package flyspell
   :ensure t
-  :commands (flyspell-mode flyspell-prog-mode)
   :diminish (flyspell-mode . " ")
+  :hook (text-mode . flyspell-mode)
+  :hook (prog-mode . flyspell-prog-mode)
   :init
   (progn
     (setq ispell-program-name (locate-file "aspell" exec-path))
-    (setq ispell-list-command "--list")
-    (add-hook 'text-mode-hook #'(lambda () (flyspell-mode +1)))
-    (add-hook 'prog-mode-hook #'flyspell-prog-mode)))
+    (setq ispell-list-command "--list")))
 
 (use-package elec-pair
-  :commands (electric-pair-mode electric-pair-local-mode)
-  :init
-  (add-hook 'text-mode-hook #'(lambda () (electric-pair-local-mode +1))))
+  :commands electric-pair-mode
+  :hook (text-mode . electric-pair-local-mode))
 
 (defmacro def-pair (pair)
   "Creates function sp/wrap-with-<PAIR>."
@@ -392,65 +384,64 @@ _<right>_ _l_: windmove-right	_d_: tighten	_q_: quit"
 (use-package smartparens-config
   :ensure smartparens
   :diminish (smartparens-mode . " ")
+  :hook (prog-mode . smartparens-mode)
+  :hook (minibuffer-setup . smartparens-mode)
   :config
-  (add-hook 'prog-mode-hook #'(lambda () (smartparens-mode +1)))
+  (progn
+    (setq sp-ignore-modes-list (delete 'minibuffer-inactive-mode sp-ignore-modes-list))
+    (sp-local-pair 'minibuffer-inactive-mode "'" nil :actions nil)
 
-  ;; Setup smartparens in minibuffer
-  (add-hook 'minibuffer-setup-hook #'(lambda () (smartparens-mode +1)))
-  (setq sp-ignore-modes-list (delete 'minibuffer-inactive-mode sp-ignore-modes-list))
-  (sp-local-pair 'minibuffer-inactive-mode "'" nil :actions nil)
+    (mode-keys smartparens-mode-map
+               ;; Strict mode toggle
+               ("C-c C-s" . 'smartparens-strict-mode)
+               ;; Navigation
+               ("C-M-a" . 'sp-beginning-of-sexp)
+               ("C-M-e" . 'sp-end-of-sexp)
+               ("C-M-f" . 'sp-forward-sexp)
+               ("C-M-b" . 'sp-backward-sexp)
 
-  (mode-keys smartparens-mode-map
-             ;; Strict mode toggle
-             ("C-c C-s" . 'smartparens-strict-mode)
-             ;; Navigation
-             ("C-M-a" . 'sp-beginning-of-sexp)
-             ("C-M-e" . 'sp-end-of-sexp)
-             ("C-M-f" . 'sp-forward-sexp)
-             ("C-M-b" . 'sp-backward-sexp)
+               ;; Traversal
+               ("C-<down>" . 'sp-down-sexp)
+               ("C-<up>" . 'sp-up-sexp)
+               ("M-<down>" . 'sp-backward-down-sexp)
+               ("M-<up>" . 'sp-backward-up-sexp)
+               ("C-M-n" . 'sp-next-sexp)
+               ("C-M-p" . 'sp-previous-sexp)
+               ("C-S-f" . 'sp-forward-symbol)
+               ("C-S-b" . 'sp-backward-symbol)
 
-             ;; Traversal
-             ("C-<down>" . 'sp-down-sexp)
-             ("C-<up>" . 'sp-up-sexp)
-             ("M-<down>" . 'sp-backward-down-sexp)
-             ("M-<up>" . 'sp-backward-up-sexp)
-             ("C-M-n" . 'sp-next-sexp)
-             ("C-M-p" . 'sp-previous-sexp)
-             ("C-S-f" . 'sp-forward-symbol)
-             ("C-S-b" . 'sp-backward-symbol)
+               ;; AST re-arrange.
+               ("C-)" . 'sp-forward-slurp-sexp)
+               ;; ("C-)" . 'sp-slurp-hybrid-sexp)
+               ("C-}" . 'sp-forward-barf-sexp)
+               ("C-(" . 'sp-backward-slurp-sexp)
+               ("C-{" . 'sp-backward-barf-sexp)
 
-             ;; AST re-arrange.
-             ("C-)" . 'sp-forward-slurp-sexp)
-             ;; ("C-)" . 'sp-slurp-hybrid-sexp)
-             ("C-}" . 'sp-forward-barf-sexp)
-             ("C-(" . 'sp-backward-slurp-sexp)
-             ("C-{" . 'sp-backward-barf-sexp)
+               ;; Killing
+               ("C-M-k" . 'sp-kill-sexp)
+               ("C-k" . 'sp-kill-hybrid-sexp)
+               ("M-k" . 'sp-backward-kill-sexp)
+               ("C-M-<up>" . 'sp-raise-sexp)
 
-             ;; Killing
-             ("C-M-k" . 'sp-kill-sexp)
-             ("C-k" . 'sp-kill-hybrid-sexp)
-             ("M-k" . 'sp-backward-kill-sexp)
-             ("C-M-<up>" . 'sp-raise-sexp)
+               ;; Unknown
+               ;; ("C-M-t" . sp-transpose-sexp)
+               ;; ("C-M-w" . sp-copy-sexp)
+               ;; ("C-M-d" . delete-sexp)
+               ;; ("M-<backspace>" . backward-kill-word)
+               ;; ("C-<backspace>" . sp-backward-kill-word)
+               ;; ([remap sp-backward-kill-word] . backward-kill-word)
+               ;; ("M-[" . sp-backward-unwrap-sexp)
+               ;; ("M-]" . sp-unwrap-sexp)
+               ;; ("C-x C-t" . sp-transpose-hybrid-sexp)
 
-             ;; Unknown
-             ;; ("C-M-t" . sp-transpose-sexp)
-             ;; ("C-M-w" . sp-copy-sexp)
-             ;; ("C-M-d" . delete-sexp)
-             ;; ("M-<backspace>" . backward-kill-word)
-             ;; ("C-<backspace>" . sp-backward-kill-word)
-             ;; ([remap sp-backward-kill-word] . backward-kill-word)
-             ;; ("M-[" . sp-backward-unwrap-sexp)
-             ;; ("M-]" . sp-unwrap-sexp)
-             ;; ("C-x C-t" . sp-transpose-hybrid-sexp)
-
-             ;; Wrap
-             ;; ("C-c C-w (" . sp/wrap-with-parens)
-             ;; ("C-c C-w [" . sp/wrap-with-brackets)
-             ;; ("C-c C-w {" . sp/wrap-with-braces)
-             ;; ("C-c C-w '" . sp/wrap-with-single-quotes)
-             ;; ("C-c C-w \"" . sp/wrap-with-double-quotes)
-             ;; ("C-c C-w `" . sp/wrap-with-back-quotes)
-             ))
+               ;; Wrap
+               ("C-c C-w (" . #'sp/wrap-with-parens)
+               ("C-c C-w [" . #'sp/wrap-with-brackets)
+               ("C-c C-w {" . #'sp/wrap-with-braces)
+               ("C-c C-w '" . #'sp/wrap-with-single-quotes)
+               ("C-c C-w \"" . #'sp/wrap-with-double-quotes)
+               ("C-c C-w `" . #'sp/wrap-with-back-quotes)
+               )))
 
 (use-package electric
   :config
@@ -475,8 +466,7 @@ _<right>_ _l_: windmove-right	_d_: tighten	_q_: quit"
 
 (use-package window-numbering
   :ensure t
-  :config
-  (window-numbering-mode +1))
+  :hook (after-init . window-numbering-mode))
 
 (use-package savehist
   :hook (after-init . savehist-mode)
@@ -499,15 +489,10 @@ _<right>_ _l_: windmove-right	_d_: tighten	_q_: quit"
 
 (use-package magit
   :ensure t
-  :config
+  :commands magit-status
+  :init
   (progn
-    (prefixed-key "gs" 'magit-status)))
-
-(use-package monky
-  :ensure t
-  :config
-  (progn
-    (prefixed-key "gh" 'monky-status)))
+    (prefixed-key "gs" #'magit-status)))
 
 (use-package diff-hl
   :ensure t
@@ -517,9 +502,18 @@ _<right>_ _l_: windmove-right	_d_: tighten	_q_: quit"
     (enable-minor-mode-globally diff-hl-flydiff-mode)
     (add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh)))
 
+(>= emacs-major-version 26
+    nil
+    (defalias 'smerge-keep-upper 'smerge-keep-mine)
+    (defalias 'smerge-keep-lower 'smerge-keep-other)
+    (defalias 'smerge-diff-base-upper 'smerge-diff-base-mine)
+    (defalias 'smerge-diff-upper-lower 'smerge-diff-mine-other)
+    (defalias 'smerge-diff-base-lower 'smerge-diff-base-other))
+
 (use-package smerge-mode
   :after hydra
   :after keybinding
+  :commands smerge-mode
   :config
   (progn
     (defhydra hydra-smerge
@@ -559,16 +553,15 @@ _p_rev	_u_pper	_E_diff	_=_: upper-lower	_RET_: current
   :config
   (progn
     (projectile-mode +1)
-    (setq projectile-completion-system 'ivy)
+    (setq projectile-completion-system 'helm)
     (setq projectile-mode-line '(:eval (format " P[%s]" (projectile-project-name))))))
 
 (use-package yasnippet
   :ensure t
   :diminish yas-minor-mode
+  :hook (after-init . yas-global-mode)
   :config
-  (progn
-    (yas-global-mode +1)
-    (prefixed-key "is" #'yas-expand)))
+  (prefixed-key "is" #'yas-expand))
 
 (use-package lsp-mode
   :load-path "lsp/lsp-mode"
@@ -601,10 +594,13 @@ _p_rev	_u_pper	_E_diff	_=_: upper-lower	_RET_: current
 (use-package company-irony
   :ensure t
   :commands company-irony
-  :after company
-  :after irony
+  :after (company irony)
   :init
-  (add-to-list 'company-backends 'company-irony))
+  (add-to-list 'company-backends 'company-irony)
+  (add-hook
+   'c++-mode-hook
+   #'(lambda ()
+       (setq-local company-backends (delete 'company-clang company-backends)))))
 
 (use-package company-irony-c-headers
   :ensure t
@@ -614,7 +610,6 @@ _p_rev	_u_pper	_E_diff	_=_: upper-lower	_RET_: current
   (add-to-list 'company-backends 'company-irony-c-headers))
 
 ;; Company-clang doesn't work well with the work setup.
-(setq company-backends (delete 'company-clang company-backends))
 
 (use-package flycheck-irony
   :ensure t
@@ -650,8 +645,7 @@ _p_rev	_u_pper	_E_diff	_=_: upper-lower	_RET_: current
 
 (use-package company-rtags
   :disabled
-  :after company
-  :after rtags
+  :after (company rtags)
   :config
   (add-to-list 'company-backends 'company-rtags))
 
@@ -844,7 +838,7 @@ Start `ielm' if it's not already running."
 ;; http://ternjs.net/doc/manual.html#emacs
 (use-package company-tern
   :ensure t
-  :after (tern js2-mode)
+  :after (tern js2-mode company)
   :commands company-tern
   :init
   (add-to-list 'company-backends 'company-tern))
@@ -901,6 +895,7 @@ Start `ielm' if it's not already running."
 
 (use-package company-anaconda
   :ensure t
+  :after (anaconda-mode company)
   :commands company-anaconda
   :init
   (add-to-list 'company-backends 'company-anaconda))
@@ -1080,7 +1075,7 @@ Start `ielm' if it's not already running."
   :defer t)
 
 (use-package semantic
-  :commands semantic-mode
+  :hook (prog-mode . semantic-mode)
   :init
   (progn
     (setq semantic-default-submodes
@@ -1101,14 +1096,7 @@ Start `ielm' if it's not already running."
             global-semantic-idle-breadcrumbs-mode
             ;; Switch to recently changed tags with `semantic-mrub-switch-tags',
             ;; or `C-x B'
-            global-semantic-mru-bookmark-mode))
-
-    (add-hook 'emacs-lisp-mode-hook 'semantic-mode)
-    (add-hook 'python-mode-hook 'semantic-mode)
-    (add-hook 'java-mode-hook 'semantic-mode)
-    (add-hook 'c-mode-hook 'semantic-mode)
-    ;; etc etc
-    (add-hook 'prog-mode-hook 'semantic-mode)))
+            global-semantic-mru-bookmark-mode))))
 
 (use-package which-func
   :disabled
@@ -1187,8 +1175,7 @@ Start `ielm' if it's not already running."
       nil
       #'(lambda () (shell-command "killall gpg-agent")))))
 
-(use-package erc-config
-  :demand t)
+(use-package erc-config)
   ;;:hook (after-init . erc-autoconnect-servers))
 
 (use-package elfeed
