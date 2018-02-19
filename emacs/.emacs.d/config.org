@@ -1600,6 +1600,94 @@ Don't use evil mode for general purpose. Current use of evil mode is for vim lik
     :demand t)
     ;;:hook (after-init . erc-autoconnect-servers))
 #+END_SRC
+* elfeed
+#+BEGIN_SRC emacs-lisp
+  (use-package elfeed
+    :ensure t
+    :config
+    (progn
+      ;; Functions to support syncing .elfeed between machines
+      ;; makes sure elfeed reads index from disk before launching
+      (defun elfeed-load-db-and-open ()
+        "Wrapper to load the elfeed db from disk before opening"
+        (interactive)
+        (elfeed-db-load)
+        (elfeed)
+        (elfeed-search-update--force))
+
+      ;;write to disk when quiting
+      (defun elfeed-save-db-and-bury ()
+        "Wrapper to save the elfeed db to disk before burying buffer"
+        (interactive)
+        (elfeed-db-save)
+        (quit-window))
+
+      (defun elfeed--toggle-tag-in-filter (filter tag)
+        "Toggles the tag in elfeed search filter."
+        (if (s-contains? tag filter)
+            (s-replace "  " " " (s-replace tag "" filter))
+          (concat filter " " tag)))
+
+      (defun elfeed-filter-toggle-tag (tag)
+        "Toggle the tag in active filter."
+        (elfeed-search-set-filter (elfeed--toggle-tag-in-filter elfeed-search-filter tag)))
+
+      (setq elfeed-db-directory "~/.elfeed")
+
+      (defhydra elfeed-hydra nil
+        "
+  ^Tags^			^Duration^		^Actions^
+  ^^^^^^^---------------------------------------------------------------
+  _e_macs			_6_: Last 6 months	_U_: Mark as Unread
+  _c_omics			_T_: Today		_R_: Mark as Read
+  _m_achine-learning 	_w_: Last week		_b_: Open in browser
+  _s_cience
+  _u_nread
+  "
+        ("e" (elfeed-filter-toggle-tag "+emacs"))
+        ("u" (elfeed-filter-toggle-tag "+unread"))
+        ("c" (elfeed-filter-toggle-tag "+comics"))
+        ("m" (elfeed-filter-toggle-tag "+ml"))
+        ("s" (elfeed-filter-toggle-tag "+science"))
+        ("6" (elfeed-filter-toggle-tag "@6-months-ago"))
+        ("T" (elfeed-filter-toggle-tag "@1-day-ago"))
+        ("w" (elfeed-filter-toggle-tag "@1-week-ago"))
+        ("U" (elfeed-search-tag-all-unread))
+        ("R" (elfeed-search-untag-all-unread))
+        ("b" elfeed-search-browse-url)
+        ("n" next-line)
+        ("<down>" next-line)
+        ("p" previous-line)
+        ("<up>" previous-line)
+        ("q" (message "Exit from Elfeed Hydra.") :exit t))
+
+      (mode-keys
+       elfeed-search-mode-map
+       ("m" . #'elfeed-toggle-star)
+       ("M" . #'elfeed-toggle-star)
+       ("h" . #'elfeed-hydra/body)
+       ("q" . #'elfeed-save-db-and-bury))
+
+      (global-key "<f5>" #'elfeed-load-db-and-open)))
+
+  (use-package elfeed-org
+    :ensure t
+    :config
+    (progn
+      (defun elfeed-org-find-file ()
+        "Open the elfeed-org file."
+        (interactive)
+        (find-file (car rmh-elfeed-org-files)))
+
+      (setq rmh-elfeed-org-files '("~/.elfeed/feed.org"))
+      (elfeed-org)
+      (prefixed-key "fe" #'elfeed-org-find-file)))
+
+  (use-package elfeed-goodies
+    :ensure t
+    :config
+    (elfeed-goodies/setup))
+#+END_SRC
 * TODO Gnus
 * Theming
 ** Helper packages
@@ -1611,11 +1699,11 @@ Don't use evil mode for general purpose. Current use of evil mode is for vim lik
 
 ** Color theme and font
 #+BEGIN_SRC emacs-lisp
-  (use-package atom-one-dark-theme
+  (use-package zenburn-theme
     :ensure t
     :config
     (progn
-      (load-theme 'atom-one-dark t)
+      (load-theme 'zenburn t)
       (set-frame-font "Inconsolata-18")))
     ;; (setq default-frame-alist '((font . "Inconsolata-18")))))
 #+END_SRC
