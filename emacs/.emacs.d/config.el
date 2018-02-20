@@ -383,6 +383,8 @@ _<right>_ _l_: windmove-right	_d_: tighten	_q_: quit"
 
 (use-package smartparens-config
   :ensure smartparens
+  :demand t
+  :commands (smartparens-strict-mode)
   :diminish (smartparens-mode . " ")
   :hook (prog-mode . smartparens-mode)
   :hook (minibuffer-setup . smartparens-mode)
@@ -393,7 +395,7 @@ _<right>_ _l_: windmove-right	_d_: tighten	_q_: quit"
 
     (mode-keys smartparens-mode-map
                ;; Strict mode toggle
-               ("C-c C-s" . 'smartparens-strict-mode)
+               ("C-c C-s" . #'smartparens-strict-mode)
                ;; Navigation
                ("C-M-a" . 'sp-beginning-of-sexp)
                ("C-M-e" . 'sp-end-of-sexp)
@@ -655,7 +657,7 @@ _p_rev	_u_pper	_E_diff	_=_: upper-lower	_RET_: current
 (add-hook 'emacs-lisp-mode-hook #'(lambda () (run-hooks 'lisp-family-mode-hook)))
 (add-hook 'lisp-mode-hook #'(lambda () (run-hooks 'lisp-family-mode-hook)))
 
-(add-hook 'lisp-family-mode-hook 'smartparens-strict-mode)
+(add-hook 'lisp-family-mode-hook #'smartparens-strict-mode)
 
 (use-package redshank
   :ensure t
@@ -1290,9 +1292,10 @@ _u_nread
 
 (use-package helium-modeline
   :demand t
-  ;;:after (powerline let-alist projectile flycheck window-numbering)
+  :after (powerline let-alist projectile flycheck window-numbering)
+  :hook (window-setup . powerline-helium-theme)
   :config
-  (powerline-helium-theme))
+  (window-numbering-clear-mode-line))
 
 (use-package theme-enhancement
   :config
