@@ -60,11 +60,11 @@
 (use-package which-key
   :ensure t
   :diminish which-key-mode
-  :init (which-key-mode t)
   :config
+  (which-key-mode +1)
   (setq which-key-sort-order 'which-key-key-order-alpha
         which-key-side-window-max-width 0.33
-        which-key-idle-delay 0.2))
+        which-key-idle-delay 0.5))
 
 (use-package hydra
   :ensure t)
@@ -88,9 +88,10 @@
 
 (use-package key-chord
   :ensure t
-  :init
-  (progn (setq key-chord-two-keys-delay 0.05))
-  :config (key-chord-mode +1))
+  :config
+  (progn
+    (key-chord-mode +1)
+    (setq key-chord-two-keys-delay 0.05)))
 
 (use-package helm
   :ensure t
@@ -162,12 +163,11 @@
 
 (use-package helm-descbinds
   :ensure t
-  :after helm
   :hook (after-init . helm-descbinds-mode))
 
 (use-package helm-ag
   :ensure t
-  :after helm)
+  :commands (helm-ag))
 
 (use-package helper-functions
   :demand t)
@@ -327,12 +327,14 @@ _<right>_ _l_: windmove-right	_d_: tighten	_q_: quit"
 (use-package company
   :ensure t
   :hook (after-init . global-company-mode)
+  :defines (company-dabbrev-downcase)
   :config
-  (progn (setq company-show-numbers t)))
+  (progn
+    (setq company-show-numbers t)
+    (setq company-dabbrev-downcase nil)))
 
 (use-package company-quickhelp
   :ensure t
-  :after company
   :hook (after-init . company-quickhelp-mode))
 
 (use-package eldoc
@@ -349,7 +351,6 @@ _<right>_ _l_: windmove-right	_d_: tighten	_q_: quit"
 
 (use-package flycheck-pos-tip
   :ensure t
-  :after flycheck
   :hook (after-init . flycheck-pos-tip-mode))
 
 (use-package flyspell
@@ -513,8 +514,7 @@ _<right>_ _l_: windmove-right	_d_: tighten	_q_: quit"
     (defalias 'smerge-diff-base-lower 'smerge-diff-base-other))
 
 (use-package smerge-mode
-  :after hydra
-  :after keybinding
+  :after (hydra keybinding)
   :commands smerge-mode
   :config
   (progn
@@ -1042,6 +1042,12 @@ Start `ielm' if it's not already running."
 (setq org-refile-use-outline-path t)
 
 (diminish 'org-src-mode " ")
+(add-hook
+ 'org-src-mode-hook
+ #'(lambda ()
+     (setq-local
+      flycheck-disabled-checkers
+      (cons 'emacs-lisp-checkdoc flycheck-disabled-checkers))))
 
 (defadvice org-capture-finalize
     (after delete-capture-frame activate)
@@ -1291,11 +1297,8 @@ _u_nread
   (sml/setup))
 
 (use-package helium-modeline
-  :demand t
-  :after (powerline let-alist projectile flycheck window-numbering)
-  :hook (window-setup . powerline-helium-theme)
-  :config
-  (window-numbering-clear-mode-line))
+  ;; :requires (powerline let-alist projectile flycheck window-numbering)
+  :hook (window-setup . powerline-helium-theme))
 
 (use-package theme-enhancement
   :config

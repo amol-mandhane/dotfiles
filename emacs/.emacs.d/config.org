@@ -82,11 +82,11 @@
   (use-package which-key
     :ensure t
     :diminish which-key-mode
-    :init (which-key-mode t)
     :config
+    (which-key-mode +1)
     (setq which-key-sort-order 'which-key-key-order-alpha
           which-key-side-window-max-width 0.33
-          which-key-idle-delay 0.2))
+          which-key-idle-delay 0.5))
 #+END_SRC
 ** Hydra
 #+BEGIN_SRC emacs-lisp
@@ -119,9 +119,10 @@ creates a framework like that using ~bind-key~.
 #+BEGIN_SRC emacs-lisp
   (use-package key-chord
     :ensure t
-    :init
-    (progn (setq key-chord-two-keys-delay 0.05))
-    :config (key-chord-mode +1))
+    :config
+    (progn
+      (key-chord-mode +1)
+      (setq key-chord-two-keys-delay 0.05)))
 #+END_SRC
 * Interface framework
 Approach to evolve interface framework
@@ -133,11 +134,11 @@ Approach to evolve interface framework
 ** COMMENT IDO
 #+BEGIN_SRC emacs-lisp
   (use-package smex
-    :disabled t
+    :disabled
     :ensure t
     :defer t)
   (use-package ido
-    :disabled t
+    :disabled
     :ensure t
     :config
     (progn
@@ -155,13 +156,13 @@ Approach to evolve interface framework
       (ido-mode +1)
       (ido-vertical-mode +1)))
   (use-package ido-completing-read+
-    :disabled t
+    :disabled
     :ensure t
     :after ido
     :config
     (ido-ubiquitous-mode +1))
   (use-package ido-vertical-mode
-    :disabled t
+    :disabled
     :ensure t
     :after ido
     :config
@@ -170,7 +171,7 @@ Approach to evolve interface framework
     :defer t
     :ensure t)
   (use-package flx-ido
-    :disabled t
+    :disabled
     :ensure t
     :after (ido flx)
     :config (flx-ido-mode +1))
@@ -179,10 +180,10 @@ Approach to evolve interface framework
 ** COMMENT Ivy
 #+BEGIN_SRC emacs-lisp
   (use-package counsel
-    :disabled t
+    :disabled
     :ensure t)
   (use-package ivy
-    :disabled t
+    :disabled
     :ensure t
     :diminish ivy-mode
     :config
@@ -273,12 +274,11 @@ Approach to evolve interface framework
 
   (use-package helm-descbinds
     :ensure t
-    :after helm
     :hook (after-init . helm-descbinds-mode))
 
   (use-package helm-ag
     :ensure t
-    :after helm)
+    :commands (helm-ag))
 #+END_SRC
 * Basic setup
 ** Load helper functions
@@ -487,12 +487,14 @@ Fill column indicator for showing right ruler.
   (use-package company
     :ensure t
     :hook (after-init . global-company-mode)
+    :defines (company-dabbrev-downcase)
     :config
-    (progn (setq company-show-numbers t)))
+    (progn
+      (setq company-show-numbers t)
+      (setq company-dabbrev-downcase nil)))
 
   (use-package company-quickhelp
     :ensure t
-    :after company
     :hook (after-init . company-quickhelp-mode))
 #+END_SRC
 
@@ -517,7 +519,6 @@ Show errors in tooltip
 #+BEGIN_SRC emacs-lisp
   (use-package flycheck-pos-tip
     :ensure t
-    :after flycheck
     :hook (after-init . flycheck-pos-tip-mode))
 #+END_SRC
 * Spell Checking
@@ -725,8 +726,7 @@ Use ~C-x v~ prefixed commands for now.
       (defalias 'smerge-diff-base-lower 'smerge-diff-base-other))
 
   (use-package smerge-mode
-    :after hydra
-    :after keybinding
+    :after (hydra keybinding)
     :commands smerge-mode
     :config
     (progn
@@ -1393,6 +1393,12 @@ Intero works well with stack projects. But without stack, we still need other op
 *** Org source editing
 #+BEGIN_SRC emacs-lisp
   (diminish 'org-src-mode " ")
+  (add-hook
+   'org-src-mode-hook
+   #'(lambda ()
+       (setq-local
+        flycheck-disabled-checkers
+        (cons 'emacs-lisp-checkdoc flycheck-disabled-checkers))))
 #+END_SRC
 *** Org capture system-wide shortcut helper
 Copied from [[http://cestlaz.github.io/posts/using-emacs-24-capture-2][C'est la Z blog]].
@@ -1702,11 +1708,8 @@ Don't use evil mode for general purpose. Current use of evil mode is for vim lik
     (sml/setup))
 
   (use-package helium-modeline
-    :demand t
-    :after (powerline let-alist projectile flycheck window-numbering)
-    :hook (window-setup . powerline-helium-theme)
-    :config
-    (window-numbering-clear-mode-line))
+    ;; :requires (powerline let-alist projectile flycheck window-numbering)
+    :hook (window-setup . powerline-helium-theme))
 #+END_SRC
 
 ** Theme enhancements.
