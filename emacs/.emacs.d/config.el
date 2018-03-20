@@ -362,7 +362,7 @@ _<right>_ _l_: windmove-right	_d_: tighten	_q_: quit"
   :diminish (flyspell-mode . " ")
   :hook (text-mode . flyspell-mode)
   :hook (prog-mode . flyspell-prog-mode)
-  :init
+  :config
   (progn
     (setq ispell-program-name (locate-file "aspell" exec-path))
     (setq ispell-list-command "--list")))
