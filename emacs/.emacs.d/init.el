@@ -14,8 +14,8 @@
      (file-name-handler-alist nil)
      (load-prefer-newer t)
      (gc-cons-threshold 640000000))
-  (if (file-newer-than-file-p "~/.emacs.d/config.org" "~/.emacs.d/config.el")
+  (if (file-newer-than-file-p "~/.emacs.d/config.org" "~/.emacs.d/config.elc")
       (org-babel-load-file "~/.emacs.d/config.org")
-    (load-file "~/.emacs.d/config.el")))
+    (load-file "~/.emacs.d/config.elc")))
 (provide 'init)
 ;;; init.el ends here

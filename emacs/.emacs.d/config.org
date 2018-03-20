@@ -3,12 +3,12 @@
 * Bootstrap
 ** Identity
 
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle yes
 (setq user-full-name ""
       user-mail-address "")
 #+END_SRC
 ** Eager basic config
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle yes
   (setq ad-redefinition-action 'accept)
 
   (defalias 'yes-or-no-p 'y-or-n-p)
@@ -43,7 +43,7 @@
   (blink-cursor-mode 0)
 #+END_SRC
 ** Ensure ~use-package~
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle yes
   (require 'package)
   ;; Package initialized in init.el
   ;; (package-initialize)
@@ -57,39 +57,40 @@
   (unless (package-installed-p 'use-package)
     (package-refresh-contents)
     (package-install 'use-package))
+
+  (require 'use-package)
 #+END_SRC
 
 ** Add .emacs.d/lisp to ~load-path~
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle yes
 (add-to-list 'load-path (expand-file-name "~/.emacs.d/lisp"))
 #+END_SRC
 
 ** Set up ~exec-path~ correctly
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle yes
   (use-package exec-path-from-shell
     :ensure t
-    :config
-    (exec-path-from-shell-initialize))
+    :hook (after-init . exec-path-from-shell-initialize))
 #+END_SRC
 
 * Daemon
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle yes
   (add-hook 'after-init-hook #'(lambda () (server-start)))
 #+END_SRC
 * Keybinding framework
 ** Which Key?
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle yes
   (use-package which-key
     :ensure t
     :diminish which-key-mode
+    :hook (after-init . which-key-mode)
     :config
-    (which-key-mode +1)
     (setq which-key-sort-order 'which-key-key-order-alpha
           which-key-side-window-max-width 0.33
           which-key-idle-delay 0.5))
 #+END_SRC
 ** Hydra
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle yes
   (use-package hydra
     :ensure t)
 #+END_SRC
@@ -97,11 +98,11 @@
 Spacemacs like mnemonics are great to remember keybindings. Following code
 creates a framework like that using ~bind-key~.
 
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle yes
   (use-package keybinding
     :demand t
-    :init
-    (global-unset-key (kbd "M-m"))
+    :init (global-unset-key (kbd "M-m"))
+    :functions (rename-mnemonic-key-prefix)
     :config
     (progn
       (rename-mnemonic-key-prefix "g" "VCS")
@@ -116,13 +117,13 @@ creates a framework like that using ~bind-key~.
       (rename-mnemonic-key-prefix "t" "Tags")))
 #+END_SRC
 ** Key-chord
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle yes
   (use-package key-chord
     :ensure t
+    :commands (key-chord-mode)
+    :init (add-hook 'after-init-hook #'(lambda () (key-chord-mode +1)))
     :config
-    (progn
-      (key-chord-mode +1)
-      (setq key-chord-two-keys-delay 0.05)))
+    (setq key-chord-two-keys-delay 0.05))
 #+END_SRC
 * Interface framework
 Approach to evolve interface framework
@@ -132,7 +133,7 @@ Approach to evolve interface framework
  + Past: Use IDO as much as possible and switch to Ivy when IDO doesn't cut it.
 
 ** COMMENT IDO
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle yes
   (use-package smex
     :disabled
     :ensure t
@@ -148,10 +149,9 @@ Approach to evolve interface framework
 
       (add-hook
        'ido-setup-hook
-       #'(lambda () (mode-keys
-                     ido-completion-map
-                     ("<tab>" . 'ido-exit-minibuffer)
-                     ("<return>" . 'ido-exit-minibuffer))))
+       #'(lambda () (mode-keys ido-completion-map
+                      ("<tab>" . 'ido-exit-minibuffer)
+                      ("<return>" . 'ido-exit-minibuffer))))
 
       (ido-mode +1)
       (ido-vertical-mode +1)))
@@ -178,7 +178,7 @@ Approach to evolve interface framework
 #+END_SRC
 
 ** COMMENT Ivy
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle yes
   (use-package counsel
     :disabled
     :ensure t)
@@ -203,14 +203,14 @@ Approach to evolve interface framework
 #+END_SRC
 
 ** Helm
-#+BEGIN_SRC emacs-lisp
-  (use-package helm
-    :ensure t
+#+BEGIN_SRC emacs-lisp :tangle yes
+  (use-package helm-config
+    :ensure helm
     :diminish helm-mode
+    :functions (helm-hide-minibuffer-maybe)
+    :defines (helm-map)
     :config
     (progn
-      (require 'helm-config)
-
       (defun helm-hide-minibuffer-maybe ()
         "Hide minibuffer in Helm session if we use the header line as input field."
         (when (with-helm-buffer helm-echo-input-in-header-line)
@@ -251,16 +251,16 @@ Approach to evolve interface framework
 
       (global-unset-key (kbd "C-x c"))
 
-      (mode-keys
-       helm-map
-       ("C-i" . #'helm-execute-persistent-action) ; make TAB work in terminal
-       ("C-z" . #'helm-select-action))
+      (require 'helm)
+      (mode-keys helm-map
+        ("C-i" . #'helm-execute-persistent-action) ; make TAB work in terminal
+        ("C-z" . #'helm-select-action))
 
       (global-keys
-       ("C-c h" . #'helm-command-prefix)
-       ("M-x" . #'helm-M-x)
-       ("C-x C-f" . #'helm-find-files)
-       ("M-s o" . #'helm-occur))
+        ("C-c h" . #'helm-command-prefix)
+        ("M-x" . #'helm-M-x)
+        ("C-x C-f" . #'helm-find-files)
+        ("M-s o" . #'helm-occur))
 
       (helm-autoresize-mode +1)
       (helm-mode +1)))
@@ -282,22 +282,21 @@ Approach to evolve interface framework
 #+END_SRC
 * Basic setup
 ** Load helper functions
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle yes
   (use-package helper-functions
     :demand t)
 #+END_SRC
 ** General config
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle yes
   (use-package autorevert
     :diminish auto-revert-mode
-    :config
-    (global-auto-revert-mode t))
+    :hook (after-init . global-auto-revert-mode))
 
   (use-package abbrev
     :diminish abbrev-mode)
 #+END_SRC
 ** Backups
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle yes
   (setq delete-old-versions -1)
   (setq version-control t)
   (setq vc-make-backup-files t)
@@ -306,19 +305,19 @@ Approach to evolve interface framework
   (setq auto-save-file-name-transforms '((".*" "~/.emacs.d/auto-save-list/" t)))
 #+END_SRC
 ** Whitespace cleanup
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle yes
   (setq require-final-newline t)
   (add-hook 'before-save-hook 'delete-trailing-whitespace)
 #+END_SRC
 
 ** Don't use ~custom~
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle yes
 (setq-default custom-file "/dev/null")
 #+END_SRC
 * Keybinding config
 ** General Hydras
 *** Window management and zoom
- #+BEGIN_SRC emacs-lisp
+ #+BEGIN_SRC emacs-lisp :tangle yes
    (use-package hydra
      :ensure t
      :config
@@ -349,44 +348,44 @@ Approach to evolve interface framework
        ("q" nil)))
  #+END_SRC
 ** General Keybindings
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle yes
   (use-package keybinding
     :config
     (progn
       (prefixed-keys
-       ("bb" . #'helm-mini)
-       ("bd" . 'kill-this-buffer)
-       ("C-i" . #'crux-switch-to-previous-buffer)
-       ("bn" . 'next-buffer)
-       ("bp" . 'previous-buffer)
-       ("ff" . #'helm-find-files)
-       ("wd" . 'delete-window)
-       ("wD" . 'delete-other-window)
-       ("wh" . 'split-window-horizontally)
-       ("wv" . 'split-window-vertically)
-       ("ww" . #'windows-hydra/body))
+        ("bb" . #'helm-mini)
+        ("bd" . 'kill-this-buffer)
+        ("C-i" . #'crux-switch-to-previous-buffer)
+        ("bn" . 'next-buffer)
+        ("bp" . 'previous-buffer)
+        ("ff" . #'helm-find-files)
+        ("wd" . 'delete-window)
+        ("wD" . 'delete-other-window)
+        ("wh" . 'split-window-horizontally)
+        ("wv" . 'split-window-vertically)
+        ("ww" . #'windows-hydra/body))
 
       (prefixed-keys
-       ("ry" . #'helm-show-kill-ring))
+        ("ry" . #'helm-show-kill-ring))
 
       (global-keys
-       ("C-S-j" . #'join-next-line)
-       ("C-S-k" . #'join-line)
-       ("C-S-y" . #'crux-duplicate-current-line-or-region))
+        ("C-S-j" . #'join-next-line)
+        ("C-S-k" . #'join-line)
+        ("C-S-y" . #'crux-duplicate-current-line-or-region))
       (global-key "C-x C-b" 'ibuffer)
       (global-key "M-/" 'hippie-expand)
 
       (global-keys
-       ("C-s" . 'isearch-forward-regexp)
-       ("C-r" . 'isearch-backward-regexp)
-       ("C-M-s" . 'isearch-forward)
-       ("C-M-r" . 'isearch-backward))
+        ("C-s" . 'isearch-forward-regexp)
+        ("C-r" . 'isearch-backward-regexp)
+        ("C-M-s" . 'isearch-forward)
+        ("C-M-r" . 'isearch-backward))
 
       (global-key "C-a" #'crux-move-beginning-of-line)
       (global-keys
-       ("C-o" . #'crux-smart-open-line)
-       ("C-S-o" . #'crux-smart-open-line-above)
-       ("C-S-d" . #'crux-kill-whole-line))
+        ("C-o" . #'crux-smart-open-line)
+        ("C-S-o" . #'crux-smart-open-line-above)
+        ("C-S-d" . #'crux-kill-whole-line))
 
       (global-key "C-c =" #'crux-indent-defun)
 
@@ -395,13 +394,13 @@ Approach to evolve interface framework
 
 * General packages
 ** Libraries
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle yes
   (use-package f :ensure t :defer t)
   (use-package s :ensure t :defer t)
   (use-package dash :ensure t :defer t)
 #+END_SRC
 ** Annoying arrows
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle yes
   (use-package annoying-arrows-mode
     :ensure t
     :defer 5
@@ -411,7 +410,7 @@ Approach to evolve interface framework
 #+END_SRC
 
 ** Beacon
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle yes
   (use-package beacon
     :ensure t
     :commands beacon-blink
@@ -420,14 +419,14 @@ Approach to evolve interface framework
 #+END_SRC
 
 ** Crux helper setup
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle yes
   (use-package crux
     :ensure t)
 #+END_SRC
 
 ** Rainbow parens
 Multi-colored parantheses are helpful, especially in lisp-like modes.
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle yes
   (show-paren-mode +1)
 
   (use-package rainbow-delimiters
@@ -437,7 +436,7 @@ Multi-colored parantheses are helpful, especially in lisp-like modes.
 ** Fill Column Indicator
 Fill column indicator for showing right ruler.
 
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle yes
   (use-package fill-column-indicator
     :ensure t
     :commands fci-mode
@@ -456,7 +455,7 @@ Fill column indicator for showing right ruler.
 #+END_SRC
 
 ** Indent guides
- #+BEGIN_SRC emacs-lisp
+ #+BEGIN_SRC emacs-lisp :tangle yes
    (use-package highlight-indent-guides
      :ensure t
      :hook (prog-mode . highlight-indent-guides-mode)
@@ -467,7 +466,7 @@ Fill column indicator for showing right ruler.
  #+END_SRC
 
 ** Expand-region
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle yes
   (use-package expand-region
     :ensure t
     :commands er/expand-region
@@ -476,7 +475,7 @@ Fill column indicator for showing right ruler.
 #+END_SRC
 
 ** Hungry delete
-   #+BEGIN_SRC emacs-lisp
+   #+BEGIN_SRC emacs-lisp :tangle yes
      (use-package hungry-delete
        :ensure t
        :diminish hungry-delete-mode
@@ -484,13 +483,13 @@ Fill column indicator for showing right ruler.
    #+END_SRC
 
 ** Ediff
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle yes
   (use-package ediff
     :config
     (setq ediff-window-setup-function 'ediff-setup-windows-plain))
 #+END_SRC
 * Auto-completion
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle yes
   (use-package company
     :ensure t
     :hook (after-init . global-company-mode)
@@ -506,14 +505,14 @@ Fill column indicator for showing right ruler.
 #+END_SRC
 
 * Documentation
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle yes
   (use-package eldoc
     :ensure t
     :diminish eldoc-mode
     :hook (after-init . global-eldoc-mode))
 #+END_SRC
 * Syntax Checking
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle yes
   (use-package flycheck
     :ensure t
     :diminish flycheck-mode
@@ -523,13 +522,13 @@ Fill column indicator for showing right ruler.
 #+END_SRC
 
 Show errors in tooltip
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle yes
   (use-package flycheck-pos-tip
     :ensure t
     :hook (after-init . flycheck-pos-tip-mode))
 #+END_SRC
 * Spell Checking
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle yes
   (use-package flyspell
     :ensure t
     :diminish (flyspell-mode . " ")
@@ -547,7 +546,7 @@ Electric-pair mode closes parenthesis automatically. However, if I'm using
 Smartparens/Paredit, no need to use electric pair mode.
 
 Turns out smartparens is too much in text mode. So use electric pair mode in text.
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle yes
   (use-package elec-pair
     :commands electric-pair-mode
     :hook (text-mode . electric-pair-local-mode))
@@ -556,7 +555,7 @@ Turns out smartparens is too much in text mode. So use electric pair mode in tex
 *** Smartparens
 Smartparens is generally awesome. It combines the ideas of electric-pair,
 paredit, wrap-region, AST navigation etc.
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle yes
   (defmacro def-pair (pair)
     "Creates function sp/wrap-with-<PAIR>."
     `(progn (defun ,(read (concat "sp/wrap-with-"
@@ -585,74 +584,74 @@ paredit, wrap-region, AST navigation etc.
       (sp-local-pair 'minibuffer-inactive-mode "'" nil :actions nil)
 
       (mode-keys smartparens-mode-map
-                 ;; Strict mode toggle
-                 ("C-c C-s" . #'smartparens-strict-mode)
-                 ;; Navigation
-                 ("C-M-a" . 'sp-beginning-of-sexp)
-                 ("C-M-e" . 'sp-end-of-sexp)
-                 ("C-M-f" . 'sp-forward-sexp)
-                 ("C-M-b" . 'sp-backward-sexp)
+        ;; Strict mode toggle
+        ("C-c C-s" . #'smartparens-strict-mode)
+        ;; Navigation
+        ("C-M-a" . 'sp-beginning-of-sexp)
+        ("C-M-e" . 'sp-end-of-sexp)
+        ("C-M-f" . 'sp-forward-sexp)
+        ("C-M-b" . 'sp-backward-sexp)
 
-                 ;; Traversal
-                 ("C-<down>" . 'sp-down-sexp)
-                 ("C-<up>" . 'sp-up-sexp)
-                 ("M-<down>" . 'sp-backward-down-sexp)
-                 ("M-<up>" . 'sp-backward-up-sexp)
-                 ("C-M-n" . 'sp-next-sexp)
-                 ("C-M-p" . 'sp-previous-sexp)
-                 ("C-S-f" . 'sp-forward-symbol)
-                 ("C-S-b" . 'sp-backward-symbol)
+        ;; Traversal
+        ("C-<down>" . 'sp-down-sexp)
+        ("C-<up>" . 'sp-up-sexp)
+        ("M-<down>" . 'sp-backward-down-sexp)
+        ("M-<up>" . 'sp-backward-up-sexp)
+        ("C-M-n" . 'sp-next-sexp)
+        ("C-M-p" . 'sp-previous-sexp)
+        ("C-S-f" . 'sp-forward-symbol)
+        ("C-S-b" . 'sp-backward-symbol)
 
-                 ;; AST re-arrange.
-                 ("C-)" . 'sp-forward-slurp-sexp)
-                 ;; ("C-)" . 'sp-slurp-hybrid-sexp)
-                 ("C-}" . 'sp-forward-barf-sexp)
-                 ("C-(" . 'sp-backward-slurp-sexp)
-                 ("C-{" . 'sp-backward-barf-sexp)
+        ;; AST re-arrange.
+        ("C-)" . 'sp-forward-slurp-sexp)
+        ;; ("C-)" . 'sp-slurp-hybrid-sexp)
+        ("C-}" . 'sp-forward-barf-sexp)
+        ("C-(" . 'sp-backward-slurp-sexp)
+        ("C-{" . 'sp-backward-barf-sexp)
 
-                 ;; Killing
-                 ("C-M-k" . 'sp-kill-sexp)
-                 ("C-k" . 'sp-kill-hybrid-sexp)
-                 ("M-k" . 'sp-backward-kill-sexp)
-                 ("C-M-<up>" . 'sp-raise-sexp)
+        ;; Killing
+        ("C-M-k" . 'sp-kill-sexp)
+        ("C-k" . 'sp-kill-hybrid-sexp)
+        ("M-k" . 'sp-backward-kill-sexp)
+        ("C-M-<up>" . 'sp-raise-sexp)
 
-                 ;; Unknown
-                 ;; ("C-M-t" . sp-transpose-sexp)
-                 ;; ("C-M-w" . sp-copy-sexp)
-                 ;; ("C-M-d" . delete-sexp)
-                 ;; ("M-<backspace>" . backward-kill-word)
-                 ;; ("C-<backspace>" . sp-backward-kill-word)
-                 ;; ([remap sp-backward-kill-word] . backward-kill-word)
-                 ;; ("M-[" . sp-backward-unwrap-sexp)
-                 ;; ("M-]" . sp-unwrap-sexp)
-                 ;; ("C-x C-t" . sp-transpose-hybrid-sexp)
+        ;; Unknown
+        ;; ("C-M-t" . sp-transpose-sexp)
+        ;; ("C-M-w" . sp-copy-sexp)
+        ;; ("C-M-d" . delete-sexp)
+        ;; ("M-<backspace>" . backward-kill-word)
+        ;; ("C-<backspace>" . sp-backward-kill-word)
+        ;; ([remap sp-backward-kill-word] . backward-kill-word)
+        ;; ("M-[" . sp-backward-unwrap-sexp)
+        ;; ("M-]" . sp-unwrap-sexp)
+        ;; ("C-x C-t" . sp-transpose-hybrid-sexp)
 
-                 ;; Wrap
-                 ("C-c C-w (" . #'sp/wrap-with-parens)
-                 ("C-c C-w [" . #'sp/wrap-with-brackets)
-                 ("C-c C-w {" . #'sp/wrap-with-braces)
-                 ("C-c C-w '" . #'sp/wrap-with-single-quotes)
-                 ("C-c C-w \"" . #'sp/wrap-with-double-quotes)
-                 ("C-c C-w `" . #'sp/wrap-with-back-quotes)
-                 )))
+        ;; Wrap
+        ("C-c C-w (" . #'sp/wrap-with-parens)
+        ("C-c C-w [" . #'sp/wrap-with-brackets)
+        ("C-c C-w {" . #'sp/wrap-with-braces)
+        ("C-c C-w '" . #'sp/wrap-with-single-quotes)
+        ("C-c C-w \"" . #'sp/wrap-with-double-quotes)
+        ("C-c C-w `" . #'sp/wrap-with-back-quotes)
+        )))
 #+END_SRC
 
 *** Auto-indentation
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle yes
   (use-package electric
     :config
     (electric-indent-mode +1))
 #+END_SRC
 *** paredit
 Redshank needs paredit
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle yes
   (use-package paredit
     :ensure t
     :disabled t)
 #+END_SRC
 ** Avy
 Avy is used to jump around the file.
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle yes
   (use-package avy
     :ensure t
     :commands avy-goto-word-1
@@ -660,24 +659,24 @@ Avy is used to jump around the file.
       (key-chord-define-global "jj" #'avy-goto-word-1))
 #+END_SRC
 * Compilation
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle yes
   (use-package compile
     :commands (compile recompile)
     :init
     (prefixed-keys
-     ("cc" . #'compile)
-     ("cr" . #'recompile)))
+      ("cc" . #'compile)
+      ("cr" . #'recompile)))
 #+END_SRC
 * Window management
 ** Window numbering
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle yes
   (use-package window-numbering
     :ensure t
     :hook (after-init . window-numbering-mode))
 #+END_SRC
 * Persistent history
 ** Minibuffer, M-x and ring history
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle yes
   (use-package savehist
     :hook (after-init . savehist-mode)
     :config
@@ -686,7 +685,7 @@ Avy is used to jump around the file.
       (setq savehist-file "~/.emacs.d/tmp/history")))
 #+END_SRC
 ** Recent files
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle yes
   (use-package recentf
     :hook (after-init . recentf-mode)
     :config
@@ -701,7 +700,7 @@ Avy is used to jump around the file.
 #+END_SRC
 * VCS
 ** Magit
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle yes
   (use-package magit
     :ensure t
     :commands magit-status
@@ -713,7 +712,7 @@ Avy is used to jump around the file.
 ** VC-mode
 Use ~C-x v~ prefixed commands for now.
 ** Highlight diff
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle yes
   (use-package diff-hl
     :ensure t
     :config
@@ -723,7 +722,7 @@ Use ~C-x v~ prefixed commands for now.
       (add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh)))
 #+END_SRC
 ** SMerge keybindings
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle yes
   (>= emacs-major-version 26
       nil
       (defalias 'smerge-keep-upper 'smerge-keep-mine)
@@ -765,7 +764,7 @@ Use ~C-x v~ prefixed commands for now.
       (prefixed-mode-key smerge-mode-map "m" #'hydra-smerge/body)))
 #+END_SRC
 * Projectile
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle yes
   (use-package projectile
     :ensure t
     :diminish projectile-mode
@@ -780,7 +779,7 @@ Use ~C-x v~ prefixed commands for now.
       (setq projectile-mode-line '(:eval (format " P[%s]" (projectile-project-name))))))
 #+END_SRC
 * Snippets
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle yes
   (use-package yasnippet
     :ensure t
     :diminish yas-minor-mode
@@ -790,7 +789,7 @@ Use ~C-x v~ prefixed commands for now.
 #+END_SRC
 * TODO Major mode setup [11/13]
 ** LSP
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle yes
   (use-package lsp-mode
     :load-path "lsp/lsp-mode"
     :config
@@ -814,7 +813,7 @@ Use ~C-x v~ prefixed commands for now.
 Irony mode is clang based autocompletion and syntax checker. It is like YouCompleteMe, but only for C-family and better.
 I've had many problems with the YCM setup at work.
 
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle yes
   (use-package irony
     :disabled
     :ensure t
@@ -829,7 +828,7 @@ I've had many problems with the YCM setup at work.
 #+END_SRC
 
 *** Completion
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle yes
   (use-package company-irony
     :disabled
     :ensure t
@@ -855,7 +854,7 @@ I've had many problems with the YCM setup at work.
 #+END_SRC
 
 *** Syntax checker
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle yes
   (use-package flycheck-irony
     :disabled
     :ensure t
@@ -866,7 +865,7 @@ I've had many problems with the YCM setup at work.
 #+END_SRC
 
 *** Eldoc
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle yes
   (use-package irony-eldoc
     :disabled
     :ensure t
@@ -877,7 +876,7 @@ I've had many problems with the YCM setup at work.
 #+END_SRC
 
 *** Coding style
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle yes
   (use-package google-c-style
     :ensure t
     :commands google-set-c-style
@@ -888,7 +887,7 @@ I've had many problems with the YCM setup at work.
 *** Navigation using RTags
 RTags is a great navigation framework for C++. Unfortunately, it doesn't handle gargantuan codebases from cloud filesystems like work.
 Still, good to have in config.
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle yes
   (use-package rtags
     :disabled
     :config
@@ -914,7 +913,7 @@ Still, good to have in config.
 ** Lisp
 *** Lisp common settings
 **** Define ~lisp-family-mode-hook~
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle yes
   (defvar lisp-family-mode-hook nil
     "Hook for lisp family major modes.")
 
@@ -922,11 +921,11 @@ Still, good to have in config.
   (add-hook 'lisp-mode-hook #'(lambda () (run-hooks 'lisp-family-mode-hook)))
 #+END_SRC
 **** Strict Smartparens
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle yes
   (add-hook 'lisp-family-mode-hook #'smartparens-strict-mode)
 #+END_SRC
 **** Redshank
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle yes
   (use-package redshank
     :ensure t
     :after paredit
@@ -935,7 +934,7 @@ Still, good to have in config.
 #+END_SRC
 **** Macrostep
 Macrostep is for incremental macro expansion.
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle yes
   (use-package macrostep
     :ensure t
     :commands macrostep-mode
@@ -945,7 +944,7 @@ Macrostep is for incremental macro expansion.
 #+END_SRC
 *** DONE Emacs Lisp
 **** Basic setup
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle yes
   ;; Helper functions.
   (defun elisp-visit-ielm ()
     "Switch to default `ielm' buffer.
@@ -978,16 +977,15 @@ Macrostep is for incremental macro expansion.
     (dolist (hook '(emacs-lisp-mode-hook ielm-mode-hook))
       (add-hook hook 'turn-on-elisp-slime-nav-mode)))
 
-  (mode-keys
-   emacs-lisp-mode-map
-   ("C-c C-z" . #'elisp-visit-ielm)
-   ("C-c C-c" . 'eval-defun)
-   ("C-c C-b" . 'eval-buffer)
-   ("C-c C-r" . 'eval-region))
+  (mode-keys emacs-lisp-mode-map
+    ("C-c C-z" . #'elisp-visit-ielm)
+    ("C-c C-c" . #'eval-defun)
+    ("C-c C-b" . #'eval-buffer)
+    ("C-c C-r" . #'eval-region))
 #+END_SRC
 **** Litable
 Use litable to evaluate code in the margin. Helpful for quick iteration
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle yes
   (use-package litable
     :ensure t
     :commands litable-mode
@@ -1002,7 +1000,7 @@ Use litable to evaluate code in the margin. Helpful for quick iteration
 #+END_SRC
 **** Pretty print eval-expression
 ~eval-expr~ is a replacement for ~eval-expression~ with prettified output.
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle yes
     (use-package eval-expr
       :ensure t
       ;; Use `pp-eval-expression'. Retain the config for minibuffer setup example.
@@ -1021,22 +1019,25 @@ Use litable to evaluate code in the margin. Helpful for quick iteration
 #+END_SRC
 
 Use ~pp-eval-expression~ instead of ~eval-expr~.
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle yes
   (global-key "M-:" 'pp-eval-expression)
 #+END_SRC
 **** Lisp interaction mode hook
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle yes
   (add-hook
    'lisp-interaction-mode-hook
    #'(lambda () (run-hooks 'emacs-lisp-mode-hook)))
 #+END_SRC
 *** DONE common-lisp
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle yes
   (use-package slime
     :ensure t
     :hook (common-lisp-mode . slime-mode)
+    :functions (slime-toggle-fancy-trace slime-inspect-definition)
     :config
     (progn
+      (require 'slime-fancy-trace)
+      (require 'slime-fancy-inspector)
       (setq inferior-lisp-program "sbcl")
       (setq slime-contribs '(slime-fancy
                              slime-indentation
@@ -1046,56 +1047,54 @@ Use ~pp-eval-expression~ instead of ~eval-expr~.
 
       ;; enable fuzzy matching in code buffer and SLIME REPL
       (setq slime-complete-symbol*-fancy t)
-      (setq slime-complete-symbol-function 'slime-fuzzy-complete-symbol)
 
       (add-hook 'slime-repl-mode-hook #'turn-off-smartparens-mode)
 
       (slime-setup '(slime-repl))
 
-      (mode-keys
-       lisp-mode-map
-       ("C-c '" . #'slime)
+      (mode-keys lisp-mode-map
+        ("C-c '" . #'slime)
 
-       ("C-c c c" . #'slime-compile-file)
-       ("C-c c C" . #'slime-compile-and-load-file)
-       ("C-c c l" . #'slime-load-file)
-       ("C-c c f" . #'slime-compile-defun)
-       ("C-c c r" . #'slime-compile-region)
-       ("C-c c n" . #'slime-remove-notes)
+        ("C-c cc" . #'slime-compile-file)
+        ("C-c cC" . #'slime-compile-and-load-file)
+        ("C-c cl" . #'slime-load-file)
+        ("C-c cf" . #'slime-compile-defun)
+        ("C-c cr" . #'slime-compile-region)
+        ("C-c cn" . #'slime-remove-notes)
 
-       ("C-c e b" . #'slime-eval-buffer)
-       ("C-c e f" . #'slime-eval-defun)
-       ("C-c e F" . #'slime-undefine-function)
-       ("C-c e e" . #'slime-eval-last-expression)
-       ("C-c e r" . #'slime-eval-region)
+        ("C-c eb" . #'slime-eval-buffer)
+        ("C-c ef" . #'slime-eval-defun)
+        ("C-c eF" . #'slime-undefine-function)
+        ("C-c ee" . #'slime-eval-last-expression)
+        ("C-c er" . #'slime-eval-region)
 
-       ("C-c g b" . #'slime-pop-find-definition-stack)
-       ("C-c g n" . #'slime-next-note)
-       ("C-c g N" . #'slime-previous-note)
+        ("C-c gb" . #'slime-pop-find-definition-stack)
+        ("C-c gn" . #'slime-next-note)
+        ("C-c gN" . #'slime-previous-note)
 
-       ("C-c h a" . #'slime-apropos)
-       ("C-c h A" . #'slime-apropos-all)
-       ("C-c h d" . #'slime-disassemble-symbol)
-       ("C-c h h" . #'slime-describe-symbol)
-       ("C-c h H" . #'slime-hyperspec-lookup)
-       ("C-c h i" . #'slime-inspect-definition)
-       ("C-c h p" . #'slime-apropos-package)
-       ("C-c h t" . #'slime-toggle-trace-fdefinition)
-       ("C-c h T" . #'slime-untrace-all)
-       ("C-c h <" . #'slime-who-calls)
-       ("C-c h >" . #'slime-calls-who)
-       ("C-c h r" . #'slime-who-references)
-       ("C-c h m" . #'slime-who-macroexpands)
-       ("C-c h s" . #'slime-who-specializes)
+        ("C-c ha" . #'slime-apropos)
+        ("C-c hA" . #'slime-apropos-all)
+        ("C-c hd" . #'slime-disassemble-symbol)
+        ("C-c hh" . #'slime-describe-symbol)
+        ("C-c hH" . #'slime-hyperspec-lookup)
+        ("C-c hi" . #'slime-inspect-definition)
+        ("C-c hp" . #'slime-apropos-package)
+        ("C-c ht" . #'slime-toggle-trace-fdefinition)
+        ("C-c hT" . #'slime-untrace-all)
+        ("C-c h<" . #'slime-who-calls)
+        ("C-c h>" . #'slime-calls-who)
+        ("C-c hr" . #'slime-who-references)
+        ("C-c hm" . #'slime-who-macroexpands)
+        ("C-c hs" . #'slime-who-specializes)
 
-       ("C-c M a" . #'slime-macroexpand-all)
-       ("C-c M o" . #'slime-macroexpand-1)
+        ("C-c Ma" . #'slime-macroexpand-all)
+        ("C-c Mo" . #'slime-macroexpand-1)
 
-       ("C-c s e" . #'slime-eval-last-expression-in-repl)
-       ("C-c s i" . #'slime)
-       ("C-c s q" . #'slime-quit-lisp)
+        ("C-c se" . #'slime-eval-last-expression-in-repl)
+        ("C-c si" . #'slime)
+        ("C-c sq" . #'slime-quit-lisp)
 
-       ("C-c t f" . #'slime-toggle-fancy-trace))))
+        ("C-c tf" . #'slime-toggle-fancy-trace))))
 
   (use-package slime-company
     :ensure t
@@ -1109,7 +1108,7 @@ Use ~pp-eval-expression~ instead of ~eval-expr~.
 *** TODO Clojure
 ** DONE Go
 *** Mode Setup
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle yes
   (use-package go-mode
     :ensure t
     :mode "\\.go\\'"
@@ -1123,7 +1122,7 @@ Use ~pp-eval-expression~ instead of ~eval-expr~.
       (add-hook 'go-mode-hook #'go-mode-setup)))
 #+END_SRC
 *** Completion
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle yes
   (use-package company-go
     :ensure t
     :after (company go-mode)
@@ -1134,20 +1133,20 @@ Use ~pp-eval-expression~ instead of ~eval-expr~.
     (setq company-go-show-annotation t))
 #+END_SRC
 *** Syntax Checker
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle yes
   (use-package flycheck-gometalinter
     :ensure t
     :after (flycheck go-mode)
     :hook (go-mode . flycheck-gometalinter-setup))
 #+END_SRC
 *** Documentation
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle yes
   (use-package go-eldoc
     :ensure t
     :hook (go-mode . go-eldoc-setup))
 #+END_SRC
 *** ~go-rename~
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle yes
   (use-package go-rename
     :if (executable-find "gorename")
     :commands go-rename
@@ -1157,23 +1156,23 @@ Use ~pp-eval-expression~ instead of ~eval-expr~.
 *** TODO Compilation and Debugger
 ** DONE Haskell
 *** Major mode
-#+BEGIN_SRC emacs-lisp
-  (use-package haskell-mode
-    :ensure t
+#+BEGIN_SRC emacs-lisp :tangle yes
+  (use-package haskell
+    :ensure haskell-mode
     :mode "\\.hs\\'"
     :config
     (progn
       (add-hook 'haskell-mode-hook #'turn-on-haskell-indent)
       (mode-keys haskell-mode-map
-                 ("C-c d" . #'haskell-debug)
-                 ("C-c i" . #'haskell-interactive-switch)
-                 ("C-c t" . #'haskell-process-do-type)
-                 ("C-c h" . #'haskell-process-do-info)
-                 ("C-c fi" . #'haskell-add-import)
-                 ("C-c ff" . #'haskell-mode-stylish-buffer))))
+        ("C-c d" . #'haskell-debug)
+        ("C-c i" . #'haskell-interactive-switch)
+        ("C-c t" . #'haskell-process-do-type)
+        ("C-c h" . #'haskell-process-do-info)
+        ("C-c fi" . #'haskell-add-import)
+        ("C-c ff" . #'haskell-mode-stylish-buffer))))
 #+END_SRC
 *** Helper packages
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle yes
   (use-package hindent
     :ensure t
     :if (executable-find "hindent")
@@ -1184,18 +1183,18 @@ Use ~pp-eval-expression~ instead of ~eval-expr~.
 #+END_SRC
 *** Intero
 Intero works well with stack projects. But without stack, we still need other options.
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle yes
   (use-package intero
     :ensure t
     :hook (haskell-mode . intero-mode))
 #+END_SRC
 *** Add libraries for XMonad.
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle yes
 (add-to-list 'flycheck-ghc-search-path (expand-file-name "~/.xmonad/lib"))
 #+END_SRC
 ** TODO HTML emmet
 ** DONE JS
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle yes
   ;; Copied from emacs web config.
   (use-package js2-mode
     :ensure t
@@ -1209,14 +1208,7 @@ Intero works well with stack projects. But without stack, we still need other op
 
       (setq js-indent-level 2)
       (setq js2-indent-level 2)
-      (setq js2-basic-offset 2)
-
-      (mode-keys
-       js2-mode-map
-       ("C-x C-e" . #'js-send-last-sexp)
-       ("C-M-x" . #'js-send-last-sexp-and-go)
-       ("C-c C-b" . #'js-send-buffer-and-go)
-       ("C-c C-l" . #'js-load-file-and-go))))
+      (setq js2-basic-offset 2)))
 
   ;; tern :- IDE like features for javascript and completion
   ;; http://ternjs.net/doc/manual.html#emacs
@@ -1249,7 +1241,7 @@ Intero works well with stack projects. But without stack, we still need other op
     (js2r-add-keybindings-with-prefix "C-c j r"))
 #+END_SRC
 ** DONE Java
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle yes
   (use-package meghanada
     :ensure t
     :commands meghanada-mode
@@ -1258,12 +1250,12 @@ Intero works well with stack projects. But without stack, we still need other op
       (add-hook 'java-mode-hook #'(lambda () (meghanada-mode +1)))))
 #+END_SRC
 
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle yes
   (add-hook 'java-mode-hook #'(lambda () (setq fill-column 100)))
 #+END_SRC
 ** TODO latex
 ** DONE Markdown
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle yes
   (use-package markdown-mode
     :ensure t
     :commands (markdown-mode gfm-mode)
@@ -1272,7 +1264,7 @@ Intero works well with stack projects. But without stack, we still need other op
            ("\\.markdown\\'" . markdown-mode)))
 #+END_SRC
 ** DONE Protocol buffers
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle yes
   (use-package protobuf-mode
     :ensure t
     :mode "\\.proto\\'"
@@ -1286,7 +1278,7 @@ Intero works well with stack projects. But without stack, we still need other op
 #+END_SRC
 ** DONE Python
 *** Python mode setup
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle yes
   (use-package python
     :ensure t
     :mode ("\\.py\\'" . python-mode)
@@ -1296,7 +1288,7 @@ Intero works well with stack projects. But without stack, we still need other op
 #+END_SRC
 
 *** Anaconda setup
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle yes
   (use-package anaconda-mode
     :ensure t
     :commands anaconda-mode
@@ -1314,7 +1306,7 @@ Intero works well with stack projects. But without stack, we still need other op
 #+END_SRC
 
 *** Virtualenv
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle yes
   (use-package virtualenvwrapper
     :disabled
     :config
@@ -1333,14 +1325,14 @@ Intero works well with stack projects. But without stack, we still need other op
 #+END_SRC
 
 *** Formatter
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle yes
   (use-package py-yapf
     :commands py-yapf
     :ensure t)
 #+END_SRC
 
 *** Testing
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle yes
   (use-package pytest
     :commands pytest
     :ensure t)
@@ -1348,7 +1340,7 @@ Intero works well with stack projects. But without stack, we still need other op
 *** TODO Setup ein
 ** DONE Shell
 *** Setup for Bash and Zsh files
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle yes
   (defconst +zsh-filename-patterns+
     '("\\.zsh\\'"
       "zlogin\\'"
@@ -1375,7 +1367,7 @@ Intero works well with stack projects. But without stack, we still need other op
 #+END_SRC
 
 *** Code completion
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle yes
   (use-package company-shell
     :ensure t
     :commands company-shell
@@ -1390,7 +1382,7 @@ Intero works well with stack projects. But without stack, we still need other op
 #+END_SRC
 
 *** Insert shebang
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle yes
   (use-package insert-shebang
     :ensure t
     :config
@@ -1400,29 +1392,27 @@ Intero works well with stack projects. But without stack, we still need other op
 #+END_SRC
 
 ** DONE ESS (Statistics/R)
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle yes
   (use-package ess
     :disabled
     :config
     (progn
-      (mode-keys
-       inferior-ess-mode-map
-       ("C-<up>". 'comint-previous-matching-input-from-input)
-       ("C-<down>" . 'comint-next-matching-input-from-input)
-       ("C-x t" . 'comint-dynamic-complete-filename))))
+      (mode-keys inferior-ess-mode-map
+        ("C-<up>". 'comint-previous-matching-input-from-input)
+        ("C-<down>" . 'comint-next-matching-input-from-input)
+        ("C-x t" . 'comint-dynamic-complete-filename))))
 #+END_SRC
 ** DONE Org mode setup
 *** Keybindings
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle yes
   (add-hook
    'org-mode-hook
-   #'(lambda () (mode-keys
-                 org-mode-map
-                 ("C-<up>" . 'org-move-subtree-up)
-                 ("C-<down>" . 'org-move-subtree-down))))
+   #'(lambda () (mode-keys org-mode-map
+                  ("C-<up>" . 'org-move-subtree-up)
+                  ("C-<down>" . 'org-move-subtree-down))))
 #+END_SRC
 *** Org agenda
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle yes
   (setq org-agenda-files '("~/organizer/main.org"))
 
   (setq
@@ -1446,7 +1436,7 @@ Intero works well with stack projects. But without stack, we still need other op
   (global-key "C-c a" #'load-org-gtd-agenda)
 #+END_SRC
 *** Org bullets
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle yes
   (use-package org-bullets
     :ensure t
     :commands org-bullets-mode
@@ -1457,7 +1447,7 @@ Intero works well with stack projects. But without stack, we still need other op
      #'(lambda () (org-bullets-mode +1))))
 #+END_SRC
 *** Org indent
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle yes
   (use-package org-indent
     :commands org-indent-mode
     :diminish org-indent-mode
@@ -1465,7 +1455,7 @@ Intero works well with stack projects. But without stack, we still need other op
     (add-hook 'org-mode-hook #'(lambda () (org-indent-mode +1))))
 #+END_SRC
 *** Org capture
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle yes
   (setq org-capture-templates
         '(("a" "Action Item" entry (file+headline "~/organizer/main.org" "Action Items")
            "* TODO [#B] %?\n  %i")
@@ -1480,14 +1470,14 @@ Intero works well with stack projects. But without stack, we still need other op
   (global-key "C-c c" 'org-capture)
 #+END_SRC
 *** Org refile
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle yes
   (setq org-refile-targets '((org-agenda-files . (:maxlevel . 6))))
 
   (setq org-outline-path-complete-in-steps nil)
   (setq org-refile-use-outline-path t)
 #+END_SRC
 *** Org source editing
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle yes
   (diminish 'org-src-mode " ")
   (add-hook
    'org-src-mode-hook
@@ -1498,7 +1488,7 @@ Intero works well with stack projects. But without stack, we still need other op
 #+END_SRC
 *** Org capture system-wide shortcut helper
 Copied from [[http://cestlaz.github.io/posts/using-emacs-24-capture-2][C'est la Z blog]].
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle yes
   (defadvice org-capture-finalize
       (after delete-capture-frame activate)
     "Advise capture-finalize to close the frame."
@@ -1527,21 +1517,21 @@ Copied from [[http://cestlaz.github.io/posts/using-emacs-24-capture-2][C'est la 
 * Code Semantics
 ** Semantic
 *** Stickyfunc
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle yes
   (use-package stickyfunc-enhance
     :ensure t
     :defer t)
 #+END_SRC
 
 *** Srefactor
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle yes
   (use-package srefactor
     :ensure t
     :defer t)
 #+END_SRC
 
 *** Semantic setup
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle yes
   (use-package semantic
     :hook (prog-mode . semantic-mode)
     :init
@@ -1569,7 +1559,7 @@ Copied from [[http://cestlaz.github.io/posts/using-emacs-24-capture-2][C'est la 
 
 ** TODO Tags
 ** Which function mode
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle yes
   (use-package which-func
     :disabled
     :config
@@ -1578,18 +1568,18 @@ Copied from [[http://cestlaz.github.io/posts/using-emacs-24-capture-2][C'est la 
       (setq which-func-unknown "")))
 #+END_SRC
 ** Imenu
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle yes
   (prefixed-key "tt" #'helm-semantic-or-imenu)
 #+END_SRC
 * Search/Replace
 ** Ag
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle yes
   (use-package ag
     :ensure t
     :defer 5)
 #+END_SRC
 ** Swiper
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle yes
   ;;(prefixed-key "ss" 'swiper)
   ;;(key-chord-define-global "??" 'swiper)
   (use-package swiper-helm
@@ -1603,21 +1593,21 @@ Copied from [[http://cestlaz.github.io/posts/using-emacs-24-capture-2][C'est la 
 #+END_SRC
 ** Anzu
 Anzu is good for interactive search and replace.
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle yes
   (use-package anzu
     :ensure t
     :diminish anzu-mode
+    :hook (after-init . global-anzu-mode)
     :config
     (progn
-      (global-anzu-mode +1)
       (global-set-key [remap query-replace] #'anzu-query-replace)
       (global-set-key [remap query-replace-regexp] #'anzu-query-replace-regexp)
       (prefixed-keys
-       ("srr" . #'anzu-query-replace-regexp)
-       ("sr." . #'anzu-query-replace-at-cursor-thing))))
+        ("srr" . #'anzu-query-replace-regexp)
+        ("sr." . #'anzu-query-replace-at-cursor-thing))))
 #+END_SRC
 ** Wgrep
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle yes
   (use-package wgrep
     :ensure t
     :defer 5)
@@ -1628,21 +1618,21 @@ Anzu is good for interactive search and replace.
 #+END_SRC
 ** IEdit
 IEdit is for interactively replacing a symbol.
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle yes
   (use-package iedit
     :commands iedit-mode
     :init (global-key "C-'" #'iedit-mode))
 #+END_SRC
 * Evil
 Don't use evil mode for general purpose. Current use of evil mode is for vim like search/replace only. Toggle as necessary.
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle yes
   (use-package evil
     :ensure t
     :defer 10)
 #+END_SRC
 
 * Undo-tree
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle yes
   (use-package undo-tree
     :ensure t
     :diminish undo-tree-mode)
@@ -1650,7 +1640,7 @@ Don't use evil mode for general purpose. Current use of evil mode is for vim lik
 
 * Encryption
 ** GPG and EPA config
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle yes
   (use-package epa
     :config
     (progn
@@ -1661,13 +1651,13 @@ Don't use evil mode for general purpose. Current use of evil mode is for vim lik
       (setq epa-pinentry-mode 'loopback)))
 #+END_SRC
 ** Auth sources
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle yes
   (use-package auth-source
     :config
     (setq auth-sources '((:source "~/.emacs.d/.authinfo.gpg"))))
 #+END_SRC
 ** Expire cache
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle yes
   (add-hook
    'after-init-hook
    #'(lambda ()
@@ -1677,14 +1667,15 @@ Don't use evil mode for general purpose. Current use of evil mode is for vim lik
         #'(lambda () (shell-command "killall gpg-agent")))))
 #+END_SRC
 * ERC
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle yes
   (use-package erc-config)
     ;;:hook (after-init . erc-autoconnect-servers))
 #+END_SRC
 * elfeed
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle yes
   (use-package elfeed
     :ensure t
+    :functions (elfeed-toggle-star)
     :config
     (progn
       ;; Functions to support syncing .elfeed between machines
@@ -1742,12 +1733,14 @@ Don't use evil mode for general purpose. Current use of evil mode is for vim lik
         ("<up>" previous-line)
         ("q" (message "Exit from Elfeed Hydra.") :exit t))
 
-      (mode-keys
-       elfeed-search-mode-map
-       ("m" . #'elfeed-toggle-star)
-       ("M" . #'elfeed-toggle-star)
-       ("h" . #'elfeed-hydra/body)
-       ("q" . #'elfeed-save-db-and-bury))
+      (defalias 'elfeed-toggle-star
+        (elfeed-expose #'elfeed-search-toggle-all 'star))
+
+      (mode-keys elfeed-search-mode-map
+        ("m" . #'elfeed-toggle-star)
+        ("M" . #'elfeed-toggle-star)
+        ("h" . #'elfeed-hydra/body)
+        ("q" . #'elfeed-save-db-and-bury))
 
       (global-key "<f5>" #'elfeed-load-db-and-open)))
 
@@ -1772,14 +1765,14 @@ Don't use evil mode for general purpose. Current use of evil mode is for vim lik
 * TODO Gnus
 * Theming
 ** Helper packages
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle yes
   (use-package powerline :ensure t :defer t)
   (use-package let-alist :ensure t :defer t)
   (use-package all-the-icons :ensure t :defer t)
 #+END_SRC
 
 ** Color theme and font
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle yes
   (use-package zenburn-theme
     :ensure t
     :config
@@ -1790,7 +1783,7 @@ Don't use evil mode for general purpose. Current use of evil mode is for vim lik
 #+END_SRC
 
 ** Modeline
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle yes
   (use-package spaceline
     :disabled
     :config
@@ -1810,29 +1803,27 @@ Don't use evil mode for general purpose. Current use of evil mode is for vim lik
 
 ** Theme enhancements.
 Enhance the loaded theme.
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle yes
   (use-package theme-enhancement
-    :config
-    (theme-enhancement/apply))
+    :hook (after-init . theme-enhancement/apply))
 #+END_SRC
 ** Linum
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle yes
   (use-package linum
+    :hook (after-init . global-linum-mode)
     :config
-    (progn
-      (global-linum-mode)
-      (setq-default linum-format " %4d ")))
+    (setq-default linum-format " %4d "))
 
   (use-package hlinum
     :ensure t
     :hook (after-init . hlinum-activate))
 #+END_SRC
 * Load machine configuration
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle yes
   (load-file "~/.emacs.machine.el")
 #+END_SRC
 * End
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle yes
   (provide 'config)
 #+END_SRC
 

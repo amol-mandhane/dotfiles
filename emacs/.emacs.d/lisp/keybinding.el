@@ -46,6 +46,7 @@
   "Define multiple global keybindings which override all minor mode keybinding.
 
   KEYS: conses of (`kbd' style keybinding string . function) for keybinding definition."
+  (declare (indent 0))
   `(progn ,@(cl-loop
              for keybd in keys
              collect `(global-key ,(car keybd) ,(cdr keybd)))))
@@ -64,6 +65,7 @@
 
   KEYMAP: Keymap to add the binding t
   KEYS: conses of (`kbd' style keybinding string . function) for keybinding definition."
+  (declare (indent 1))
   `(progn ,@(cl-loop
              for keybd in keys
              collect `(mode-key ,keymap ,(car keybd) ,(cdr keybd)))))
@@ -79,6 +81,7 @@
   "Define keys with mnemonic prefix.
 
   KEYS: conses of (`kbd' style keybinding string . function) for keybinding definition."
+  (declare (indent 0))
   `(progn ,@(cl-loop
              for keybd in keys
              collect `(prefixed-key ,(car keybd) ,(cdr keybd)))))
@@ -96,6 +99,7 @@
 
   KEYMAP: Keymap to add the binding to.
   KEYS: conses of (`kbd' style keybinding string . function) for keybinding definition."
+  (declare (indent 1))
   `(progn ,@(cl-loop
              for keybd in keys
              collect `(prefixed-mode-key ,keymap ,(car keybd) ,(cdr keybd)))))
