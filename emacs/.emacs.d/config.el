@@ -266,11 +266,13 @@ _<right>_ _l_: windmove-right	_d_: tighten	_q_: quit"
 (use-package f :ensure t :defer t)
 (use-package s :ensure t :defer t)
 (use-package dash :ensure t :defer t)
+(use-package crux :ensure t)
 
 (use-package annoying-arrows-mode
   :ensure t
   :defer 5
   :diminish annoying-arrows-mode
+  :commands global-annoying-arrows-mode
   :config
   (global-annoying-arrows-mode +1))
 
@@ -280,9 +282,6 @@ _<right>_ _l_: windmove-right	_d_: tighten	_q_: quit"
   :init
   (global-key "C-\\" #'beacon-blink))
 
-(use-package crux
-  :ensure t)
-
 (show-paren-mode +1)
 
 (use-package rainbow-delimiters
@@ -291,7 +290,7 @@ _<right>_ _l_: windmove-right	_d_: tighten	_q_: quit"
 
 (use-package fill-column-indicator
   :ensure t
-  :commands fci-mode
+  :commands (fci-mode turn-on-fci-mode turn-off-fci-mode)
   :init (enable-minor-mode-globally fci-mode)
   :config
   (progn
@@ -359,6 +358,7 @@ _<right>_ _l_: windmove-right	_d_: tighten	_q_: quit"
 
 (use-package flyspell
   :ensure t
+  :after (exec-path-from-shell)
   :diminish (flyspell-mode . " ")
   :hook (text-mode . flyspell-mode)
   :hook (prog-mode . flyspell-prog-mode)
@@ -451,8 +451,7 @@ _<right>_ _l_: windmove-right	_d_: tighten	_q_: quit"
       )))
 
 (use-package electric
-  :config
-  (electric-indent-mode +1))
+  :hook (after-init . electric-indent-mode))
 
 (use-package paredit
   :ensure t
@@ -503,11 +502,13 @@ _<right>_ _l_: windmove-right	_d_: tighten	_q_: quit"
 
 (use-package diff-hl
   :ensure t
-  :config
+  :commands (diff-hl-mode diff-hl-flydiff-mode)
+  :init
   (progn
     (enable-minor-mode-globally diff-hl-mode)
-    (enable-minor-mode-globally diff-hl-flydiff-mode)
-    (add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh)))
+    (enable-minor-mode-globally diff-hl-flydiff-mode))
+  :config
+  (add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh))
 
 (>= emacs-major-version 26
     nil
@@ -552,22 +553,22 @@ _p_rev	_u_pper	_E_diff	_=_: upper-lower	_RET_: current
 (use-package projectile
   :ensure t
   :diminish projectile-mode
+  :hook (after-init . projectile-mode)
   :init
   (progn
     (setq projectile-enable-caching t)
     (setq projectile-keymap-prefix (kbd (concat +keybinding/mnemonic-prefix+ " p"))))
   :config
   (progn
-    (projectile-mode +1)
     (setq projectile-completion-system 'helm)
     (setq projectile-mode-line '(:eval (format " P[%s]" (projectile-project-name))))))
 
 (use-package yasnippet
   :ensure t
   :diminish yas-minor-mode
+  :commands (yas-expand)
   :hook (after-init . yas-global-mode)
-  :config
-  (prefixed-key "is" #'yas-expand))
+  :init (prefixed-key "is" #'yas-expand))
 
 (use-package lsp-mode
   :load-path "lsp/lsp-mode"
@@ -721,7 +722,7 @@ Start `ielm' if it's not already running."
 
 (use-package litable
   :ensure t
-  :commands litable-mode
+  :commands (litable-mode litable-accept-as-pure)
   :init
   (progn
     (mode-key emacs-lisp-mode-map "C-c l" #'litable-mode)
@@ -864,11 +865,13 @@ Start `ielm' if it's not already running."
   :config
   (mode-key go-mode-map "C-c r" #'go-rename))
 
-(use-package haskell
-  :ensure haskell-mode
+(use-package haskell-mode
+  :ensure t
   :mode "\\.hs\\'"
+  :functions (haskell-debug haskell-add-import)
   :config
   (progn
+    (require 'haskell)
     (add-hook 'haskell-mode-hook #'turn-on-haskell-indent)
     (mode-keys haskell-mode-map
       ("C-c d" . #'haskell-debug)
@@ -1021,6 +1024,7 @@ Start `ielm' if it's not already running."
   "Filename patterns for Zsh script files.")
 
 (use-package sh-script
+  :commands (sh-set-shell)
   :init
   (progn
     (dolist (pattern +zsh-filename-patterns+)
@@ -1271,7 +1275,8 @@ Start `ielm' if it's not already running."
 (use-package elfeed
   :ensure t
   :functions (elfeed-toggle-star)
-  :config
+  :commands (elfeed elfeed-db-load elfeed-search-update--force)
+  :init
   (progn
     ;; Functions to support syncing .elfeed between machines
     ;; makes sure elfeed reads index from disk before launching
@@ -1282,6 +1287,9 @@ Start `ielm' if it's not already running."
       (elfeed)
       (elfeed-search-update--force))
 
+    (global-key "<f5>" #'elfeed-load-db-and-open))
+  :config
+  (progn
     ;;write to disk when quiting
     (defun elfeed-save-db-and-bury ()
       "Wrapper to save the elfeed db to disk before burying buffer"
@@ -1335,12 +1343,15 @@ _u_nread
       ("m" . #'elfeed-toggle-star)
       ("M" . #'elfeed-toggle-star)
       ("h" . #'elfeed-hydra/body)
-      ("q" . #'elfeed-save-db-and-bury))
-
-    (global-key "<f5>" #'elfeed-load-db-and-open)))
+      ("q" . #'elfeed-save-db-and-bury))))
 
 (use-package elfeed-org
   :ensure t
+  :commands (elfeed-org)
+  :init
+  (progn
+    (setq rmh-elfeed-org-files '("~/.elfeed/feed.org"))
+    (add-hook 'after-init-hook #'elfeed-org))
   :config
   (progn
     (defun elfeed-org-find-file ()
@@ -1348,14 +1359,11 @@ _u_nread
       (interactive)
       (find-file (car rmh-elfeed-org-files)))
 
-    (setq rmh-elfeed-org-files '("~/.elfeed/feed.org"))
-    (elfeed-org)
     (prefixed-key "fe" #'elfeed-org-find-file)))
 
 (use-package elfeed-goodies
   :ensure t
-  :config
-  (elfeed-goodies/setup))
+  :hook (after-init . elfeed-goodies/setup))
 
 (use-package powerline :ensure t :defer t)
 (use-package let-alist :ensure t :defer t)

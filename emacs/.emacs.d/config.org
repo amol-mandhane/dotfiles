@@ -398,6 +398,7 @@ Approach to evolve interface framework
   (use-package f :ensure t :defer t)
   (use-package s :ensure t :defer t)
   (use-package dash :ensure t :defer t)
+  (use-package crux :ensure t)
 #+END_SRC
 ** Annoying arrows
 #+BEGIN_SRC emacs-lisp :tangle yes
@@ -405,6 +406,7 @@ Approach to evolve interface framework
     :ensure t
     :defer 5
     :diminish annoying-arrows-mode
+    :commands global-annoying-arrows-mode
     :config
     (global-annoying-arrows-mode +1))
 #+END_SRC
@@ -416,12 +418,6 @@ Approach to evolve interface framework
     :commands beacon-blink
     :init
     (global-key "C-\\" #'beacon-blink))
-#+END_SRC
-
-** Crux helper setup
-#+BEGIN_SRC emacs-lisp :tangle yes
-  (use-package crux
-    :ensure t)
 #+END_SRC
 
 ** Rainbow parens
@@ -439,7 +435,7 @@ Fill column indicator for showing right ruler.
 #+BEGIN_SRC emacs-lisp :tangle yes
   (use-package fill-column-indicator
     :ensure t
-    :commands fci-mode
+    :commands (fci-mode turn-on-fci-mode turn-off-fci-mode)
     :init (enable-minor-mode-globally fci-mode)
     :config
     (progn
@@ -475,12 +471,12 @@ Fill column indicator for showing right ruler.
 #+END_SRC
 
 ** Hungry delete
-   #+BEGIN_SRC emacs-lisp :tangle yes
-     (use-package hungry-delete
-       :ensure t
-       :diminish hungry-delete-mode
-       :hook (after-init . global-hungry-delete-mode))
-   #+END_SRC
+#+BEGIN_SRC emacs-lisp :tangle yes
+  (use-package hungry-delete
+    :ensure t
+    :diminish hungry-delete-mode
+    :hook (after-init . global-hungry-delete-mode))
+#+END_SRC
 
 ** Ediff
 #+BEGIN_SRC emacs-lisp :tangle yes
@@ -531,6 +527,7 @@ Show errors in tooltip
 #+BEGIN_SRC emacs-lisp :tangle yes
   (use-package flyspell
     :ensure t
+    :after (exec-path-from-shell)
     :diminish (flyspell-mode . " ")
     :hook (text-mode . flyspell-mode)
     :hook (prog-mode . flyspell-prog-mode)
@@ -639,8 +636,7 @@ paredit, wrap-region, AST navigation etc.
 *** Auto-indentation
 #+BEGIN_SRC emacs-lisp :tangle yes
   (use-package electric
-    :config
-    (electric-indent-mode +1))
+    :hook (after-init . electric-indent-mode))
 #+END_SRC
 *** paredit
 Redshank needs paredit
@@ -715,11 +711,13 @@ Use ~C-x v~ prefixed commands for now.
 #+BEGIN_SRC emacs-lisp :tangle yes
   (use-package diff-hl
     :ensure t
-    :config
+    :commands (diff-hl-mode diff-hl-flydiff-mode)
+    :init
     (progn
       (enable-minor-mode-globally diff-hl-mode)
-      (enable-minor-mode-globally diff-hl-flydiff-mode)
-      (add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh)))
+      (enable-minor-mode-globally diff-hl-flydiff-mode))
+    :config
+    (add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh))
 #+END_SRC
 ** SMerge keybindings
 #+BEGIN_SRC emacs-lisp :tangle yes
@@ -768,13 +766,13 @@ Use ~C-x v~ prefixed commands for now.
   (use-package projectile
     :ensure t
     :diminish projectile-mode
+    :hook (after-init . projectile-mode)
     :init
     (progn
       (setq projectile-enable-caching t)
       (setq projectile-keymap-prefix (kbd (concat +keybinding/mnemonic-prefix+ " p"))))
     :config
     (progn
-      (projectile-mode +1)
       (setq projectile-completion-system 'helm)
       (setq projectile-mode-line '(:eval (format " P[%s]" (projectile-project-name))))))
 #+END_SRC
@@ -783,9 +781,9 @@ Use ~C-x v~ prefixed commands for now.
   (use-package yasnippet
     :ensure t
     :diminish yas-minor-mode
+    :commands (yas-expand)
     :hook (after-init . yas-global-mode)
-    :config
-    (prefixed-key "is" #'yas-expand))
+    :init (prefixed-key "is" #'yas-expand))
 #+END_SRC
 * TODO Major mode setup [11/13]
 ** LSP
@@ -988,7 +986,7 @@ Use litable to evaluate code in the margin. Helpful for quick iteration
 #+BEGIN_SRC emacs-lisp :tangle yes
   (use-package litable
     :ensure t
-    :commands litable-mode
+    :commands (litable-mode litable-accept-as-pure)
     :init
     (progn
       (mode-key emacs-lisp-mode-map "C-c l" #'litable-mode)
@@ -1157,11 +1155,13 @@ Use ~pp-eval-expression~ instead of ~eval-expr~.
 ** DONE Haskell
 *** Major mode
 #+BEGIN_SRC emacs-lisp :tangle yes
-  (use-package haskell
-    :ensure haskell-mode
+  (use-package haskell-mode
+    :ensure t
     :mode "\\.hs\\'"
+    :functions (haskell-debug haskell-add-import)
     :config
     (progn
+      (require 'haskell)
       (add-hook 'haskell-mode-hook #'turn-on-haskell-indent)
       (mode-keys haskell-mode-map
         ("C-c d" . #'haskell-debug)
@@ -1352,6 +1352,7 @@ Intero works well with stack projects. But without stack, we still need other op
     "Filename patterns for Zsh script files.")
 
   (use-package sh-script
+    :commands (sh-set-shell)
     :init
     (progn
       (dolist (pattern +zsh-filename-patterns+)
@@ -1676,7 +1677,8 @@ Don't use evil mode for general purpose. Current use of evil mode is for vim lik
   (use-package elfeed
     :ensure t
     :functions (elfeed-toggle-star)
-    :config
+    :commands (elfeed elfeed-db-load elfeed-search-update--force)
+    :init
     (progn
       ;; Functions to support syncing .elfeed between machines
       ;; makes sure elfeed reads index from disk before launching
@@ -1687,6 +1689,9 @@ Don't use evil mode for general purpose. Current use of evil mode is for vim lik
         (elfeed)
         (elfeed-search-update--force))
 
+      (global-key "<f5>" #'elfeed-load-db-and-open))
+    :config
+    (progn
       ;;write to disk when quiting
       (defun elfeed-save-db-and-bury ()
         "Wrapper to save the elfeed db to disk before burying buffer"
@@ -1740,12 +1745,15 @@ Don't use evil mode for general purpose. Current use of evil mode is for vim lik
         ("m" . #'elfeed-toggle-star)
         ("M" . #'elfeed-toggle-star)
         ("h" . #'elfeed-hydra/body)
-        ("q" . #'elfeed-save-db-and-bury))
-
-      (global-key "<f5>" #'elfeed-load-db-and-open)))
+        ("q" . #'elfeed-save-db-and-bury))))
 
   (use-package elfeed-org
     :ensure t
+    :commands (elfeed-org)
+    :init
+    (progn
+      (setq rmh-elfeed-org-files '("~/.elfeed/feed.org"))
+      (add-hook 'after-init-hook #'elfeed-org))
     :config
     (progn
       (defun elfeed-org-find-file ()
@@ -1753,14 +1761,11 @@ Don't use evil mode for general purpose. Current use of evil mode is for vim lik
         (interactive)
         (find-file (car rmh-elfeed-org-files)))
 
-      (setq rmh-elfeed-org-files '("~/.elfeed/feed.org"))
-      (elfeed-org)
       (prefixed-key "fe" #'elfeed-org-find-file)))
 
   (use-package elfeed-goodies
     :ensure t
-    :config
-    (elfeed-goodies/setup))
+    :hook (after-init . elfeed-goodies/setup))
 #+END_SRC
 * TODO Gnus
 * Theming

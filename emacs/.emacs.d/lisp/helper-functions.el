@@ -45,5 +45,11 @@ ARGS: Advice argument."
 FUNC: Function to silence."
   `(progn (advice-add ,func :around #'silence-function-message-advice)))
 
+(defun byte-recompile-configuration ()
+  "Byte-compile the configuration."
+  (interactive)
+  (org-babel-tangle-file "~/.emacs.d/config.org")
+  (byte-recompile-file "~/.emacs.d/config.el" :force 0 nil))
+
 (provide 'helper-functions)
 ;;; helper-functions.el ends here
