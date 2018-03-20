@@ -324,6 +324,10 @@ _<right>_ _l_: windmove-right	_d_: tighten	_q_: quit"
   :diminish hungry-delete-mode
   :hook (after-init . global-hungry-delete-mode))
 
+(use-package ediff
+  :config
+  (setq ediff-window-setup-function 'ediff-setup-windows-plain))
+
 (use-package company
   :ensure t
   :hook (after-init . global-company-mode)
@@ -583,6 +587,7 @@ _p_rev	_u_pper	_E_diff	_=_: upper-lower	_RET_: current
          (setq-local company-backends (remove 'company-capf company-backends))))))
 
 (use-package irony
+  :disabled
   :ensure t
   :commands irony-mode
   :init
@@ -594,6 +599,7 @@ _p_rev	_u_pper	_E_diff	_=_: upper-lower	_RET_: current
   (add-hook 'irony-mode-hook 'irony-cdb-autosetup-compile-options))
 
 (use-package company-irony
+  :disabled
   :ensure t
   :commands company-irony
   :after (company irony)
@@ -605,6 +611,7 @@ _p_rev	_u_pper	_E_diff	_=_: upper-lower	_RET_: current
        (setq-local company-backends (delete 'company-clang company-backends)))))
 
 (use-package company-irony-c-headers
+  :disabled
   :ensure t
   :commands company-irony-c-headers
   :after (company irony)
@@ -614,6 +621,7 @@ _p_rev	_u_pper	_E_diff	_=_: upper-lower	_RET_: current
 ;; Company-clang doesn't work well with the work setup.
 
 (use-package flycheck-irony
+  :disabled
   :ensure t
   :commands flycheck-irony-setup
   :after (flycheck irony)
@@ -621,6 +629,7 @@ _p_rev	_u_pper	_E_diff	_=_: upper-lower	_RET_: current
   (add-hook 'c-mode-common-hook #'flycheck-irony-setup))
 
 (use-package irony-eldoc
+  :disabled
   :ensure t
   :commands irony-eldoc
   :after irony
@@ -665,6 +674,13 @@ _p_rev	_u_pper	_E_diff	_=_: upper-lower	_RET_: current
   :diminish redshank-mode
   :hook (lisp-family-mode . redshank-mode))
 
+(use-package macrostep
+  :ensure t
+  :commands macrostep-mode
+  :init
+  (mode-key emacs-lisp-mode-map "C-c m" #'macrostep-mode)
+  (mode-key lisp-mode-map "C-c m" #'macrostep-mode))
+
 ;; Helper functions.
 (defun elisp-visit-ielm ()
   "Switch to default `ielm' buffer.
@@ -704,12 +720,6 @@ Start `ielm' if it's not already running."
  ("C-c C-b" . 'eval-buffer)
  ("C-c C-r" . 'eval-region))
 
-(use-package macrostep
-  :ensure t
-  :commands macrostep-mode
-  :init
-  (mode-key emacs-lisp-mode-map "C-c m" #'macrostep-mode))
-
 (use-package litable
   :ensure t
   :commands litable-mode
@@ -743,6 +753,80 @@ Start `ielm' if it's not already running."
 (add-hook
  'lisp-interaction-mode-hook
  #'(lambda () (run-hooks 'emacs-lisp-mode-hook)))
+
+(use-package slime
+  :ensure t
+  :hook (common-lisp-mode . slime-mode)
+  :config
+  (progn
+    (setq inferior-lisp-program "sbcl")
+    (setq slime-contribs '(slime-fancy
+                           slime-indentation
+                           slime-sbcl-exts
+                           slime-scratch
+                           slime-company))
+
+    ;; enable fuzzy matching in code buffer and SLIME REPL
+    (setq slime-complete-symbol*-fancy t)
+    (setq slime-complete-symbol-function 'slime-fuzzy-complete-symbol)
+
+    (add-hook 'slime-repl-mode-hook #'turn-off-smartparens-mode)
+
+    (slime-setup '(slime-repl))
+
+    (mode-keys
+     lisp-mode-map
+     ("C-c '" . #'slime)
+
+     ("C-c c c" . #'slime-compile-file)
+     ("C-c c C" . #'slime-compile-and-load-file)
+     ("C-c c l" . #'slime-load-file)
+     ("C-c c f" . #'slime-compile-defun)
+     ("C-c c r" . #'slime-compile-region)
+     ("C-c c n" . #'slime-remove-notes)
+
+     ("C-c e b" . #'slime-eval-buffer)
+     ("C-c e f" . #'slime-eval-defun)
+     ("C-c e F" . #'slime-undefine-function)
+     ("C-c e e" . #'slime-eval-last-expression)
+     ("C-c e r" . #'slime-eval-region)
+
+     ("C-c g b" . #'slime-pop-find-definition-stack)
+     ("C-c g n" . #'slime-next-note)
+     ("C-c g N" . #'slime-previous-note)
+
+     ("C-c h a" . #'slime-apropos)
+     ("C-c h A" . #'slime-apropos-all)
+     ("C-c h d" . #'slime-disassemble-symbol)
+     ("C-c h h" . #'slime-describe-symbol)
+     ("C-c h H" . #'slime-hyperspec-lookup)
+     ("C-c h i" . #'slime-inspect-definition)
+     ("C-c h p" . #'slime-apropos-package)
+     ("C-c h t" . #'slime-toggle-trace-fdefinition)
+     ("C-c h T" . #'slime-untrace-all)
+     ("C-c h <" . #'slime-who-calls)
+     ("C-c h >" . #'slime-calls-who)
+     ("C-c h r" . #'slime-who-references)
+     ("C-c h m" . #'slime-who-macroexpands)
+     ("C-c h s" . #'slime-who-specializes)
+
+     ("C-c M a" . #'slime-macroexpand-all)
+     ("C-c M o" . #'slime-macroexpand-1)
+
+     ("C-c s e" . #'slime-eval-last-expression-in-repl)
+     ("C-c s i" . #'slime)
+     ("C-c s q" . #'slime-quit-lisp)
+
+     ("C-c t f" . #'slime-toggle-fancy-trace))))
+
+(use-package slime-company
+  :ensure t
+  :after (company)
+  :commands (company-slime)
+  :init
+  (add-to-list 'company-backends 'company-slime)
+  :config
+  (setq slime-company-completion 'fuzzy))
 
 (use-package go-mode
   :ensure t
@@ -868,6 +952,13 @@ Start `ielm' if it's not already running."
     (add-hook 'java-mode-hook #'(lambda () (meghanada-mode +1)))))
 
 (add-hook 'java-mode-hook #'(lambda () (setq fill-column 100)))
+
+(use-package markdown-mode
+  :ensure t
+  :commands (markdown-mode gfm-mode)
+  :mode (("README\\.md\\'" . gfm-mode)
+         ("\\.md\\'" . markdown-mode)
+         ("\\.markdown\\'" . markdown-mode)))
 
 (use-package protobuf-mode
   :ensure t
