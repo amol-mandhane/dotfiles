@@ -510,8 +510,7 @@ _<right>_ _l_: windmove-right	_d_: tighten	_q_: quit"
   :config
   (add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh))
 
-(>= emacs-major-version 26
-    nil
+(unless (>= emacs-major-version 26)
     (defalias 'smerge-keep-upper 'smerge-keep-mine)
     (defalias 'smerge-keep-lower 'smerge-keep-other)
     (defalias 'smerge-diff-base-upper 'smerge-diff-base-mine)

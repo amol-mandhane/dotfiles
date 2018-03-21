@@ -721,8 +721,7 @@ Use ~C-x v~ prefixed commands for now.
 #+END_SRC
 ** SMerge keybindings
 #+BEGIN_SRC emacs-lisp :tangle yes
-  (>= emacs-major-version 26
-      nil
+  (unless (>= emacs-major-version 26)
       (defalias 'smerge-keep-upper 'smerge-keep-mine)
       (defalias 'smerge-keep-lower 'smerge-keep-other)
       (defalias 'smerge-diff-base-upper 'smerge-diff-base-mine)
