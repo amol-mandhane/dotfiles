@@ -21,42 +21,42 @@ URxvt.perl-ext-common: default,matcher
 ! *color14: #fcaf3e
 ! *color15: #EEEEEC
 
-urxvt*foreground:   #f9f7dd
-urxvt*background:   #2f2f2f
+urxvt*foreground:   #c2c2c2
+urxvt*background:   #202124
 
 !black
-urxvt*color0: #393939
+urxvt*color0: #202124
 urxvt*color8: #474747
 
 !red
-urxvt*color1: #da4939
-urxvt*color9: #ff6c5c
+urxvt*color1: #d33b30
+urxvt*color9: #d33b30
 
 !green
-urxvt*color2 : #86cb92
-urxvt*color10: #8fb676
+urxvt*color2 : #28994f
+urxvt*color10: #28994f
 
 !yellow
-urxvt*color3:  #d0d26b
-urxvt*color11: #c8bc45
+urxvt*color3:  #eda912
+urxvt*color11: #dd860e
 
 !blue
-urxvt*color4: #07a0c3
-urxvt*color12: #d0d0ff
+urxvt*color4: #2581df
+urxvt*color12: #2581df
 
 !magenta
-urxvt*color5: #9f5079
-urxvt*color13: #a761c2
+urxvt*color5: #f538a0
+urxvt*color13: #9c166b
 
 !cyan
-urxvt*color6: #435d75
-urxvt*color14: #6e98a4
+urxvt*color6: #24c1e0
+urxvt*color14: #018773
 
 !white
 urxvt*color7: #c2c2c2
 urxvt*color15: #c2c2c2
 
-URxvt*font: xft:Inconsolata:pixelsize=16
+URxvt*font: xft:Inconsolata:pixelsize=18
 URxvt*letterSpace: -1
 
 URxvt.scrollstyle: plain
@@ -78,7 +78,7 @@ URxvt.internalBorder:       16
 
 ! Rofi config.
 rofi.levenshtein-sort: true
-rofi.font: IBM Plex Sans 12
+rofi.font: Roboto 12
 
 Xft.dpi: 108
 Xft.autohint: 0
