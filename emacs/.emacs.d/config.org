@@ -355,7 +355,7 @@ Approach to evolve interface framework
       (prefixed-keys
         ("bb" . #'helm-mini)
         ("bd" . 'kill-this-buffer)
-        ("C-i" . #'crux-switch-to-previous-buffer)
+        ("C-i" . #'switch-to-previous-buffer)
         ("bn" . 'next-buffer)
         ("bp" . 'previous-buffer)
         ("ff" . #'helm-find-files)
@@ -436,18 +436,7 @@ Fill column indicator for showing right ruler.
   (use-package fill-column-indicator
     :ensure t
     :commands (fci-mode turn-on-fci-mode turn-off-fci-mode)
-    :init (enable-minor-mode-globally fci-mode)
-    :config
-    (progn
-      ;;Fill column indicator interferes with company mode to create UI breakages.
-      ;;This snippet disables FCI when company mode is on.
-      (advice-add
-       'company-call-frontends
-       :before
-       #'(lambda (command)
-           (cond
-            ((string= "show" command) (turn-off-fci-mode))
-            ((string= "hide" command) (turn-on-fci-mode)))))))
+    :init (enable-minor-mode-globally fci-mode))
 #+END_SRC
 
 ** Indent guides
@@ -498,6 +487,11 @@ Fill column indicator for showing right ruler.
   (use-package company-quickhelp
     :ensure t
     :hook (after-init . company-quickhelp-mode))
+
+  (use-package company-childframe
+    :ensure t
+    :diminish company-childframe-mode
+    :hook (after-init . company-childframe-mode))
 #+END_SRC
 
 * Documentation
@@ -717,7 +711,13 @@ Use ~C-x v~ prefixed commands for now.
       (enable-minor-mode-globally diff-hl-mode)
       (enable-minor-mode-globally diff-hl-flydiff-mode))
     :config
-    (add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh))
+    (add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh)
+    (defhydra diff-hl-hydra (:foreign-keys warn)
+      "diff-hl-hydra"
+      ("n" diff-hl-next-hunk "Next Hunk")
+      ("p" diff-hl-previous-hunk "Previous Hunk")
+      ("k" diff-hl-revert-hunk "Kill Hunk")
+      ("q" nil "Quit")))
 #+END_SRC
 ** SMerge keybindings
 #+BEGIN_SRC emacs-lisp :tangle yes
@@ -734,7 +734,7 @@ Use ~C-x v~ prefixed commands for now.
     :config
     (progn
       (defhydra hydra-smerge
-        (:color green)
+        (:foreign-keys warn)
         "
   ^Move^	^Keep^	^Aux^	^Diff^
   ------------------------------------------------------
@@ -1635,7 +1635,10 @@ Don't use evil mode for general purpose. Current use of evil mode is for vim lik
 #+BEGIN_SRC emacs-lisp :tangle yes
   (use-package undo-tree
     :ensure t
-    :diminish undo-tree-mode)
+    :diminish undo-tree-mode
+    :config
+    (mode-key undo-tree-visualizer-mode-map
+              "<RET>" #'undo-tree-visualizer-quit))
 #+END_SRC
 
 * Encryption
@@ -1777,13 +1780,12 @@ Don't use evil mode for general purpose. Current use of evil mode is for vim lik
 
 ** Color theme and font
 #+BEGIN_SRC emacs-lisp :tangle yes
-  (use-package zenburn-theme
+  (use-package challenger-deep-theme
     :ensure t
     :config
     (progn
-      (load-theme 'zenburn t)
-      (set-frame-font "Inconsolata-18")))
-    ;; (setq default-frame-alist '((font . "Inconsolata-18")))))
+      (load-theme 'challenger-deep t)
+      (set-frame-font "Iosevka-18")))
 #+END_SRC
 
 ** Modeline
@@ -1809,18 +1811,17 @@ Don't use evil mode for general purpose. Current use of evil mode is for vim lik
 Enhance the loaded theme.
 #+BEGIN_SRC emacs-lisp :tangle yes
   (use-package theme-enhancement
-    :hook (after-init . theme-enhancement/apply))
+    :hook (after-init . (lambda () (theme-enhancement/apply nil :italics :org))))
 #+END_SRC
-** Linum
+** Line numbers
 #+BEGIN_SRC emacs-lisp :tangle yes
-  (use-package linum
-    :hook (after-init . global-linum-mode)
-    :config
-    (setq-default linum-format " %4d "))
-
-  (use-package hlinum
-    :ensure t
-    :hook (after-init . hlinum-activate))
+  (use-package display-line-numbers
+    :hook (after-init . global-display-line-numbers-mode)
+    :init
+    (setq-default display-line-numbers-widen t
+                  display-line-numbers-grow-only t
+                  display-line-numbers-width 5)
+    (set-face-attribute 'line-number-current-line nil :inherit 'fringe))
 #+END_SRC
 * Load machine configuration
 #+BEGIN_SRC emacs-lisp :tangle yes

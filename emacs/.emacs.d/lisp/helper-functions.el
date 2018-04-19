@@ -1,20 +1,32 @@
 ;;; helper-functions --- General functions used across configs
 
 ;;; Commentary:
-;;; This file contains some independent functions. Refer docstring for usage.
+;;; This file contains some independent functions.  Refer docstring for usage.
 
 ;;; Code:
+(require 'cl-lib)
 
 (defun reload-config ()
-  "Reload ~/.emacs.d/init.el"
+  "Reload ~/.emacs.d/init.el."
   (interactive)
   (load-file (expand-file-name "~/.emacs.d/init.el")))
 
-(defun switch-to-previous-buffer ()
-  "Switch to previously open buffer.
-Repeated invocations toggle between the two most recently open buffers."
+(defun switch-to-previous-buffer (&optional window)
+  "Switch back and forth between current and last buffer in the WINDOW."
   (interactive)
-  (switch-to-buffer (other-buffer (current-buffer) 1)))
+  (let ((current-buffer (window-buffer window))
+        (buffer-predicate
+         (frame-parameter (window-frame window) 'buffer-predicate)))
+    ;; switch to first buffer previously shown in this window that matches
+    ;; frame-parameter `buffer-predicate'
+    (switch-to-buffer
+     (or (cl-find-if (lambda (buffer)
+                       (and (not (eq buffer current-buffer))
+                            (or (null buffer-predicate)
+                                (funcall buffer-predicate buffer))))
+                     (mapcar #'car (window-prev-buffers window)))
+         ;; `other-buffer' honors `buffer-predicate' so no need to filter
+         (other-buffer current-buffer t)))))
 
 (defun join-next-line ()
   "Join the next line to the current one."
@@ -23,7 +35,7 @@ Repeated invocations toggle between the two most recently open buffers."
   (join-line))
 
 (defmacro enable-minor-mode-globally (minor-mode-to-enable)
-  "Enables the minor mode globally.
+  "Enable the minor mode globally.
 MINOR-MODE: Symbol of minor mode to enable."
   `(progn
      (define-globalized-minor-mode

@@ -125,14 +125,17 @@ Currently these are borrowed from Cyberpunk theme."
 
 (require 'cl-lib)
 
-(defun theme-enhancement/apply ()
+(defun theme-enhancement/apply (&optional bold italics org)
   "Apply theme enhancements."
   (progn
-    (cl-loop for f in +theme-enhancement/bold-faces+
-             collect (ignore-errors (set-face-bold f t)))
-    (cl-loop for f in +theme-enhancement/italic-faces+
-             collect (set-face-italic f t))
-    (theme-enhancement--org-mode)))
+    (when bold
+      (cl-loop for f in +theme-enhancement/bold-faces+
+               collect (ignore-errors (set-face-bold f t))))
+    (when italics
+      (cl-loop for f in +theme-enhancement/italic-faces+
+               collect (set-face-italic f t)))
+    (when org
+      (theme-enhancement--org-mode))))
 
 (provide 'theme-enhancement)
 ;;; theme-enhancement.el ends here

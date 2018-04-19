@@ -227,7 +227,7 @@ _<right>_ _l_: windmove-right	_d_: tighten	_q_: quit"
     (prefixed-keys
       ("bb" . #'helm-mini)
       ("bd" . 'kill-this-buffer)
-      ("C-i" . #'crux-switch-to-previous-buffer)
+      ("C-i" . #'switch-to-previous-buffer)
       ("bn" . 'next-buffer)
       ("bp" . 'previous-buffer)
       ("ff" . #'helm-find-files)
@@ -291,18 +291,7 @@ _<right>_ _l_: windmove-right	_d_: tighten	_q_: quit"
 (use-package fill-column-indicator
   :ensure t
   :commands (fci-mode turn-on-fci-mode turn-off-fci-mode)
-  :init (enable-minor-mode-globally fci-mode)
-  :config
-  (progn
-    ;;Fill column indicator interferes with company mode to create UI breakages.
-    ;;This snippet disables FCI when company mode is on.
-    (advice-add
-     'company-call-frontends
-     :before
-     #'(lambda (command)
-         (cond
-          ((string= "show" command) (turn-off-fci-mode))
-          ((string= "hide" command) (turn-on-fci-mode)))))))
+  :init (enable-minor-mode-globally fci-mode))
 
 (use-package highlight-indent-guides
   :ensure t
@@ -339,6 +328,11 @@ _<right>_ _l_: windmove-right	_d_: tighten	_q_: quit"
 (use-package company-quickhelp
   :ensure t
   :hook (after-init . company-quickhelp-mode))
+
+(use-package company-childframe
+  :ensure t
+  :diminish company-childframe-mode
+  :hook (after-init . company-childframe-mode))
 
 (use-package eldoc
   :ensure t
@@ -508,7 +502,13 @@ _<right>_ _l_: windmove-right	_d_: tighten	_q_: quit"
     (enable-minor-mode-globally diff-hl-mode)
     (enable-minor-mode-globally diff-hl-flydiff-mode))
   :config
-  (add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh))
+  (add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh)
+  (defhydra diff-hl-hydra (:foreign-keys warn)
+    "diff-hl-hydra"
+    ("n" diff-hl-next-hunk "Next Hunk")
+    ("p" diff-hl-previous-hunk "Previous Hunk")
+    ("k" diff-hl-revert-hunk "Kill Hunk")
+    ("q" nil "Quit")))
 
 (unless (>= emacs-major-version 26)
     (defalias 'smerge-keep-upper 'smerge-keep-mine)
@@ -523,7 +523,7 @@ _<right>_ _l_: windmove-right	_d_: tighten	_q_: quit"
   :config
   (progn
     (defhydra hydra-smerge
-      (:color green)
+      (:foreign-keys warn)
       "
 ^Move^	^Keep^	^Aux^	^Diff^
 ------------------------------------------------------
@@ -1245,7 +1245,10 @@ Start `ielm' if it's not already running."
 
 (use-package undo-tree
   :ensure t
-  :diminish undo-tree-mode)
+  :diminish undo-tree-mode
+  :config
+  (mode-key undo-tree-visualizer-mode-map
+            "<RET>" #'undo-tree-visualizer-quit))
 
 (use-package epa
   :config
@@ -1368,13 +1371,12 @@ _u_nread
 (use-package let-alist :ensure t :defer t)
 (use-package all-the-icons :ensure t :defer t)
 
-(use-package zenburn-theme
+(use-package challenger-deep-theme
   :ensure t
   :config
   (progn
-    (load-theme 'zenburn t)
-    (set-frame-font "Inconsolata-18")))
-  ;; (setq default-frame-alist '((font . "Inconsolata-18")))))
+    (load-theme 'challenger-deep t)
+    (set-frame-font "Iosevka-18")))
 
 (use-package spaceline
   :disabled
@@ -1393,16 +1395,15 @@ _u_nread
   :hook (window-setup . powerline-helium-theme))
 
 (use-package theme-enhancement
-  :hook (after-init . theme-enhancement/apply))
+  :hook (after-init . (lambda () (theme-enhancement/apply nil :italics :org))))
 
-(use-package linum
-  :hook (after-init . global-linum-mode)
-  :config
-  (setq-default linum-format " %4d "))
-
-(use-package hlinum
-  :ensure t
-  :hook (after-init . hlinum-activate))
+(use-package display-line-numbers
+  :hook (after-init . global-display-line-numbers-mode)
+  :init
+  (setq-default display-line-numbers-widen t
+                display-line-numbers-grow-only t
+                display-line-numbers-width 5)
+  (set-face-attribute 'line-number-current-line nil :inherit 'fringe))
 
 (load-file "~/.emacs.machine.el")
 
