@@ -58,7 +58,18 @@
     (package-refresh-contents)
     (package-install 'use-package))
 
-  (require 'use-package)
+  (eval-when-compile
+    (require 'use-package))
+
+  (use-package diminish
+    :ensure t)
+
+  (use-package use-package-chords
+    :ensure t
+    :config
+    (progn
+      (key-chord-mode +1)
+      (setq key-chord-two-keys-delay 0.05)))
 #+END_SRC
 
 ** Add .emacs.d/lisp to ~load-path~
@@ -75,7 +86,7 @@
 
 * Daemon
 #+BEGIN_SRC emacs-lisp :tangle yes
-  (add-hook 'after-init-hook #'(lambda () (server-start)))
+  (add-hook 'after-init-hook (lambda () (server-start)))
 #+END_SRC
 * Keybinding framework
 ** Which Key?
@@ -116,15 +127,6 @@ creates a framework like that using ~bind-key~.
       (rename-mnemonic-key-prefix "!" "Terminal")
       (rename-mnemonic-key-prefix "t" "Tags")))
 #+END_SRC
-** Key-chord
-#+BEGIN_SRC emacs-lisp :tangle yes
-  (use-package key-chord
-    :ensure t
-    :commands (key-chord-mode)
-    :init (add-hook 'after-init-hook #'(lambda () (key-chord-mode +1)))
-    :config
-    (setq key-chord-two-keys-delay 0.05))
-#+END_SRC
 * Interface framework
 Approach to evolve interface framework
  + Current: Helm, FTW.
@@ -141,17 +143,14 @@ Approach to evolve interface framework
   (use-package ido
     :disabled
     :ensure t
+    :bind (:map ido-completion-map
+                ("<tab>" . ido-exit-minibuffer)
+                ("<return>" . ido-exit-minibuffer))
     :config
     (progn
       (setq ido-enable-flex-matching t)
       (setq ido-use-virtual-buffers t)
       (setq ido-enable-regexp t)
-
-      (add-hook
-       'ido-setup-hook
-       #'(lambda () (mode-keys ido-completion-map
-                      ("<tab>" . 'ido-exit-minibuffer)
-                      ("<return>" . 'ido-exit-minibuffer))))
 
       (ido-mode +1)
       (ido-vertical-mode +1)))
@@ -186,6 +185,9 @@ Approach to evolve interface framework
     :disabled
     :ensure t
     :diminish ivy-mode
+    :bind (("M-x" . counsel-M-x)
+           ("C-c M-x" . execute-extended-command)
+           ("C-x C-f" . counsel-find-file))
     :config
     (progn
       (setq ivy-use-virtual-buffers t)
@@ -195,11 +197,7 @@ Approach to evolve interface framework
       (setq ivy-re-builders-alist
             '((counsel-M-x . ivy--regex-fuzzy)
               (counsel-find-file . ivy--regex-fuzzy)
-              (t . ivy--regex-plus)))
-      (global-keys
-        ("M-x" . 'counsel-M-x)
-        ("C-c M-x" . 'execute-extended-command)
-        ("C-x C-f" . 'counsel-find-file))))
+              (t . ivy--regex-plus)))))
 #+END_SRC
 
 ** Helm
@@ -304,12 +302,6 @@ Approach to evolve interface framework
   (setq vc-follow-symlinks t)
   (setq auto-save-file-name-transforms '((".*" "~/.emacs.d/auto-save-list/" t)))
 #+END_SRC
-** Whitespace cleanup
-#+BEGIN_SRC emacs-lisp :tangle yes
-  (setq require-final-newline t)
-  (add-hook 'before-save-hook 'delete-trailing-whitespace)
-#+END_SRC
-
 ** Don't use ~custom~
 #+BEGIN_SRC emacs-lisp :tangle yes
 (setq-default custom-file "/dev/null")
@@ -415,30 +407,41 @@ Approach to evolve interface framework
 #+BEGIN_SRC emacs-lisp :tangle yes
   (use-package beacon
     :ensure t
-    :commands beacon-blink
-    :init
-    (global-key "C-\\" #'beacon-blink))
+    :bind (("C-\\" . beacon-blink)))
 #+END_SRC
 
 ** Rainbow parens
 Multi-colored parantheses are helpful, especially in lisp-like modes.
 #+BEGIN_SRC emacs-lisp :tangle yes
-  (show-paren-mode +1)
+  (use-package paren
+    :hook (after-init . show-paren-mode))
 
   (use-package rainbow-delimiters
     :ensure t
     :hook (prog-mode . rainbow-delimiters-mode))
 #+END_SRC
-** Fill Column Indicator
+** COMMENT Fill Column Indicator
 Fill column indicator for showing right ruler.
 
-#+BEGIN_SRC emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp
   (use-package fill-column-indicator
     :ensure t
     :commands (fci-mode turn-on-fci-mode turn-off-fci-mode)
     :init (enable-minor-mode-globally fci-mode))
 #+END_SRC
+** Whitespace
+#+BEGIN_SRC emacs-lisp :tangle yes
+  (use-package whitespace
+    :diminish global-whitespace-mode
+    :config
+    (progn
+      (setq whitespace-style '(face lines-tail))
+      (setq whitespace-line-column 80)
+      (global-whitespace-mode +1)
 
+      (setq-default require-final-newline t)
+      (add-hook 'before-save-hook #'delete-trailing-whitespace)))
+#+END_SRC
 ** Indent guides
  #+BEGIN_SRC emacs-lisp :tangle yes
    (use-package highlight-indent-guides
@@ -454,9 +457,7 @@ Fill column indicator for showing right ruler.
 #+BEGIN_SRC emacs-lisp :tangle yes
   (use-package expand-region
     :ensure t
-    :commands er/expand-region
-    :init
-    (global-key "C-=" #'er/expand-region))
+    :bind (("C-=" . er/expand-region)))
 #+END_SRC
 
 ** Hungry delete
@@ -473,6 +474,14 @@ Fill column indicator for showing right ruler.
     :config
     (setq ediff-window-setup-function 'ediff-setup-windows-plain))
 #+END_SRC
+** Disable mouse
+#+BEGIN_SRC emacs-lisp :tangle yes
+  (use-package disable-mouse
+    :ensure t
+    :diminish disable-mouse-mode
+    :diminish disable-mouse-global-mode
+    :hook (after-init . global-disable-mouse-mode))
+#+END_SRC
 * Auto-completion
 #+BEGIN_SRC emacs-lisp :tangle yes
   (use-package company
@@ -487,11 +496,6 @@ Fill column indicator for showing right ruler.
   (use-package company-quickhelp
     :ensure t
     :hook (after-init . company-quickhelp-mode))
-
-  (use-package company-childframe
-    :ensure t
-    :diminish company-childframe-mode
-    :hook (after-init . company-childframe-mode))
 #+END_SRC
 
 * Documentation
@@ -522,13 +526,19 @@ Show errors in tooltip
   (use-package flyspell
     :ensure t
     :after (exec-path-from-shell)
-    :diminish (flyspell-mode . " ")
+    :diminish (flyspell-mode . " ")
     :hook (text-mode . flyspell-mode)
     :hook (prog-mode . flyspell-prog-mode)
-    :config
+    :init
     (progn
-      (setq ispell-program-name (locate-file "aspell" exec-path))
-      (setq ispell-list-command "--list")))
+      (setq-default ispell-program-name "/usr/local/bin/aspell")
+      (setq-default ispell-list-commaqnd "--list")))
+
+  (use-package flyspell-correct-helm
+    :ensure t
+    :after (flyspell helm)
+    :bind (:map flyspell-mode-map
+                ("C-c C-\\" . flyspell-correct-previous-word-generic)))
 #+END_SRC
 * Navigation
 ** Smartparens/Indentation/autopair
@@ -539,7 +549,6 @@ Smartparens/Paredit, no need to use electric pair mode.
 Turns out smartparens is too much in text mode. So use electric pair mode in text.
 #+BEGIN_SRC emacs-lisp :tangle yes
   (use-package elec-pair
-    :commands electric-pair-mode
     :hook (text-mode . electric-pair-local-mode))
 #+END_SRC
 
@@ -607,7 +616,7 @@ paredit, wrap-region, AST navigation etc.
         ("C-M-<up>" . 'sp-raise-sexp)
 
         ;; Unknown
-        ;; ("C-M-t" . sp-transpose-sexp)
+        ("C-M-t" . #'sp-transpose-sexp)
         ;; ("C-M-w" . sp-copy-sexp)
         ;; ("C-M-d" . delete-sexp)
         ;; ("M-<backspace>" . backward-kill-word)
@@ -644,9 +653,7 @@ Avy is used to jump around the file.
 #+BEGIN_SRC emacs-lisp :tangle yes
   (use-package avy
     :ensure t
-    :commands avy-goto-word-1
-    :init
-      (key-chord-define-global "jj" #'avy-goto-word-1))
+    :chords (("jj" . avy-goto-word-1)))
 #+END_SRC
 * Compilation
 #+BEGIN_SRC emacs-lisp :tangle yes
@@ -784,7 +791,7 @@ Use ~C-x v~ prefixed commands for now.
     :hook (after-init . yas-global-mode)
     :init (prefixed-key "is" #'yas-expand))
 #+END_SRC
-* TODO Major mode setup [11/13]
+* TODO Major mode setup [12/13]
 ** LSP
 #+BEGIN_SRC emacs-lisp :tangle yes
   (use-package lsp-mode
@@ -876,9 +883,7 @@ I've had many problems with the YCM setup at work.
 #+BEGIN_SRC emacs-lisp :tangle yes
   (use-package google-c-style
     :ensure t
-    :commands google-set-c-style
-    :init
-    (add-hook 'c-mode-common-hook 'google-set-c-style))
+    :hook (c-mode-common . google-set-c-style))
 #+END_SRC
 
 *** Navigation using RTags
@@ -934,10 +939,10 @@ Macrostep is for incremental macro expansion.
 #+BEGIN_SRC emacs-lisp :tangle yes
   (use-package macrostep
     :ensure t
-    :commands macrostep-mode
-    :init
-    (mode-key emacs-lisp-mode-map "C-c m" #'macrostep-mode)
-    (mode-key lisp-mode-map "C-c m" #'macrostep-mode))
+    :bind (:map emacs-lisp-mode-map
+                ("C-c m" . macrostep-mode)
+                :map lisp-mode-map
+                ("C-c m" . macrostep-mode)))
 #+END_SRC
 *** DONE Emacs Lisp
 **** Basic setup
@@ -985,15 +990,15 @@ Use litable to evaluate code in the margin. Helpful for quick iteration
 #+BEGIN_SRC emacs-lisp :tangle yes
   (use-package litable
     :ensure t
-    :commands (litable-mode litable-accept-as-pure)
-    :init
-    (progn
-      (mode-key emacs-lisp-mode-map "C-c l" #'litable-mode)
-      (mode-key lisp-interaction-mode-map "C-c l" #'litable-mode))
+    :bind (:map emacs-lisp-mode-map
+                ("C-c l" . litable-mode)
+                :map lisp-interaction-mode-map
+                ("C-c l" . litable-mode)
+                :map litable-mode-map
+                ("C-c p" . litable-accept-as-pure))
+
     :config
-    (progn
-      (setq litable-list-file "~/.emacs.d/tmp/litable-lists.el")
-      (mode-key litable-mode-map "C-c p" #'litable-accept-as-pure)))
+    (setq litable-list-file "~/.emacs.d/tmp/litable-lists.el"))
 #+END_SRC
 **** Pretty print eval-expression
 ~eval-expr~ is a replacement for ~eval-expression~ with prettified output.
@@ -1017,7 +1022,8 @@ Use litable to evaluate code in the margin. Helpful for quick iteration
 
 Use ~pp-eval-expression~ instead of ~eval-expr~.
 #+BEGIN_SRC emacs-lisp :tangle yes
-  (global-key "M-:" 'pp-eval-expression)
+  (use-package pp
+    :bind (("M-:" . pp-eval-expression)))
 #+END_SRC
 **** Lisp interaction mode hook
 #+BEGIN_SRC emacs-lisp :tangle yes
@@ -1146,9 +1152,8 @@ Use ~pp-eval-expression~ instead of ~eval-expr~.
 #+BEGIN_SRC emacs-lisp :tangle yes
   (use-package go-rename
     :if (executable-find "gorename")
-    :commands go-rename
-    :config
-    (mode-key go-mode-map "C-c r" #'go-rename))
+    :bind (:map go-mode-map
+                ("C-c r" . go-rename)))
 #+END_SRC
 *** TODO Compilation and Debugger
 ** DONE Haskell
@@ -1241,18 +1246,30 @@ Intero works well with stack projects. But without stack, we still need other op
 #+END_SRC
 ** DONE Java
 #+BEGIN_SRC emacs-lisp :tangle yes
-  (use-package meghanada
-    :ensure t
-    :commands meghanada-mode
+  (use-package cc-mode
     :init
-    (progn
-      (add-hook 'java-mode-hook #'(lambda () (meghanada-mode +1)))))
+    (add-hook
+     'java-mode-hook
+     (lambda () (setq fill-column 100
+                      whitespace-line-column 100))))
 #+END_SRC
-
+** DONE LaTeX
 #+BEGIN_SRC emacs-lisp :tangle yes
-  (add-hook 'java-mode-hook #'(lambda () (setq fill-column 100)))
+  (use-package tex
+    :ensure auctex
+    :pin gnu
+    :config
+    (progn
+      (setq TeX-parse-self t)  ;; Enable parse on load.
+      (setq TeX-auto-save t)  ;; Enable parse on save.
+
+      (setq TeX-PDF-mode t)))
+
+  (use-package company-auctex
+    :ensure t
+    :after (company tex)
+    :hook (after-init . company-auctex-init))
 #+END_SRC
-** TODO latex
 ** DONE Markdown
 #+BEGIN_SRC emacs-lisp :tangle yes
   (use-package markdown-mode
@@ -1403,88 +1420,84 @@ Intero works well with stack projects. But without stack, we still need other op
         ("C-x t" . 'comint-dynamic-complete-filename))))
 #+END_SRC
 ** DONE Org mode setup
-*** Keybindings
+*** Org
 #+BEGIN_SRC emacs-lisp :tangle yes
-  (add-hook
-   'org-mode-hook
-   #'(lambda () (mode-keys org-mode-map
-                  ("C-<up>" . 'org-move-subtree-up)
-                  ("C-<down>" . 'org-move-subtree-down))))
+  (use-package org
+    :ensure t
+    :pin gnu
+    :bind (:map org-mode-map
+                ("C-<up>" . org-move-subtree-up)
+                ("C-<down>" . org-move-subtree-down))
+    :config
+    (progn
+      (setq org-refile-targets '((org-agenda-files . (:maxlevel . 6))))
+
+      (setq org-outline-path-complete-in-steps nil)
+      (setq org-refile-use-outline-path t)))
 #+END_SRC
 *** Org agenda
 #+BEGIN_SRC emacs-lisp :tangle yes
-  (setq org-agenda-files '("~/organizer/main.org"))
+  (use-package org-agenda
+    :after (org)
+    :functions (org-agenda)
+    :init
+    (progn
+      (defun load-org-gtd-agenda ()
+        "Load custom agenda directly."
+        (interactive)
+        (org-agenda nil "c"))
 
-  (setq
-   org-agenda-custom-commands
-   '(("c" "GTD Agenda View"
-      ((agenda "")
-       (alltodo "")))))
-
-  ;; Add this above for high priority task
-  ;; (tags
-  ;;  "PRIORITY=\"A\""
-  ;;  ((org-agenda-skip-function '(org-agenda-skip-entry-if 'todo 'done))
-  ;;   (org-agenda-overriding-header "High-priority unfinished tasks:")))
-
-  (defun load-org-gtd-agenda ()
-    "Load custom agenda directly."
-    (interactive)
-    (org-agenda nil "c"))
-
-  (global-key "<f2>" #'load-org-gtd-agenda)
-  (global-key "C-c a" #'load-org-gtd-agenda)
+      (global-key "<f2>" #'load-org-gtd-agenda)
+      (global-key "C-c a" #'load-org-gtd-agenda))
+    :config
+    (progn
+      (setq org-agenda-files '("~/organizer/main.org"))
+      (setq org-agenda-custom-commands '(("c" "GTD Agenda View"
+                                          ((agenda "")
+                                           (alltodo "")))))))
 #+END_SRC
 *** Org bullets
 #+BEGIN_SRC emacs-lisp :tangle yes
   (use-package org-bullets
+    :after (org)
     :ensure t
-    :commands org-bullets-mode
     :diminish org-bullets-mode
-    :init
-    (add-hook
-     'org-mode-hook
-     #'(lambda () (org-bullets-mode +1))))
+    :hook (org-mode . org-bullets-mode))
 #+END_SRC
 *** Org indent
 #+BEGIN_SRC emacs-lisp :tangle yes
   (use-package org-indent
-    :commands org-indent-mode
     :diminish org-indent-mode
-    :init
-    (add-hook 'org-mode-hook #'(lambda () (org-indent-mode +1))))
+    :hook (org-mode . org-indent-mode))
 #+END_SRC
 *** Org capture
 #+BEGIN_SRC emacs-lisp :tangle yes
-  (setq org-capture-templates
-        '(("a" "Action Item" entry (file+headline "~/organizer/main.org" "Action Items")
-           "* TODO [#B] %?\n  %i")
-          ("c" "Calendar" entry (file+headline "~/organizer/main.org" "Calendar")
-           "* %?\n %^T\n %i")
-          ("r" "Reference" entry (file "~/organizer/reference.org")
-           "* %?\n  %i\n%^{prompt|Description}\n\n:PROPERTIES:\n:RecordDate:\t%T\n:END:"
-           :prepend t
-           :empty-lines 1)))
+  (use-package org-capture
+    :after (org)
+    :bind (([f6] . org-capture)
+           ("C-c c" . org-capture))
+    :init
+    (setq org-capture-templates
+          '(("a" "Action Item" entry (file+headline "~/organizer/main.org" "Action Items")
+             "* TODO [#B] %?\n  %i")
+            ("c" "Calendar" entry (file+headline "~/organizer/main.org" "Calendar")
+             "* %?\n %^T\n %i")
+            ("r" "Reference" entry (file "~/organizer/reference.org")
+             "* %?\n  %i\n%^{prompt|Description}\n\n:PROPERTIES:\n:RecordDate:\t%T\n:END:"
+             :prepend t
+             :empty-lines 1))))
 
-  (global-key "<f6>" 'org-capture)
-  (global-key "C-c c" 'org-capture)
-#+END_SRC
-*** Org refile
-#+BEGIN_SRC emacs-lisp :tangle yes
-  (setq org-refile-targets '((org-agenda-files . (:maxlevel . 6))))
-
-  (setq org-outline-path-complete-in-steps nil)
-  (setq org-refile-use-outline-path t)
 #+END_SRC
 *** Org source editing
 #+BEGIN_SRC emacs-lisp :tangle yes
-  (diminish 'org-src-mode " ")
-  (add-hook
-   'org-src-mode-hook
-   #'(lambda ()
-       (setq-local
-        flycheck-disabled-checkers
-        (cons 'emacs-lisp-checkdoc flycheck-disabled-checkers))))
+  (use-package org-src
+    :diminish (org-src-mode . " ")
+    :config
+    (add-hook
+     'org-src-mode-hook
+     (lambda ()
+       (setq-local flycheck-disabled-checkers
+                   (cons 'emacs-lisp-checkdoc flycheck-disabled-checkers)))))
 #+END_SRC
 *** Org capture system-wide shortcut helper
 Copied from [[http://cestlaz.github.io/posts/using-emacs-24-capture-2][C'est la Z blog]].
@@ -1580,16 +1593,13 @@ Copied from [[http://cestlaz.github.io/posts/using-emacs-24-capture-2][C'est la 
 #+END_SRC
 ** Swiper
 #+BEGIN_SRC emacs-lisp :tangle yes
-  ;;(prefixed-key "ss" 'swiper)
-  ;;(key-chord-define-global "??" 'swiper)
   (use-package swiper-helm
     :ensure t
     :after helm
     :commands swiper-helm
+    :chords (("??" . swiper-helm))
     :init
-    (progn
-      (prefixed-key "ss" #'swiper-helm)
-      (key-chord-define-global "??" #'swiper-helm)))
+    (prefixed-key "ss" #'swiper-helm))
 #+END_SRC
 ** Anzu
 Anzu is good for interactive search and replace.
@@ -1620,8 +1630,8 @@ Anzu is good for interactive search and replace.
 IEdit is for interactively replacing a symbol.
 #+BEGIN_SRC emacs-lisp :tangle yes
   (use-package iedit
-    :commands iedit-mode
-    :init (global-key "C-'" #'iedit-mode))
+    :ensure t
+    :bind (("C-'" . iedit-mode)))
 #+END_SRC
 * Evil
 Don't use evil mode for general purpose. Current use of evil mode is for vim like search/replace only. Toggle as necessary.
@@ -1636,9 +1646,8 @@ Don't use evil mode for general purpose. Current use of evil mode is for vim lik
   (use-package undo-tree
     :ensure t
     :diminish undo-tree-mode
-    :config
-    (mode-key undo-tree-visualizer-mode-map
-              "<RET>" #'undo-tree-visualizer-quit))
+    :bind (:map undo-tree-visualizer-mode-map
+                ("<RET>" . undo-tree-visualizer-quit)))
 #+END_SRC
 
 * Encryption

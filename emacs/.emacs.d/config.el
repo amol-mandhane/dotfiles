@@ -48,7 +48,18 @@
   (package-refresh-contents)
   (package-install 'use-package))
 
-(require 'use-package)
+(eval-when-compile
+  (require 'use-package))
+
+(use-package diminish
+  :ensure t)
+
+(use-package use-package-chords
+  :ensure t
+  :config
+  (progn
+    (key-chord-mode +1)
+    (setq key-chord-two-keys-delay 0.05)))
 
 (add-to-list 'load-path (expand-file-name "~/.emacs.d/lisp"))
 
@@ -56,7 +67,7 @@
   :ensure t
   :hook (after-init . exec-path-from-shell-initialize))
 
-(add-hook 'after-init-hook #'(lambda () (server-start)))
+(add-hook 'after-init-hook (lambda () (server-start)))
 
 (use-package which-key
   :ensure t
@@ -86,13 +97,6 @@
     (rename-mnemonic-key-prefix "sr" "Replace")
     (rename-mnemonic-key-prefix "!" "Terminal")
     (rename-mnemonic-key-prefix "t" "Tags")))
-
-(use-package key-chord
-  :ensure t
-  :commands (key-chord-mode)
-  :init (add-hook 'after-init-hook #'(lambda () (key-chord-mode +1)))
-  :config
-  (setq key-chord-two-keys-delay 0.05))
 
 (use-package helm-config
   :ensure helm
@@ -187,9 +191,6 @@
 (setq vc-follow-symlinks t)
 (setq auto-save-file-name-transforms '((".*" "~/.emacs.d/auto-save-list/" t)))
 
-(setq require-final-newline t)
-(add-hook 'before-save-hook 'delete-trailing-whitespace)
-
 (setq-default custom-file "/dev/null")
 
 (use-package hydra
@@ -278,20 +279,25 @@ _<right>_ _l_: windmove-right	_d_: tighten	_q_: quit"
 
 (use-package beacon
   :ensure t
-  :commands beacon-blink
-  :init
-  (global-key "C-\\" #'beacon-blink))
+  :bind (("C-\\" . beacon-blink)))
 
-(show-paren-mode +1)
+(use-package paren
+  :hook (after-init . show-paren-mode))
 
 (use-package rainbow-delimiters
   :ensure t
   :hook (prog-mode . rainbow-delimiters-mode))
 
-(use-package fill-column-indicator
-  :ensure t
-  :commands (fci-mode turn-on-fci-mode turn-off-fci-mode)
-  :init (enable-minor-mode-globally fci-mode))
+(use-package whitespace
+  :diminish global-whitespace-mode
+  :config
+  (progn
+    (setq whitespace-style '(face lines-tail))
+    (setq whitespace-line-column 80)
+    (global-whitespace-mode +1)
+
+    (setq-default require-final-newline t)
+    (add-hook 'before-save-hook #'delete-trailing-whitespace)))
 
 (use-package highlight-indent-guides
   :ensure t
@@ -303,9 +309,7 @@ _<right>_ _l_: windmove-right	_d_: tighten	_q_: quit"
 
 (use-package expand-region
   :ensure t
-  :commands er/expand-region
-  :init
-  (global-key "C-=" #'er/expand-region))
+  :bind (("C-=" . er/expand-region)))
 
 (use-package hungry-delete
   :ensure t
@@ -315,6 +319,12 @@ _<right>_ _l_: windmove-right	_d_: tighten	_q_: quit"
 (use-package ediff
   :config
   (setq ediff-window-setup-function 'ediff-setup-windows-plain))
+
+(use-package disable-mouse
+  :ensure t
+  :diminish disable-mouse-mode
+  :diminish disable-mouse-global-mode
+  :hook (after-init . global-disable-mouse-mode))
 
 (use-package company
   :ensure t
@@ -328,11 +338,6 @@ _<right>_ _l_: windmove-right	_d_: tighten	_q_: quit"
 (use-package company-quickhelp
   :ensure t
   :hook (after-init . company-quickhelp-mode))
-
-(use-package company-childframe
-  :ensure t
-  :diminish company-childframe-mode
-  :hook (after-init . company-childframe-mode))
 
 (use-package eldoc
   :ensure t
@@ -353,16 +358,21 @@ _<right>_ _l_: windmove-right	_d_: tighten	_q_: quit"
 (use-package flyspell
   :ensure t
   :after (exec-path-from-shell)
-  :diminish (flyspell-mode . " ")
+  :diminish (flyspell-mode . " ")
   :hook (text-mode . flyspell-mode)
   :hook (prog-mode . flyspell-prog-mode)
-  :config
+  :init
   (progn
-    (setq ispell-program-name (locate-file "aspell" exec-path))
-    (setq ispell-list-command "--list")))
+    (setq-default ispell-program-name "/usr/local/bin/aspell")
+    (setq-default ispell-list-commaqnd "--list")))
+
+(use-package flyspell-correct-helm
+  :ensure t
+  :after (flyspell helm)
+  :bind (:map flyspell-mode-map
+              ("C-c C-\\" . flyspell-correct-previous-word-generic)))
 
 (use-package elec-pair
-  :commands electric-pair-mode
   :hook (text-mode . electric-pair-local-mode))
 
 (defmacro def-pair (pair)
@@ -425,7 +435,7 @@ _<right>_ _l_: windmove-right	_d_: tighten	_q_: quit"
       ("C-M-<up>" . 'sp-raise-sexp)
 
       ;; Unknown
-      ;; ("C-M-t" . sp-transpose-sexp)
+      ("C-M-t" . #'sp-transpose-sexp)
       ;; ("C-M-w" . sp-copy-sexp)
       ;; ("C-M-d" . delete-sexp)
       ;; ("M-<backspace>" . backward-kill-word)
@@ -453,9 +463,7 @@ _<right>_ _l_: windmove-right	_d_: tighten	_q_: quit"
 
 (use-package avy
   :ensure t
-  :commands avy-goto-word-1
-  :init
-    (key-chord-define-global "jj" #'avy-goto-word-1))
+  :chords (("jj" . avy-goto-word-1)))
 
 (use-package compile
   :commands (compile recompile)
@@ -638,9 +646,7 @@ _p_rev	_u_pper	_E_diff	_=_: upper-lower	_RET_: current
 
 (use-package google-c-style
   :ensure t
-  :commands google-set-c-style
-  :init
-  (add-hook 'c-mode-common-hook 'google-set-c-style))
+  :hook (c-mode-common . google-set-c-style))
 
 (use-package rtags
   :disabled
@@ -676,10 +682,10 @@ _p_rev	_u_pper	_E_diff	_=_: upper-lower	_RET_: current
 
 (use-package macrostep
   :ensure t
-  :commands macrostep-mode
-  :init
-  (mode-key emacs-lisp-mode-map "C-c m" #'macrostep-mode)
-  (mode-key lisp-mode-map "C-c m" #'macrostep-mode))
+  :bind (:map emacs-lisp-mode-map
+              ("C-c m" . macrostep-mode)
+              :map lisp-mode-map
+              ("C-c m" . macrostep-mode)))
 
 ;; Helper functions.
 (defun elisp-visit-ielm ()
@@ -721,15 +727,15 @@ Start `ielm' if it's not already running."
 
 (use-package litable
   :ensure t
-  :commands (litable-mode litable-accept-as-pure)
-  :init
-  (progn
-    (mode-key emacs-lisp-mode-map "C-c l" #'litable-mode)
-    (mode-key lisp-interaction-mode-map "C-c l" #'litable-mode))
+  :bind (:map emacs-lisp-mode-map
+              ("C-c l" . litable-mode)
+              :map lisp-interaction-mode-map
+              ("C-c l" . litable-mode)
+              :map litable-mode-map
+              ("C-c p" . litable-accept-as-pure))
+
   :config
-  (progn
-    (setq litable-list-file "~/.emacs.d/tmp/litable-lists.el")
-    (mode-key litable-mode-map "C-c p" #'litable-accept-as-pure)))
+  (setq litable-list-file "~/.emacs.d/tmp/litable-lists.el"))
 
 (use-package eval-expr
   :ensure t
@@ -747,7 +753,8 @@ Start `ielm' if it's not already running."
       (set (make-local-variable 'eldoc-documentation-function) #'elisp-eldoc-documentation-function)
       (eldoc-mode +1))))
 
-(global-key "M-:" 'pp-eval-expression)
+(use-package pp
+  :bind (("M-:" . pp-eval-expression)))
 
 (add-hook
  'lisp-interaction-mode-hook
@@ -860,9 +867,8 @@ Start `ielm' if it's not already running."
 
 (use-package go-rename
   :if (executable-find "gorename")
-  :commands go-rename
-  :config
-  (mode-key go-mode-map "C-c r" #'go-rename))
+  :bind (:map go-mode-map
+              ("C-c r" . go-rename)))
 
 (use-package haskell-mode
   :ensure t
@@ -939,14 +945,27 @@ Start `ielm' if it's not already running."
   :config
   (js2r-add-keybindings-with-prefix "C-c j r"))
 
-(use-package meghanada
-  :ensure t
-  :commands meghanada-mode
+(use-package cc-mode
   :init
-  (progn
-    (add-hook 'java-mode-hook #'(lambda () (meghanada-mode +1)))))
+  (add-hook
+   'java-mode-hook
+   (lambda () (setq fill-column 100
+                    whitespace-line-column 100))))
 
-(add-hook 'java-mode-hook #'(lambda () (setq fill-column 100)))
+(use-package tex
+  :ensure auctex
+  :pin gnu
+  :config
+  (progn
+    (setq TeX-parse-self t)  ;; Enable parse on load.
+    (setq TeX-auto-save t)  ;; Enable parse on save.
+
+    (setq TeX-PDF-mode t)))
+
+(use-package company-auctex
+  :ensure t
+  :after (company tex)
+  :hook (after-init . company-auctex-init))
 
 (use-package markdown-mode
   :ensure t
@@ -1065,74 +1084,71 @@ Start `ielm' if it's not already running."
       ("C-<down>" . 'comint-next-matching-input-from-input)
       ("C-x t" . 'comint-dynamic-complete-filename))))
 
-(add-hook
- 'org-mode-hook
- #'(lambda () (mode-keys org-mode-map
-                ("C-<up>" . 'org-move-subtree-up)
-                ("C-<down>" . 'org-move-subtree-down))))
+(use-package org
+  :ensure t
+  :pin gnu
+  :bind (:map org-mode-map
+              ("C-<up>" . org-move-subtree-up)
+              ("C-<down>" . org-move-subtree-down))
+  :config
+  (progn
+    (setq org-refile-targets '((org-agenda-files . (:maxlevel . 6))))
 
-(setq org-agenda-files '("~/organizer/main.org"))
+    (setq org-outline-path-complete-in-steps nil)
+    (setq org-refile-use-outline-path t)))
 
-(setq
- org-agenda-custom-commands
- '(("c" "GTD Agenda View"
-    ((agenda "")
-     (alltodo "")))))
+(use-package org-agenda
+  :after (org)
+  :functions (org-agenda)
+  :init
+  (progn
+    (defun load-org-gtd-agenda ()
+      "Load custom agenda directly."
+      (interactive)
+      (org-agenda nil "c"))
 
-;; Add this above for high priority task
-;; (tags
-;;  "PRIORITY=\"A\""
-;;  ((org-agenda-skip-function '(org-agenda-skip-entry-if 'todo 'done))
-;;   (org-agenda-overriding-header "High-priority unfinished tasks:")))
-
-(defun load-org-gtd-agenda ()
-  "Load custom agenda directly."
-  (interactive)
-  (org-agenda nil "c"))
-
-(global-key "<f2>" #'load-org-gtd-agenda)
-(global-key "C-c a" #'load-org-gtd-agenda)
+    (global-key "<f2>" #'load-org-gtd-agenda)
+    (global-key "C-c a" #'load-org-gtd-agenda))
+  :config
+  (progn
+    (setq org-agenda-files '("~/organizer/main.org"))
+    (setq org-agenda-custom-commands '(("c" "GTD Agenda View"
+                                        ((agenda "")
+                                         (alltodo "")))))))
 
 (use-package org-bullets
+  :after (org)
   :ensure t
-  :commands org-bullets-mode
   :diminish org-bullets-mode
-  :init
-  (add-hook
-   'org-mode-hook
-   #'(lambda () (org-bullets-mode +1))))
+  :hook (org-mode . org-bullets-mode))
 
 (use-package org-indent
-  :commands org-indent-mode
   :diminish org-indent-mode
+  :hook (org-mode . org-indent-mode))
+
+(use-package org-capture
+  :after (org)
+  :bind (([f6] . org-capture)
+         ("C-c c" . org-capture))
   :init
-  (add-hook 'org-mode-hook #'(lambda () (org-indent-mode +1))))
+  (setq org-capture-templates
+        '(("a" "Action Item" entry (file+headline "~/organizer/main.org" "Action Items")
+           "* TODO [#B] %?\n  %i")
+          ("c" "Calendar" entry (file+headline "~/organizer/main.org" "Calendar")
+           "* %?\n %^T\n %i")
+          ("r" "Reference" entry (file "~/organizer/reference.org")
+           "* %?\n  %i\n%^{prompt|Description}\n\n:PROPERTIES:\n:RecordDate:\t%T\n:END:"
+           :prepend t
+           :empty-lines 1))))
 
-(setq org-capture-templates
-      '(("a" "Action Item" entry (file+headline "~/organizer/main.org" "Action Items")
-         "* TODO [#B] %?\n  %i")
-        ("c" "Calendar" entry (file+headline "~/organizer/main.org" "Calendar")
-         "* %?\n %^T\n %i")
-        ("r" "Reference" entry (file "~/organizer/reference.org")
-         "* %?\n  %i\n%^{prompt|Description}\n\n:PROPERTIES:\n:RecordDate:\t%T\n:END:"
-         :prepend t
-         :empty-lines 1)))
-
-(global-key "<f6>" 'org-capture)
-(global-key "C-c c" 'org-capture)
-
-(setq org-refile-targets '((org-agenda-files . (:maxlevel . 6))))
-
-(setq org-outline-path-complete-in-steps nil)
-(setq org-refile-use-outline-path t)
-
-(diminish 'org-src-mode " ")
-(add-hook
- 'org-src-mode-hook
- #'(lambda ()
-     (setq-local
-      flycheck-disabled-checkers
-      (cons 'emacs-lisp-checkdoc flycheck-disabled-checkers))))
+(use-package org-src
+  :diminish (org-src-mode . " ")
+  :config
+  (add-hook
+   'org-src-mode-hook
+   (lambda ()
+     (setq-local flycheck-disabled-checkers
+                 (cons 'emacs-lisp-checkdoc flycheck-disabled-checkers)))))
 
 (defadvice org-capture-finalize
     (after delete-capture-frame activate)
@@ -1204,16 +1220,13 @@ Start `ielm' if it's not already running."
   :ensure t
   :defer 5)
 
-;;(prefixed-key "ss" 'swiper)
-;;(key-chord-define-global "??" 'swiper)
 (use-package swiper-helm
   :ensure t
   :after helm
   :commands swiper-helm
+  :chords (("??" . swiper-helm))
   :init
-  (progn
-    (prefixed-key "ss" #'swiper-helm)
-    (key-chord-define-global "??" #'swiper-helm)))
+  (prefixed-key "ss" #'swiper-helm))
 
 (use-package anzu
   :ensure t
@@ -1236,8 +1249,8 @@ Start `ielm' if it's not already running."
   :defer 5)
 
 (use-package iedit
-  :commands iedit-mode
-  :init (global-key "C-'" #'iedit-mode))
+  :ensure t
+  :bind (("C-'" . iedit-mode)))
 
 (use-package evil
   :ensure t
@@ -1246,9 +1259,8 @@ Start `ielm' if it's not already running."
 (use-package undo-tree
   :ensure t
   :diminish undo-tree-mode
-  :config
-  (mode-key undo-tree-visualizer-mode-map
-            "<RET>" #'undo-tree-visualizer-quit))
+  :bind (:map undo-tree-visualizer-mode-map
+              ("<RET>" . undo-tree-visualizer-quit)))
 
 (use-package epa
   :config

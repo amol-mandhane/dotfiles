@@ -108,7 +108,7 @@ BUFFER-NAME-PREFIX: Intended prefix of the buffer name."
               (cl-remove-if
                #'(lambda (s) (string= s ""))
                (split-string buffer-name-prefix "/"))))
-          (concat "/"
+          (concat "/"
                   (cl-reduce
                    #'(lambda (s acc) (if (<= threshold (length acc))
                                          acc
@@ -242,8 +242,8 @@ ACTIVE-P: Boolean representing whether the modeline is active or not."
               (list
                (helium--make-block-xpm)
                (powerline-raw (concat " " (window-numbering-get-number-string)) .block-face 'r)
-               (powerline-raw (if buffer-read-only "" "") .default-face 'l)
-               (powerline-raw (if (buffer-modified-p) "" "") .default-face 'l)
+               (powerline-raw (if buffer-read-only "" "") .default-face 'l)
+               (powerline-raw (if (buffer-modified-p) "" "") .default-face 'l)
                (powerline-raw (helium--project-name) .highlight-face 'l)
                (powerline-raw (helium--buffer-name-prefix) .default-face )
                (powerline-raw (buffer-name) .highlight-bold-face)
