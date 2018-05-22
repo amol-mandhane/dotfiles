@@ -482,6 +482,17 @@ Fill column indicator for showing right ruler.
     :diminish disable-mouse-global-mode
     :hook (after-init . global-disable-mouse-mode))
 #+END_SRC
+** Write good
+#+BEGIN_SRC emacs-lisp :tangle yes
+  (use-package writegood-mode
+    :disabled
+    :ensure t
+    :hook (text-mode . writegood-mode))
+
+  (use-package artbollocks-mode
+    :ensure t
+    :hook (text-mode . artbollocks-mode))
+#+END_SRC
 * Auto-completion
 #+BEGIN_SRC emacs-lisp :tangle yes
   (use-package company

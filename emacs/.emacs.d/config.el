@@ -326,6 +326,15 @@ _<right>_ _l_: windmove-right	_d_: tighten	_q_: quit"
   :diminish disable-mouse-global-mode
   :hook (after-init . global-disable-mouse-mode))
 
+(use-package writegood-mode
+  :disabled
+  :ensure t
+  :hook (text-mode . writegood-mode))
+
+(use-package artbollocks-mode
+  :ensure t
+  :hook (text-mode . artbollocks-mode))
+
 (use-package company
   :ensure t
   :hook (after-init . global-company-mode)
