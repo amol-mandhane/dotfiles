@@ -27,16 +27,27 @@
 
 (unless (frame-parameter nil 'fullscreen)
   (if
-      (eq system-type 'darwin)
+      (eval-when-compile
+        (eq system-type 'darwin))
       (toggle-frame-fullscreen)
     (toggle-frame-maximized)))
 
 (setq-default cursor-type 'bar)
 (blink-cursor-mode 0)
 
+(setq delete-old-versions -1)
+(setq version-control t)
+(setq vc-make-backup-files t)
+(setq backup-directory-alist `(("." . "~/.emacs.d/backups")))
+(setq vc-follow-symlinks t)
+(setq auto-save-file-name-transforms '((".*" "~/.emacs.d/auto-save-list/" t)))
+
+(setq-default custom-file "/dev/null")
+
+(add-to-list 'load-path (expand-file-name "~/.emacs.d/lisp"))
+
 (require 'package)
-;; Package initialized in init.el
-;; (package-initialize)
+(package-initialize)
 (setq package-archives
       '(("gnu" . "https://elpa.gnu.org/packages/")
         ("org" . "https://orgmode.org/elpa/")
@@ -61,7 +72,7 @@
     (key-chord-mode +1)
     (setq key-chord-two-keys-delay 0.05)))
 
-(add-to-list 'load-path (expand-file-name "~/.emacs.d/lisp"))
+(use-package use-package-prefixed-bind)
 
 (use-package exec-path-from-shell
   :ensure t
@@ -69,24 +80,29 @@
 
 (add-hook 'after-init-hook (lambda () (server-start)))
 
+(use-package f :ensure t :defer t)
+(use-package s :ensure t :defer t)
+(use-package dash :ensure t :defer t)
+(use-package powerline :ensure t :defer t)
+(use-package let-alist :ensure t :defer t)
+(use-package all-the-icons :ensure t :defer t)
+(use-package hydra :ensure t :demand t)
+(use-package helper-functions :demand t)
+
 (use-package which-key
   :ensure t
   :diminish which-key-mode
   :hook (after-init . which-key-mode)
   :config
-  (setq which-key-sort-order 'which-key-key-order-alpha
-        which-key-side-window-max-width 0.33
-        which-key-idle-delay 0.5))
-
-(use-package hydra
-  :ensure t)
-
-(use-package keybinding
-  :demand t
-  :init (global-unset-key (kbd "M-m"))
-  :functions (rename-mnemonic-key-prefix)
-  :config
   (progn
+    (setq which-key-sort-order 'which-key-key-order-alpha
+          which-key-side-window-max-width 0.33
+          which-key-idle-delay 0.5)
+
+    (defun rename-mnemonic-key-prefix (key-string name)
+      (which-key-add-key-based-replacements
+        (concat +keybinding/mnemonic-prefix+ " " key-string) name))
+
     (rename-mnemonic-key-prefix "g" "VCS")
     (rename-mnemonic-key-prefix "e" "Errors")
     (rename-mnemonic-key-prefix "p" "Projects")
@@ -98,28 +114,30 @@
     (rename-mnemonic-key-prefix "!" "Terminal")
     (rename-mnemonic-key-prefix "t" "Tags")))
 
-(use-package helm-config
-  :ensure helm
+(use-package helm
+  :ensure t
+  :demand
   :diminish helm-mode
-  :functions (helm-hide-minibuffer-maybe)
-  :defines (helm-map)
+  :bind (("C-c h" . helm-command-prefix)
+         ("M-x" . helm-M-x)
+         ("C-x C-f" . helm-find-files)
+         ("M-s o" . helm-occur)
+         :map helm-map
+         ("C-i" . helm-execute-persistent-action) ; make TAB work in terminal
+         ([tab] . helm-execute-persistent-action)
+         ("C-z" . helm-select-action))
+  :prefixed-bind (("bb" . helm-mini)
+                  ("ry" . helm-show-kill-ring)
+                  ("ff" . helm-find-files)
+                  ("tt" . helm-semantic-or-imenu))
   :config
   (progn
-    (defun helm-hide-minibuffer-maybe ()
-      "Hide minibuffer in Helm session if we use the header line as input field."
-      (when (with-helm-buffer helm-echo-input-in-header-line)
-        (let ((ov (make-overlay (point-min) (point-max) nil nil t)))
-          (overlay-put ov 'window (selected-window))
-          (overlay-put ov 'face
-                       (let ((bg-color (face-background 'default nil)))
-                         `(:background ,bg-color :foreground ,bg-color)))
-          (setq-local cursor-type nil))))
-
+    (require 'helm-config)
     (setq helm-move-to-line-cycle-in-source t
           helm-ff-search-library-in-sexp t
           helm-scroll-amount 8
           helm-ff-file-name-history-use-recentf t
-          helm-echo-input-in-header-line t
+          ;; helm-echo-input-in-header-line t
 
           helm-buffers-fuzzy-matching t
           helm-recentf-fuzzy-match t
@@ -141,30 +159,14 @@
           helm-quick-update t
           helm-ff-skip-boring-files t)
 
-    (add-hook 'helm-minibuffer-set-up-hook #'helm-hide-minibuffer-maybe)
-
-    (global-unset-key (kbd "C-x c"))
-
-    (require 'helm)
-    (mode-keys helm-map
-      ("C-i" . #'helm-execute-persistent-action) ; make TAB work in terminal
-      ("C-z" . #'helm-select-action))
-
-    (global-keys
-      ("C-c h" . #'helm-command-prefix)
-      ("M-x" . #'helm-M-x)
-      ("C-x C-f" . #'helm-find-files)
-      ("M-s o" . #'helm-occur))
-
-    (helm-autoresize-mode +1)
-    (helm-mode +1)))
+    (helm-mode +1)
+    (helm-autoresize-mode +1)))
 
 (use-package helm-projectile
   :ensure t
   :after (helm projectile)
   :hook (after-init . helm-projectile-on)
-  :commands (helm-projectile)
-  :init (prefixed-key "pp" #'helm-projectile))
+  :prefixed-bind (("pp" . helm-projectile)))
 
 (use-package helm-descbinds
   :ensure t
@@ -174,9 +176,6 @@
   :ensure t
   :commands (helm-ag))
 
-(use-package helper-functions
-  :demand t)
-
 (use-package autorevert
   :diminish auto-revert-mode
   :hook (after-init . global-auto-revert-mode))
@@ -184,90 +183,11 @@
 (use-package abbrev
   :diminish abbrev-mode)
 
-(setq delete-old-versions -1)
-(setq version-control t)
-(setq vc-make-backup-files t)
-(setq backup-directory-alist `(("." . "~/.emacs.d/backups")))
-(setq vc-follow-symlinks t)
-(setq auto-save-file-name-transforms '((".*" "~/.emacs.d/auto-save-list/" t)))
+(use-package ibuffer
+  :bind (("C-x C-b" . ibuffer)))
 
-(setq-default custom-file "/dev/null")
-
-(use-package hydra
-  :ensure t
-  :config
-  (defhydra windows-hydra ()
-    "
-^Windows^				^Window^		^Zoom^
---------------------------------------------------------------------------
-_<left>_ _h_: windmove-left		_w_: enlarge	_-_: zoom out
-_<down>_ _j_: windmove-down		_s_: shrink	_+_ _=_: zoom in
-_<up>_ _k_: windmove-up		_a_: widen	_0_: reset
-_<right>_ _l_: windmove-right	_d_: tighten	_q_: quit"
-    ("<left>" windmove-left)
-    ("<right>" windmove-right)
-    ("<up>" windmove-up)
-    ("<down>" windmove-down)
-    ("h" windmove-left)
-    ("j" windmove-down)
-    ("k" windmove-up)
-    ("l" windmove-right)
-    ("+" text-scale-increase)
-    ("=" text-scale-increase)
-    ("-" text-scale-decrease)
-    ("w" enlarge-window)
-    ("a" enlarge-window-horizontally)
-    ("s" shrink-window)
-    ("d" shrink-window-horizontally)
-    ("0" (text-scale-increase 0))
-    ("q" nil)))
-
-(use-package keybinding
-  :config
-  (progn
-    (prefixed-keys
-      ("bb" . #'helm-mini)
-      ("bd" . 'kill-this-buffer)
-      ("C-i" . #'switch-to-previous-buffer)
-      ("bn" . 'next-buffer)
-      ("bp" . 'previous-buffer)
-      ("ff" . #'helm-find-files)
-      ("wd" . 'delete-window)
-      ("wD" . 'delete-other-window)
-      ("wh" . 'split-window-horizontally)
-      ("wv" . 'split-window-vertically)
-      ("ww" . #'windows-hydra/body))
-
-    (prefixed-keys
-      ("ry" . #'helm-show-kill-ring))
-
-    (global-keys
-      ("C-S-j" . #'join-next-line)
-      ("C-S-k" . #'join-line)
-      ("C-S-y" . #'crux-duplicate-current-line-or-region))
-    (global-key "C-x C-b" 'ibuffer)
-    (global-key "M-/" 'hippie-expand)
-
-    (global-keys
-      ("C-s" . 'isearch-forward-regexp)
-      ("C-r" . 'isearch-backward-regexp)
-      ("C-M-s" . 'isearch-forward)
-      ("C-M-r" . 'isearch-backward))
-
-    (global-key "C-a" #'crux-move-beginning-of-line)
-    (global-keys
-      ("C-o" . #'crux-smart-open-line)
-      ("C-S-o" . #'crux-smart-open-line-above)
-      ("C-S-d" . #'crux-kill-whole-line))
-
-    (global-key "C-c =" #'crux-indent-defun)
-
-    (prefixed-key "!!" #'crux-visit-term-buffer)))
-
-(use-package f :ensure t :defer t)
-(use-package s :ensure t :defer t)
-(use-package dash :ensure t :defer t)
-(use-package crux :ensure t)
+(use-package hippie-exp
+  :bind (("M-/" . hippie-expand)))
 
 (use-package annoying-arrows-mode
   :ensure t
@@ -280,6 +200,18 @@ _<right>_ _l_: windmove-right	_d_: tighten	_q_: quit"
 (use-package beacon
   :ensure t
   :bind (("C-\\" . beacon-blink)))
+
+(use-package crux
+  :after (helper-functions)
+  :commands (crux-eval-and-replace)
+  :ensure t
+  :bind (("C-S-j" . join-next-line)
+        ("C-S-k" . join-line)
+        ("C-S-y" . crux-duplicate-current-line-or-region)
+        ("C-a" . crux-move-beginning-of-line)
+        ("C-S-d" . crux-kill-whole-line)
+        ("C-c =" . crux-indent-defun))
+  :prefixed-bind (("!!" . crux-visit-term-buffer)))
 
 (use-package paren
   :hook (after-init . show-paren-mode))
@@ -335,6 +267,50 @@ _<right>_ _l_: windmove-right	_d_: tighten	_q_: quit"
   :ensure t
   :hook (text-mode . artbollocks-mode))
 
+(use-package undo-tree
+  :ensure t
+  :diminish undo-tree-mode
+  :bind (:map undo-tree-visualizer-mode-map
+              ("<RET>" . undo-tree-visualizer-quit)))
+
+(use-package isearch
+  :bind
+  (("C-s" . isearch-forward-regexp)
+   ("C-r" . isearch-backward-regexp)
+   ("C-M-s" . isearch-forward)
+   ("C-M-r" . isearch-backward)))
+
+(use-package ag
+  :ensure t
+  :defer 5)
+
+(use-package swiper-helm
+  :ensure t
+  :after helm
+  :chords (("??" . swiper-helm))
+  :prefixed-bind ("ss" . swiper-helm))
+
+(use-package anzu
+  :ensure t
+  :diminish anzu-mode
+  :hook (after-init . global-anzu-mode)
+  :bind (([remap query-replace] . anzu-query-replace)
+         ([remap query-replace-regexp] . anzu-query-replace-regexp))
+  :prefixed-bind (("srr" . anzu-query-replace-regexp)
+                  ("sr." . anzu-query-replace-at-cursor-thing)))
+
+(use-package wgrep
+  :ensure t
+  :defer 5)
+
+(use-package wgrep-ag
+  :ensure t
+  :defer 5)
+
+(use-package iedit
+  :ensure t
+  :bind (("C-'" . iedit-mode)))
+
 (use-package company
   :ensure t
   :hook (after-init . global-company-mode)
@@ -347,6 +323,51 @@ _<right>_ _l_: windmove-right	_d_: tighten	_q_: quit"
 (use-package company-quickhelp
   :ensure t
   :hook (after-init . company-quickhelp-mode))
+
+(use-package windmove
+  :prefixed-bind
+  (("bd" . kill-this-buffer)
+   ("bn" . next-buffer)
+   ("bp" . previous-buffer)
+
+   ("wd" . delete-window)
+   ("wD" . delete-other-window)
+   ("wh" . split-window-horizontally)
+   ("wv" . split-window-vertically)
+
+   ("C-i" . switch-to-previous-buffer)
+
+   ("ww" . windows-hydra/body))
+  :init
+  (defhydra windows-hydra ()
+    "
+   ^Windows^				^Window^		^Zoom^
+   --------------------------------------------------------------------------
+   _<left>_ _h_: windmove-left		_w_: enlarge	_-_: zoom out
+   _<down>_ _j_: windmove-down		_s_: shrink	_+_ _=_: zoom in
+   _<up>_ _k_: windmove-up		_a_: widen	_0_: reset
+   _<right>_ _l_: windmove-right	_d_: tighten	_q_: quit"
+    ("<left>" windmove-left)
+    ("<right>" windmove-right)
+    ("<up>" windmove-up)
+    ("<down>" windmove-down)
+    ("h" windmove-left)
+    ("j" windmove-down)
+    ("k" windmove-up)
+    ("l" windmove-right)
+    ("+" text-scale-increase)
+    ("=" text-scale-increase)
+    ("-" text-scale-decrease)
+    ("w" enlarge-window)
+    ("a" enlarge-window-horizontally)
+    ("s" shrink-window)
+    ("d" shrink-window-horizontally)
+    ("0" (text-scale-increase 0))
+    ("q" nil)))
+
+(use-package window-numbering
+  :ensure t
+  :hook (after-init . window-numbering-mode))
 
 (use-package eldoc
   :ensure t
@@ -384,84 +405,66 @@ _<right>_ _l_: windmove-right	_d_: tighten	_q_: quit"
 (use-package elec-pair
   :hook (text-mode . electric-pair-local-mode))
 
-(defmacro def-pair (pair)
-  "Creates function sp/wrap-with-<PAIR>."
-  `(progn (defun ,(read (concat "sp/wrap-with-"
-                                (prin1-to-string (car pair))
-                                "s")) (&optional arg)
-            (interactive "p")
-            (sp-wrap-with-pair ,(cdr pair)))))
-
-(def-pair (paren . "("))
-(def-pair (bracket . "["))
-(def-pair (brace . "{"))
-(def-pair (single-quote . "'"))
-(def-pair (double-quote . "\""))
-(def-pair (back-quote . "`"))
-
 (use-package smartparens-config
   :ensure smartparens
   :demand t
-  :commands (smartparens-strict-mode)
   :diminish (smartparens-mode . " ")
   :hook (prog-mode . smartparens-mode)
   :hook (minibuffer-setup . smartparens-mode)
+  :bind (:map smartparens-mode-map
+              ;; Strict mode toggle
+              ("C-c C-s" . smartparens-strict-mode)
+              ;; Navigation
+              ("C-M-a" . sp-beginning-of-sexp)
+              ("C-M-e" . sp-end-of-sexp)
+              ("C-M-f" . sp-forward-sexp)
+              ("C-M-b" . sp-backward-sexp)
+
+              ;; Traversal
+              ("C-<down>" . sp-down-sexp)
+              ("C-<up>"   . sp-up-sexp)
+              ("M-<down>" . sp-backward-down-sexp)
+              ("M-<up>"   . sp-backward-up-sexp)
+              ("C-M-n"    . sp-next-sexp)
+              ("C-M-p"    . sp-previous-sexp)
+              ("C-S-f"    . sp-forward-symbol)
+              ("C-S-b"    . sp-backward-symbol)
+
+              ;; AST re-arrange.
+              ("C-)" . sp-forward-slurp-sexp)
+              ;; ("C-)" . 'sp-slurp-hybrid-sexp)
+              ("C-}" . sp-forward-barf-sexp)
+              ("C-(" . sp-backward-slurp-sexp)
+              ("C-{" . sp-backward-barf-sexp)
+
+              ;; Killing
+              ("C-M-k"    . sp-kill-sexp)
+              ("C-k"      . sp-kill-hybrid-sexp)
+              ("M-k"      . sp-backward-kill-sexp)
+              ("C-M-<up>" . sp-raise-sexp)
+
+              ;; Unknown
+              ("C-M-t" . sp-transpose-sexp)
+              ;; ("C-M-w" . sp-copy-sexp)
+              ;; ("C-M-d" . delete-sexp)
+              ;; ("M-<backspace>" . backward-kill-word)
+              ;; ("C-<backspace>" . sp-backward-kill-word)
+              ;; ([remap sp-backward-kill-word] . backward-kill-word)
+              ;; ("M-[" . sp-backward-unwrap-sexp)
+              ;; ("M-]" . sp-unwrap-sexp)
+              ;; ("C-x C-t" . sp-transpose-hybrid-sexp)
+
+              ;; Wrap
+              ("C-c C-w ("  . (lambda () (interactive) (sp-wrap-with-pair "(")))
+              ("C-c C-w ["  . (lambda () (interactive) (sp-wrap-with-pair "[")))
+              ("C-c C-w {"  . (lambda () (interactive) (sp-wrap-with-pair "{")))
+              ("C-c C-w '"  . (lambda () (interactive) (sp-wrap-with-pair "'")))
+              ("C-c C-w \"" . (lambda () (interactive) (sp-wrap-with-pair "\"")))
+              ("C-c C-w `"  . (lambda () (interactive) (sp-wrap-with-pair "`"))))
   :config
   (progn
-    (setq sp-ignore-modes-list (delete 'minibuffer-inactive-mode sp-ignore-modes-list))
-    (sp-local-pair 'minibuffer-inactive-mode "'" nil :actions nil)
-
-    (mode-keys smartparens-mode-map
-      ;; Strict mode toggle
-      ("C-c C-s" . #'smartparens-strict-mode)
-      ;; Navigation
-      ("C-M-a" . 'sp-beginning-of-sexp)
-      ("C-M-e" . 'sp-end-of-sexp)
-      ("C-M-f" . 'sp-forward-sexp)
-      ("C-M-b" . 'sp-backward-sexp)
-
-      ;; Traversal
-      ("C-<down>" . 'sp-down-sexp)
-      ("C-<up>" . 'sp-up-sexp)
-      ("M-<down>" . 'sp-backward-down-sexp)
-      ("M-<up>" . 'sp-backward-up-sexp)
-      ("C-M-n" . 'sp-next-sexp)
-      ("C-M-p" . 'sp-previous-sexp)
-      ("C-S-f" . 'sp-forward-symbol)
-      ("C-S-b" . 'sp-backward-symbol)
-
-      ;; AST re-arrange.
-      ("C-)" . 'sp-forward-slurp-sexp)
-      ;; ("C-)" . 'sp-slurp-hybrid-sexp)
-      ("C-}" . 'sp-forward-barf-sexp)
-      ("C-(" . 'sp-backward-slurp-sexp)
-      ("C-{" . 'sp-backward-barf-sexp)
-
-      ;; Killing
-      ("C-M-k" . 'sp-kill-sexp)
-      ("C-k" . 'sp-kill-hybrid-sexp)
-      ("M-k" . 'sp-backward-kill-sexp)
-      ("C-M-<up>" . 'sp-raise-sexp)
-
-      ;; Unknown
-      ("C-M-t" . #'sp-transpose-sexp)
-      ;; ("C-M-w" . sp-copy-sexp)
-      ;; ("C-M-d" . delete-sexp)
-      ;; ("M-<backspace>" . backward-kill-word)
-      ;; ("C-<backspace>" . sp-backward-kill-word)
-      ;; ([remap sp-backward-kill-word] . backward-kill-word)
-      ;; ("M-[" . sp-backward-unwrap-sexp)
-      ;; ("M-]" . sp-unwrap-sexp)
-      ;; ("C-x C-t" . sp-transpose-hybrid-sexp)
-
-      ;; Wrap
-      ("C-c C-w (" . #'sp/wrap-with-parens)
-      ("C-c C-w [" . #'sp/wrap-with-brackets)
-      ("C-c C-w {" . #'sp/wrap-with-braces)
-      ("C-c C-w '" . #'sp/wrap-with-single-quotes)
-      ("C-c C-w \"" . #'sp/wrap-with-double-quotes)
-      ("C-c C-w `" . #'sp/wrap-with-back-quotes)
-      )))
+    (cl-delete 'minibuffer-inactive-mode sp-ignore-modes-list)
+    (sp-local-pair 'minibuffer-inactive-mode "'" nil :actions nil)))
 
 (use-package electric
   :hook (after-init . electric-indent-mode))
@@ -475,15 +478,8 @@ _<right>_ _l_: windmove-right	_d_: tighten	_q_: quit"
   :chords (("jj" . avy-goto-word-1)))
 
 (use-package compile
-  :commands (compile recompile)
-  :init
-  (prefixed-keys
-    ("cc" . #'compile)
-    ("cr" . #'recompile)))
-
-(use-package window-numbering
-  :ensure t
-  :hook (after-init . window-numbering-mode))
+  :prefixed-bind (("cc" . compile)
+                  ("cr" . recompile)))
 
 (use-package savehist
   :hook (after-init . savehist-mode)
@@ -506,10 +502,7 @@ _<right>_ _l_: windmove-right	_d_: tighten	_q_: quit"
 
 (use-package magit
   :ensure t
-  :commands magit-status
-  :init
-  (progn
-    (prefixed-key "gs" #'magit-status)))
+  :prefixed-bind (("gs" . magit-status)))
 
 (use-package diff-hl
   :ensure t
@@ -527,44 +520,43 @@ _<right>_ _l_: windmove-right	_d_: tighten	_q_: quit"
     ("k" diff-hl-revert-hunk "Kill Hunk")
     ("q" nil "Quit")))
 
-(unless (>= emacs-major-version 26)
+(eval-when-compile
+  (unless (>= emacs-major-version 26)
     (defalias 'smerge-keep-upper 'smerge-keep-mine)
     (defalias 'smerge-keep-lower 'smerge-keep-other)
     (defalias 'smerge-diff-base-upper 'smerge-diff-base-mine)
     (defalias 'smerge-diff-upper-lower 'smerge-diff-mine-other)
-    (defalias 'smerge-diff-base-lower 'smerge-diff-base-other))
+    (defalias 'smerge-diff-base-lower 'smerge-diff-base-other)))
 
 (use-package smerge-mode
-  :after (hydra keybinding)
-  :commands smerge-mode
-  :config
-  (progn
-    (defhydra hydra-smerge
-      (:foreign-keys warn)
-      "
+  :demand
+  :prefixed-bind (:map smerge-mode-map
+                       ("m" . hydra-smerge/body))
+  :init
+  (defhydra hydra-smerge
+    (:foreign-keys warn)
+    "
 ^Move^	^Keep^	^Aux^	^Diff^
 ------------------------------------------------------
 _n_ext	_b_ase	_R_efine	_<_: base-upper	_q_uit
 _p_rev	_u_pper	_E_diff	_=_: upper-lower	_RET_: current
 ^ ^	_l_ower	_C_ombine	_>_: base-lower
 ^ ^	_a_ll	_r_esolve"
-      ("RET" smerge-keep-current)
-      ("C" smerge-combine-with-next)
-      ("E" smerge-ediff)
-      ("R" smerge-refine)
-      ("a" smerge-keep-all)
-      ("b" smerge-keep-base)
-      ("u" smerge-keep-upper)
-      ("n" smerge-next)
-      ("l" smerge-keep-lower)
-      ("p" smerge-prev)
-      ("r" smerge-resolve)
-      ("<" smerge-diff-base-upper)
-      ("=" smerge-diff-upper-lower)
-      (">" smerge-diff-base-lower)
-      ("q" nil :color red))
-
-    (prefixed-mode-key smerge-mode-map "m" #'hydra-smerge/body)))
+    ("RET" smerge-keep-current)
+    ("C" smerge-combine-with-next)
+    ("E" smerge-ediff)
+    ("R" smerge-refine)
+    ("a" smerge-keep-all)
+    ("b" smerge-keep-base)
+    ("u" smerge-keep-upper)
+    ("n" smerge-next)
+    ("l" smerge-keep-lower)
+    ("p" smerge-prev)
+    ("r" smerge-resolve)
+    ("<" smerge-diff-base-upper)
+    ("=" smerge-diff-upper-lower)
+    (">" smerge-diff-base-lower)
+    ("q" nil :color red)))
 
 (use-package projectile
   :ensure t
@@ -582,26 +574,8 @@ _p_rev	_u_pper	_E_diff	_=_: upper-lower	_RET_: current
 (use-package yasnippet
   :ensure t
   :diminish yas-minor-mode
-  :commands (yas-expand)
   :hook (after-init . yas-global-mode)
-  :init (prefixed-key "is" #'yas-expand))
-
-(use-package lsp-mode
-  :load-path "lsp/lsp-mode"
-  :config
-  (require 'lsp-flycheck))
-
-(use-package company-lsp
-  :load-path "lsp/company-lsp"
-  :after (lsp-mode company)
-  :commands company-lsp
-  :init
-  (progn
-    (push 'company-lsp company-backends)
-    (add-hook
-     'lsp-mode-hook
-     #'(lambda ()
-         (setq-local company-backends (remove 'company-capf company-backends))))))
+  :prefixed-bind ("is" . yas-expand))
 
 (use-package irony
   :disabled
@@ -697,42 +671,43 @@ _p_rev	_u_pper	_E_diff	_=_: upper-lower	_RET_: current
               ("C-c m" . macrostep-mode)))
 
 ;; Helper functions.
-(defun elisp-visit-ielm ()
-  "Switch to default `ielm' buffer.
-Start `ielm' if it's not already running."
-  (interactive)
-  (crux-start-or-switch-to 'ielm "*ielm*"))
+(use-package elisp-mode
+  :demand
+  :bind (:map emacs-lisp-mode-map
+              ("C-c C-z" . elisp-visit-ielm)
+              ("C-c C-c" . eval-defun)
+              ("C-c C-b" . eval-buffer)
+              ("C-c C-r" . eval-region))
+  :hook (emacs-lisp-mode . emacs-lisp-mode-setup)
+  :init
+  (progn
+    (defun elisp-visit-ielm ()
+      "Switch to default `ielm' buffer.
+       Start `ielm' if it's not already running."
+      (interactive)
+      (crux-start-or-switch-to 'ielm "*ielm*"))
 
-(defun elisp-recompile-elc-on-save ()
-  "Recompile your elc when saving an elisp file."
-  (add-hook
-   'after-save-hook
-   (lambda ()
-     (when (and (file-exists-p (byte-compile-dest-file buffer-file-name)))
-       (emacs-lisp-byte-compile)))
-   nil
-   t))
+    (defun elisp-recompile-elc-on-save ()
+      "Recompile when saving an elisp file."
+      (add-hook
+       'after-save-hook
+       (lambda ()
+         (when (file-exists-p (byte-compile-dest-file buffer-file-name))
+           (emacs-lisp-byte-compile)))
+       nil
+       :local))
 
-(defun emacs-lisp-mode-setup ()
-  "Setup for emacs-lisp mode."
-  (elisp-recompile-elc-on-save)
-  (setq mode-name "ELisp"))
-
-(add-hook 'emacs-lisp-mode-hook #'emacs-lisp-mode-setup)
+    (defun emacs-lisp-mode-setup ()
+      "Setup for emacs-lisp mode."
+      (elisp-recompile-elc-on-save)
+      (setq mode-name "ELisp"))))
 
 (use-package elisp-slime-nav
   :ensure t
-  :commands turn-on-elisp-slime-nav-mode
+  :after (elisp-mode)
   :diminish elisp-slime-nav-mode
-  :config
-  (dolist (hook '(emacs-lisp-mode-hook ielm-mode-hook))
-    (add-hook hook 'turn-on-elisp-slime-nav-mode)))
-
-(mode-keys emacs-lisp-mode-map
-  ("C-c C-z" . #'elisp-visit-ielm)
-  ("C-c C-c" . #'eval-defun)
-  ("C-c C-b" . #'eval-buffer)
-  ("C-c C-r" . #'eval-region))
+  :hook (emacs-lisp-mode . turn-on-elisp-slime-nav-mode)
+  :hook (ielm-mode . turn-on-elisp-slime-nav-mode))
 
 (use-package litable
   :ensure t
@@ -750,16 +725,17 @@ Start `ielm' if it's not already running."
   :ensure t
   ;; Use `pp-eval-expression'. Retain the config for minibuffer setup example.
   :disabled
+  :bind (("M-:" . eval-expr))
   :config
   (progn
-    (global-key "M-:" #'eval-expr)
     (setq eval-expr-print-function 'pp
           eval-expr-print-level 20
           eval-expr-print-length 100)
 
     (defun eval-expr-minibuffer-setup ()
       (set-syntax-table emacs-lisp-mode-syntax-table)
-      (set (make-local-variable 'eldoc-documentation-function) #'elisp-eldoc-documentation-function)
+      (setq-local
+       eldoc-documentation-function #'elisp-eldoc-documentation-function)
       (eldoc-mode +1))))
 
 (use-package pp
@@ -773,6 +749,49 @@ Start `ielm' if it's not already running."
   :ensure t
   :hook (common-lisp-mode . slime-mode)
   :functions (slime-toggle-fancy-trace slime-inspect-definition)
+  :bind (:map lisp-mode-map
+              ("C-c '" . slime)
+
+              ("C-c cc" . slime-compile-file)
+              ("C-c cC" . slime-compile-and-load-file)
+              ("C-c cl" . slime-load-file)
+              ("C-c cf" . slime-compile-defun)
+              ("C-c cr" . slime-compile-region)
+              ("C-c cn" . slime-remove-notes)
+
+              ("C-c eb" . slime-eval-buffer)
+              ("C-c ef" . slime-eval-defun)
+              ("C-c eF" . slime-undefine-function)
+              ("C-c ee" . slime-eval-last-expression)
+              ("C-c er" . slime-eval-region)
+
+              ("C-c gb" . slime-pop-find-definition-stack)
+              ("C-c gn" . slime-next-note)
+              ("C-c gN" . slime-previous-note)
+
+              ("C-c ha" . slime-apropos)
+              ("C-c hA" . slime-apropos-all)
+              ("C-c hd" . slime-disassemble-symbol)
+              ("C-c hh" . slime-describe-symbol)
+              ("C-c hH" . slime-hyperspec-lookup)
+              ("C-c hi" . slime-inspect-definition)
+              ("C-c hp" . slime-apropos-package)
+              ("C-c ht" . slime-toggle-trace-fdefinition)
+              ("C-c hT" . slime-untrace-all)
+              ("C-c h<" . slime-who-calls)
+              ("C-c h>" . slime-calls-who)
+              ("C-c hr" . slime-who-references)
+              ("C-c hm" . slime-who-macroexpands)
+              ("C-c hs" . slime-who-specializes)
+
+              ("C-c Ma" . slime-macroexpand-all)
+              ("C-c Mo" . slime-macroexpand-1)
+
+              ("C-c se" . slime-eval-last-expression-in-repl)
+              ("C-c si" . slime)
+              ("C-c sq" . slime-quit-lisp)
+
+              ("C-c tf" . slime-toggle-fancy-trace))
   :config
   (progn
     (require 'slime-fancy-trace)
@@ -791,49 +810,7 @@ Start `ielm' if it's not already running."
 
     (slime-setup '(slime-repl))
 
-    (mode-keys lisp-mode-map
-      ("C-c '" . #'slime)
-
-      ("C-c cc" . #'slime-compile-file)
-      ("C-c cC" . #'slime-compile-and-load-file)
-      ("C-c cl" . #'slime-load-file)
-      ("C-c cf" . #'slime-compile-defun)
-      ("C-c cr" . #'slime-compile-region)
-      ("C-c cn" . #'slime-remove-notes)
-
-      ("C-c eb" . #'slime-eval-buffer)
-      ("C-c ef" . #'slime-eval-defun)
-      ("C-c eF" . #'slime-undefine-function)
-      ("C-c ee" . #'slime-eval-last-expression)
-      ("C-c er" . #'slime-eval-region)
-
-      ("C-c gb" . #'slime-pop-find-definition-stack)
-      ("C-c gn" . #'slime-next-note)
-      ("C-c gN" . #'slime-previous-note)
-
-      ("C-c ha" . #'slime-apropos)
-      ("C-c hA" . #'slime-apropos-all)
-      ("C-c hd" . #'slime-disassemble-symbol)
-      ("C-c hh" . #'slime-describe-symbol)
-      ("C-c hH" . #'slime-hyperspec-lookup)
-      ("C-c hi" . #'slime-inspect-definition)
-      ("C-c hp" . #'slime-apropos-package)
-      ("C-c ht" . #'slime-toggle-trace-fdefinition)
-      ("C-c hT" . #'slime-untrace-all)
-      ("C-c h<" . #'slime-who-calls)
-      ("C-c h>" . #'slime-calls-who)
-      ("C-c hr" . #'slime-who-references)
-      ("C-c hm" . #'slime-who-macroexpands)
-      ("C-c hs" . #'slime-who-specializes)
-
-      ("C-c Ma" . #'slime-macroexpand-all)
-      ("C-c Mo" . #'slime-macroexpand-1)
-
-      ("C-c se" . #'slime-eval-last-expression-in-repl)
-      ("C-c si" . #'slime)
-      ("C-c sq" . #'slime-quit-lisp)
-
-      ("C-c tf" . #'slime-toggle-fancy-trace))))
+    ))
 
 (use-package slime-company
   :ensure t
@@ -851,7 +828,7 @@ Start `ielm' if it's not already running."
   (progn
     (defun go-mode-setup ()
       (add-hook 'before-save-hook #'gofmt-before-save)
-      (setq-local tab-width 4)
+      (setq-local tab-width 2)
       (setq gofmt-command "goimports")
       (go-guru-hl-identifier-mode +1))
     (add-hook 'go-mode-hook #'go-mode-setup)))
@@ -882,18 +859,15 @@ Start `ielm' if it's not already running."
 (use-package haskell-mode
   :ensure t
   :mode "\\.hs\\'"
-  :functions (haskell-debug haskell-add-import)
+  :bind (:map haskell-mode-map
+              ("C-c d" . haskell-debug)
+              ("C-c i" . haskell-interactive-switch)
+              ("C-c t" . haskell-process-do-type)
+              ("C-c h" . haskell-process-do-info)
+              ("C-c fi" . haskell-add-import)
+              ("C-c ff" . haskell-mode-stylish-buffer))
   :config
-  (progn
-    (require 'haskell)
-    (add-hook 'haskell-mode-hook #'turn-on-haskell-indent)
-    (mode-keys haskell-mode-map
-      ("C-c d" . #'haskell-debug)
-      ("C-c i" . #'haskell-interactive-switch)
-      ("C-c t" . #'haskell-process-do-type)
-      ("C-c h" . #'haskell-process-do-info)
-      ("C-c fi" . #'haskell-add-import)
-      ("C-c ff" . #'haskell-mode-stylish-buffer))))
+  (add-hook 'haskell-mode-hook #'turn-on-haskell-indent))
 
 (use-package hindent
   :ensure t
@@ -904,10 +878,11 @@ Start `ielm' if it's not already running."
   (setq hindent-reformat-buffer-on-save t))
 
 (use-package intero
+  :after (haskell-mode company flycheck)
   :ensure t
-  :hook (haskell-mode . intero-mode))
-
-(add-to-list 'flycheck-ghc-search-path (expand-file-name "~/.xmonad/lib"))
+  :hook (haskell-mode . intero-mode)
+  :config
+  (add-to-list 'flycheck-ghc-search-path (expand-file-name "~/.xmonad/lib")))
 
 ;; Copied from emacs web config.
 (use-package js2-mode
@@ -1003,11 +978,9 @@ Start `ielm' if it's not already running."
 
 (use-package anaconda-mode
   :ensure t
-  :commands anaconda-mode
   :diminish anaconda-mode
   :diminish anaconda-eldoc-mode
-  :init
-  (add-hook 'python-mode-hook #'(lambda () (anaconda-mode +1))))
+  :hook (python-mode . anaconda-mode))
 
 (use-package company-anaconda
   :ensure t
@@ -1027,10 +1000,8 @@ Start `ielm' if it's not already running."
 
 (use-package pyenv-mode
   :ensure t
-  :commands pyenv-mode
-  :after virtualenvwrapper
-  :init
-  (add-hook 'python-mode-hook #'(lambda () (pyenv-mode +1))))
+  :hook (python-mode . pyenv-mode)
+  :after virtualenvwrapper)
 
 (use-package py-yapf
   :commands py-yapf
@@ -1086,12 +1057,10 @@ Start `ielm' if it's not already running."
 
 (use-package ess
   :disabled
-  :config
-  (progn
-    (mode-keys inferior-ess-mode-map
-      ("C-<up>". 'comint-previous-matching-input-from-input)
-      ("C-<down>" . 'comint-next-matching-input-from-input)
-      ("C-x t" . 'comint-dynamic-complete-filename))))
+  :bind (:map inferior-ess-mode-map
+              ("C-<up>". comint-previous-matching-input-from-input)
+              ("C-<down>" . comint-next-matching-input-from-input)
+              ("C-x t" . comint-dynamic-complete-filename)))
 
 (use-package org
   :ensure t
@@ -1109,15 +1078,13 @@ Start `ielm' if it's not already running."
 (use-package org-agenda
   :after (org)
   :functions (org-agenda)
+  :bind (([f2] . load-org-gtd-agenda)
+         ("C-c a" . load-org-gtd-agenda))
   :init
-  (progn
-    (defun load-org-gtd-agenda ()
-      "Load custom agenda directly."
-      (interactive)
-      (org-agenda nil "c"))
-
-    (global-key "<f2>" #'load-org-gtd-agenda)
-    (global-key "C-c a" #'load-org-gtd-agenda))
+  (defun load-org-gtd-agenda ()
+    "Load custom agenda directly."
+    (interactive)
+    (org-agenda nil "c"))
   :config
   (progn
     (setq org-agenda-files '("~/organizer/main.org"))
@@ -1223,53 +1190,9 @@ Start `ielm' if it's not already running."
     (which-function-mode +1)
     (setq which-func-unknown "")))
 
-(prefixed-key "tt" #'helm-semantic-or-imenu)
-
-(use-package ag
-  :ensure t
-  :defer 5)
-
-(use-package swiper-helm
-  :ensure t
-  :after helm
-  :commands swiper-helm
-  :chords (("??" . swiper-helm))
-  :init
-  (prefixed-key "ss" #'swiper-helm))
-
-(use-package anzu
-  :ensure t
-  :diminish anzu-mode
-  :hook (after-init . global-anzu-mode)
-  :config
-  (progn
-    (global-set-key [remap query-replace] #'anzu-query-replace)
-    (global-set-key [remap query-replace-regexp] #'anzu-query-replace-regexp)
-    (prefixed-keys
-      ("srr" . #'anzu-query-replace-regexp)
-      ("sr." . #'anzu-query-replace-at-cursor-thing))))
-
-(use-package wgrep
-  :ensure t
-  :defer 5)
-
-(use-package wgrep-ag
-  :ensure t
-  :defer 5)
-
-(use-package iedit
-  :ensure t
-  :bind (("C-'" . iedit-mode)))
-
 (use-package evil
   :ensure t
   :defer 10)
-
-(use-package undo-tree
-  :ensure t
-  :diminish undo-tree-mode
-  :bind (:map undo-tree-visualizer-mode-map
-              ("<RET>" . undo-tree-visualizer-quit)))
 
 (use-package epa
   :config
@@ -1286,11 +1209,12 @@ Start `ielm' if it's not already running."
 
 (add-hook
  'after-init-hook
- #'(lambda ()
-     (run-at-time
-      "1 min"
-      nil
-      #'(lambda () (shell-command "killall gpg-agent")))))
+ (lambda ()
+   (run-at-time
+    "1 min"
+    nil
+    (lambda () (with-temp-buffer
+                 (shell-command "killall gpg-agent" (current-buffer)))))))
 
 (use-package erc-config)
   ;;:hook (after-init . erc-autoconnect-servers))
@@ -1299,18 +1223,21 @@ Start `ielm' if it's not already running."
   :ensure t
   :functions (elfeed-toggle-star)
   :commands (elfeed elfeed-db-load elfeed-search-update--force)
+  :bind (([f5] . elfeed-load-db-and-open)
+         :map elfeed-search-mode-map
+         ("m" . elfeed-toggle-star)
+         ("M" . elfeed-toggle-star)
+         ("h" . elfeed-hydra/body)
+         ("q" . elfeed-save-db-and-bury))
   :init
-  (progn
-    ;; Functions to support syncing .elfeed between machines
-    ;; makes sure elfeed reads index from disk before launching
-    (defun elfeed-load-db-and-open ()
-      "Wrapper to load the elfeed db from disk before opening"
-      (interactive)
-      (elfeed-db-load)
-      (elfeed)
-      (elfeed-search-update--force))
-
-    (global-key "<f5>" #'elfeed-load-db-and-open))
+  ;; Functions to support syncing .elfeed between machines
+  ;; makes sure elfeed reads index from disk before launching
+  (defun elfeed-load-db-and-open ()
+    "Wrapper to load the elfeed db from disk before opening"
+    (interactive)
+    (elfeed-db-load)
+    (elfeed)
+    (elfeed-search-update--force))
   :config
   (progn
     ;;write to disk when quiting
@@ -1360,13 +1287,7 @@ _u_nread
       ("q" (message "Exit from Elfeed Hydra.") :exit t))
 
     (defalias 'elfeed-toggle-star
-      (elfeed-expose #'elfeed-search-toggle-all 'star))
-
-    (mode-keys elfeed-search-mode-map
-      ("m" . #'elfeed-toggle-star)
-      ("M" . #'elfeed-toggle-star)
-      ("h" . #'elfeed-hydra/body)
-      ("q" . #'elfeed-save-db-and-bury))))
+      (elfeed-expose #'elfeed-search-toggle-all 'star))))
 
 (use-package elfeed-org
   :ensure t
@@ -1374,23 +1295,11 @@ _u_nread
   :init
   (progn
     (setq rmh-elfeed-org-files '("~/.elfeed/feed.org"))
-    (add-hook 'after-init-hook #'elfeed-org))
-  :config
-  (progn
-    (defun elfeed-org-find-file ()
-      "Open the elfeed-org file."
-      (interactive)
-      (find-file (car rmh-elfeed-org-files)))
-
-    (prefixed-key "fe" #'elfeed-org-find-file)))
+    (add-hook 'after-init-hook #'elfeed-org)))
 
 (use-package elfeed-goodies
   :ensure t
   :hook (after-init . elfeed-goodies/setup))
-
-(use-package powerline :ensure t :defer t)
-(use-package let-alist :ensure t :defer t)
-(use-package all-the-icons :ensure t :defer t)
 
 (use-package challenger-deep-theme
   :ensure t

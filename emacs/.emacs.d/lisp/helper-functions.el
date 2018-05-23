@@ -61,7 +61,8 @@ FUNC: Function to silence."
   "Byte-compile the configuration."
   (interactive)
   (org-babel-tangle-file "~/.emacs.d/config.org")
-  (byte-recompile-file "~/.emacs.d/config.el" :force 0 nil))
+  (byte-recompile-file "~/.emacs.d/config.el" :force 0 nil)
+  (byte-recompile-directory "~/.emacs.d/lisp/" 0 :force))
 
 (provide 'helper-functions)
 ;;; helper-functions.el ends here
