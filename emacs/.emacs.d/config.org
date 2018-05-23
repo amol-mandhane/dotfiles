@@ -2,7 +2,6 @@
 
 * Bootstrap
 ** Identity
-
 #+BEGIN_SRC emacs-lisp :tangle yes
 (setq user-full-name ""
       user-mail-address "")
@@ -42,14 +41,14 @@
       (toggle-frame-maximized)))
 
   (setq-default cursor-type 'bar)
-  (blink-cursor-mode 0)
+  (blink-cursor-mode -1)
 #+END_SRC
 *** Backups
 #+BEGIN_SRC emacs-lisp :tangle yes
   (setq delete-old-versions -1)
   (setq version-control t)
   (setq vc-make-backup-files t)
-  (setq backup-directory-alist `(("." . "~/.emacs.d/backups")))
+  (setq backup-directory-alist '(("." . "~/.emacs.d/backups")))
   (setq vc-follow-symlinks t)
   (setq auto-save-file-name-transforms '((".*" "~/.emacs.d/auto-save-list/" t)))
 #+END_SRC
@@ -60,7 +59,7 @@
 
 ** Add .emacs.d/lisp to ~load-path~
 #+BEGIN_SRC emacs-lisp :tangle yes
-(add-to-list 'load-path (expand-file-name "~/.emacs.d/lisp"))
+(add-to-list 'load-path (eval-when-compile (expand-file-name "~/.emacs.d/lisp")))
 #+END_SRC
 ** Ensure ~use-package~
 #+BEGIN_SRC emacs-lisp :tangle yes
@@ -131,16 +130,18 @@
         (which-key-add-key-based-replacements
           (concat +keybinding/mnemonic-prefix+ " " key-string) name))
 
-      (rename-mnemonic-key-prefix "g" "VCS")
-      (rename-mnemonic-key-prefix "e" "Errors")
-      (rename-mnemonic-key-prefix "p" "Projects")
-      (rename-mnemonic-key-prefix "f" "Files")
+      (rename-mnemonic-key-prefix "!" "Terminal")
       (rename-mnemonic-key-prefix "b" "Buffers")
-      (rename-mnemonic-key-prefix "w" "Windows")
+      (rename-mnemonic-key-prefix "c" "Compilation")
+      (rename-mnemonic-key-prefix "e" "Errors")
+      (rename-mnemonic-key-prefix "f" "Files")
+      (rename-mnemonic-key-prefix "g" "VCS")
+      (rename-mnemonic-key-prefix "p" "Projects")
+      (rename-mnemonic-key-prefix "r" "Ring/Register")
       (rename-mnemonic-key-prefix "s" "Search/Replace")
       (rename-mnemonic-key-prefix "sr" "Replace")
-      (rename-mnemonic-key-prefix "!" "Terminal")
-      (rename-mnemonic-key-prefix "t" "Tags")))
+      (rename-mnemonic-key-prefix "t" "Tags")
+      (rename-mnemonic-key-prefix "w" "Windows")))
 #+END_SRC
 * Interface framework
 Approach to evolve interface framework
@@ -224,6 +225,7 @@ Approach to evolve interface framework
     :bind (("C-c h" . helm-command-prefix)
            ("M-x" . helm-M-x)
            ("C-x C-f" . helm-find-files)
+           ("C-x b" . helm-mini)
            ("M-s o" . helm-occur)
            :map helm-map
            ("C-i" . helm-execute-persistent-action) ; make TAB work in terminal
@@ -284,7 +286,9 @@ Approach to evolve interface framework
 #+BEGIN_SRC emacs-lisp :tangle yes
   (use-package autorevert
     :diminish auto-revert-mode
-    :hook (after-init . global-auto-revert-mode))
+    :hook (after-init . global-auto-revert-mode)
+    :config
+    (setq auto-revert-verbose nil))
 
   (use-package abbrev
     :diminish abbrev-mode)
@@ -321,11 +325,11 @@ Approach to evolve interface framework
     :commands (crux-eval-and-replace)
     :ensure t
     :bind (("C-S-j" . join-next-line)
-          ("C-S-k" . join-line)
-          ("C-S-y" . crux-duplicate-current-line-or-region)
-          ("C-a" . crux-move-beginning-of-line)
-          ("C-S-d" . crux-kill-whole-line)
-          ("C-c =" . crux-indent-defun))
+           ("C-S-k" . join-line)
+           ("C-S-y" . crux-duplicate-current-line-or-region)
+           ("C-a" . crux-move-beginning-of-line)
+           ("C-S-d" . crux-kill-whole-line)
+           ("C-c =" . crux-indent-defun))
     :prefixed-bind (("!!" . crux-visit-term-buffer)))
 #+END_SRC
 ** Rainbow parens
@@ -411,7 +415,21 @@ Fill column indicator for showing right ruler.
     :ensure t
     :hook (text-mode . artbollocks-mode))
 #+END_SRC
-* Undo-tree
+** Registers
+#+BEGIN_SRC emacs-lisp :tangle yes
+  (use-package register
+    :prefixed-bind (("rr" . copy-to-register)
+                    ("ri" . insert-register)))
+#+END_SRC
+** Snippets
+#+BEGIN_SRC emacs-lisp :tangle yes
+  (use-package yasnippet
+    :ensure t
+    :diminish yas-minor-mode
+    :hook (after-init . yas-global-mode)
+    :prefixed-bind ("is" . yas-expand))
+#+END_SRC
+** Undo-tree
 #+BEGIN_SRC emacs-lisp :tangle yes
   (use-package undo-tree
     :ensure t
@@ -721,7 +739,7 @@ Use ~C-x v~ prefixed commands for now.
 #+BEGIN_SRC emacs-lisp :tangle yes
   (use-package diff-hl
     :ensure t
-    :commands (diff-hl-mode diff-hl-flydiff-mode)
+    :commands (diff-hl-mode diff-hl-flydiff-mode diff-hl-margin-mode)
     :init
     (progn
       (enable-minor-mode-globally diff-hl-mode)
@@ -790,15 +808,7 @@ Use ~C-x v~ prefixed commands for now.
       (setq projectile-completion-system 'helm)
       (setq projectile-mode-line '(:eval (format " P[%s]" (projectile-project-name))))))
 #+END_SRC
-* Snippets
-#+BEGIN_SRC emacs-lisp :tangle yes
-  (use-package yasnippet
-    :ensure t
-    :diminish yas-minor-mode
-    :hook (after-init . yas-global-mode)
-    :prefixed-bind ("is" . yas-expand))
-#+END_SRC
-* TODO Major mode setup [12/13]
+* Major mode setup
 ** COMMENT LSP
 #+BEGIN_SRC emacs-lisp :tangle yes
   (use-package lsp-mode
@@ -817,7 +827,7 @@ Use ~C-x v~ prefixed commands for now.
            (setq-local company-backends (remove 'company-capf company-backends))))))
 #+END_SRC
 
-** DONE C/C++
+** C/C++
 *** Irony Mode
 Irony mode is clang based autocompletion and syntax checker. It is like YouCompleteMe, but only for C-family and better.
 I've had many problems with the YCM setup at work.
@@ -949,7 +959,7 @@ Macrostep is for incremental macro expansion.
                 :map lisp-mode-map
                 ("C-c m" . macrostep-mode)))
 #+END_SRC
-*** DONE Emacs Lisp
+*** Emacs Lisp
 **** Basic setup
 #+BEGIN_SRC emacs-lisp :tangle yes
   ;; Helper functions.
@@ -1038,7 +1048,7 @@ Use ~pp-eval-expression~ instead of ~eval-expr~.
    'lisp-interaction-mode-hook
    #'(lambda () (run-hooks 'emacs-lisp-mode-hook)))
 #+END_SRC
-*** DONE common-lisp
+*** common-lisp
 #+BEGIN_SRC emacs-lisp :tangle yes
   (use-package slime
     :ensure t
@@ -1117,7 +1127,7 @@ Use ~pp-eval-expression~ instead of ~eval-expr~.
     (setq slime-company-completion 'fuzzy))
 #+END_SRC
 *** TODO Clojure
-** DONE Go
+** Go
 *** Mode Setup
 #+BEGIN_SRC emacs-lisp :tangle yes
   (use-package go-mode
@@ -1164,7 +1174,7 @@ Use ~pp-eval-expression~ instead of ~eval-expr~.
                 ("C-c r" . go-rename)))
 #+END_SRC
 *** TODO Compilation and Debugger
-** DONE Haskell
+** Haskell
 *** Major mode
 #+BEGIN_SRC emacs-lisp :tangle yes
   (use-package haskell-mode
@@ -1201,7 +1211,7 @@ Intero works well with stack projects. But without stack, we still need other op
     (add-to-list 'flycheck-ghc-search-path (expand-file-name "~/.xmonad/lib")))
 #+END_SRC
 ** TODO HTML emmet
-** DONE JS
+** COMMENT JS
 #+BEGIN_SRC emacs-lisp :tangle yes
   ;; Copied from emacs web config.
   (use-package js2-mode
@@ -1248,7 +1258,7 @@ Intero works well with stack projects. But without stack, we still need other op
     :config
     (js2r-add-keybindings-with-prefix "C-c j r"))
 #+END_SRC
-** DONE Java
+** Java
 #+BEGIN_SRC emacs-lisp :tangle yes
   (use-package cc-mode
     :init
@@ -1257,7 +1267,7 @@ Intero works well with stack projects. But without stack, we still need other op
      (lambda () (setq fill-column 100
                       whitespace-line-column 100))))
 #+END_SRC
-** DONE LaTeX
+** LaTeX
 #+BEGIN_SRC emacs-lisp :tangle yes
   (use-package tex
     :ensure auctex
@@ -1274,7 +1284,7 @@ Intero works well with stack projects. But without stack, we still need other op
     :after (company tex)
     :hook (after-init . company-auctex-init))
 #+END_SRC
-** DONE Markdown
+** Markdown
 #+BEGIN_SRC emacs-lisp :tangle yes
   (use-package markdown-mode
     :ensure t
@@ -1283,7 +1293,7 @@ Intero works well with stack projects. But without stack, we still need other op
            ("\\.md\\'" . markdown-mode)
            ("\\.markdown\\'" . markdown-mode)))
 #+END_SRC
-** DONE Protocol buffers
+** Protocol buffers
 #+BEGIN_SRC emacs-lisp :tangle yes
   (use-package protobuf-mode
     :ensure t
@@ -1296,7 +1306,7 @@ Intero works well with stack projects. But without stack, we still need other op
           imenu-generic-expression
           '((nil "^[[:space:]]*\\(message\\|service\\|enum\\)[[:space:]]+\\([[:alnum:]]+\\)" 2))))))
 #+END_SRC
-** DONE Python
+** Python
 *** Python mode setup
 #+BEGIN_SRC emacs-lisp :tangle yes
   (use-package python
@@ -1354,7 +1364,7 @@ Intero works well with stack projects. But without stack, we still need other op
     :ensure t)
 #+END_SRC
 *** TODO Setup ein
-** DONE Shell
+** Shell
 *** Setup for Bash and Zsh files
 #+BEGIN_SRC emacs-lisp :tangle yes
   (defconst +zsh-filename-patterns+
@@ -1408,7 +1418,7 @@ Intero works well with stack projects. But without stack, we still need other op
       (remove-hook 'find-file-hook 'insert-shebang)))
 #+END_SRC
 
-** DONE ESS (Statistics/R)
+** COMMENT ESS (Statistics/R)
 #+BEGIN_SRC emacs-lisp :tangle yes
   (use-package ess
     :disabled
@@ -1417,7 +1427,7 @@ Intero works well with stack projects. But without stack, we still need other op
                 ("C-<down>" . comint-next-matching-input-from-input)
                 ("C-x t" . comint-dynamic-complete-filename)))
 #+END_SRC
-** DONE Org mode setup
+** Org mode setup
 *** Org
 #+BEGIN_SRC emacs-lisp :tangle yes
   (use-package org
@@ -1551,13 +1561,13 @@ Copied from [[http://cestlaz.github.io/posts/using-emacs-24-capture-2][C'est la 
               ;; Use a database of parsed tags
               global-semanticdb-minor-mode
               ;; Decorate buffers with additional semantic information
-              global-semantic-decoration-mode
+              ;; global-semantic-decoration-mode
               ;; Highlight the name of the function you're currently in
               global-semantic-highlight-func-mode
               ;; show the name of the function at the top in a sticky
               global-semantic-stickyfunc-mode
               ;; Generate a summary of the current tag when idle
-                                          ; global-semantic-idle-summary-mode
+              ;; global-semantic-idle-summary-mode
 
               ;; Show a breadcrumb of location during idle time
               global-semantic-idle-breadcrumbs-mode
@@ -1576,14 +1586,6 @@ Copied from [[http://cestlaz.github.io/posts/using-emacs-24-capture-2][C'est la 
       (which-function-mode +1)
       (setq which-func-unknown "")))
 #+END_SRC
-* Evil
-Don't use evil mode for general purpose. Current use of evil mode is for vim like search/replace only. Toggle as necessary.
-#+BEGIN_SRC emacs-lisp :tangle yes
-  (use-package evil
-    :ensure t
-    :defer 10)
-#+END_SRC
-
 * Encryption
 ** GPG and EPA config
 #+BEGIN_SRC emacs-lisp :tangle yes

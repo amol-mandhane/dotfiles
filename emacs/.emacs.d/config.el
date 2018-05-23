@@ -33,18 +33,18 @@
     (toggle-frame-maximized)))
 
 (setq-default cursor-type 'bar)
-(blink-cursor-mode 0)
+(blink-cursor-mode -1)
 
 (setq delete-old-versions -1)
 (setq version-control t)
 (setq vc-make-backup-files t)
-(setq backup-directory-alist `(("." . "~/.emacs.d/backups")))
+(setq backup-directory-alist '(("." . "~/.emacs.d/backups")))
 (setq vc-follow-symlinks t)
 (setq auto-save-file-name-transforms '((".*" "~/.emacs.d/auto-save-list/" t)))
 
 (setq-default custom-file "/dev/null")
 
-(add-to-list 'load-path (expand-file-name "~/.emacs.d/lisp"))
+(add-to-list 'load-path (eval-when-compile (expand-file-name "~/.emacs.d/lisp")))
 
 (require 'package)
 (package-initialize)
@@ -103,16 +103,18 @@
       (which-key-add-key-based-replacements
         (concat +keybinding/mnemonic-prefix+ " " key-string) name))
 
-    (rename-mnemonic-key-prefix "g" "VCS")
-    (rename-mnemonic-key-prefix "e" "Errors")
-    (rename-mnemonic-key-prefix "p" "Projects")
-    (rename-mnemonic-key-prefix "f" "Files")
+    (rename-mnemonic-key-prefix "!" "Terminal")
     (rename-mnemonic-key-prefix "b" "Buffers")
-    (rename-mnemonic-key-prefix "w" "Windows")
+    (rename-mnemonic-key-prefix "c" "Compilation")
+    (rename-mnemonic-key-prefix "e" "Errors")
+    (rename-mnemonic-key-prefix "f" "Files")
+    (rename-mnemonic-key-prefix "g" "VCS")
+    (rename-mnemonic-key-prefix "p" "Projects")
+    (rename-mnemonic-key-prefix "r" "Ring/Register")
     (rename-mnemonic-key-prefix "s" "Search/Replace")
     (rename-mnemonic-key-prefix "sr" "Replace")
-    (rename-mnemonic-key-prefix "!" "Terminal")
-    (rename-mnemonic-key-prefix "t" "Tags")))
+    (rename-mnemonic-key-prefix "t" "Tags")
+    (rename-mnemonic-key-prefix "w" "Windows")))
 
 (use-package helm
   :ensure t
@@ -121,6 +123,7 @@
   :bind (("C-c h" . helm-command-prefix)
          ("M-x" . helm-M-x)
          ("C-x C-f" . helm-find-files)
+         ("C-x b" . helm-mini)
          ("M-s o" . helm-occur)
          :map helm-map
          ("C-i" . helm-execute-persistent-action) ; make TAB work in terminal
@@ -178,7 +181,9 @@
 
 (use-package autorevert
   :diminish auto-revert-mode
-  :hook (after-init . global-auto-revert-mode))
+  :hook (after-init . global-auto-revert-mode)
+  :config
+  (setq auto-revert-verbose nil))
 
 (use-package abbrev
   :diminish abbrev-mode)
@@ -206,11 +211,11 @@
   :commands (crux-eval-and-replace)
   :ensure t
   :bind (("C-S-j" . join-next-line)
-        ("C-S-k" . join-line)
-        ("C-S-y" . crux-duplicate-current-line-or-region)
-        ("C-a" . crux-move-beginning-of-line)
-        ("C-S-d" . crux-kill-whole-line)
-        ("C-c =" . crux-indent-defun))
+         ("C-S-k" . join-line)
+         ("C-S-y" . crux-duplicate-current-line-or-region)
+         ("C-a" . crux-move-beginning-of-line)
+         ("C-S-d" . crux-kill-whole-line)
+         ("C-c =" . crux-indent-defun))
   :prefixed-bind (("!!" . crux-visit-term-buffer)))
 
 (use-package paren
@@ -266,6 +271,16 @@
 (use-package artbollocks-mode
   :ensure t
   :hook (text-mode . artbollocks-mode))
+
+(use-package register
+  :prefixed-bind (("rr" . copy-to-register)
+                  ("ri" . insert-register)))
+
+(use-package yasnippet
+  :ensure t
+  :diminish yas-minor-mode
+  :hook (after-init . yas-global-mode)
+  :prefixed-bind ("is" . yas-expand))
 
 (use-package undo-tree
   :ensure t
@@ -506,7 +521,7 @@
 
 (use-package diff-hl
   :ensure t
-  :commands (diff-hl-mode diff-hl-flydiff-mode)
+  :commands (diff-hl-mode diff-hl-flydiff-mode diff-hl-margin-mode)
   :init
   (progn
     (enable-minor-mode-globally diff-hl-mode)
@@ -570,12 +585,6 @@ _p_rev	_u_pper	_E_diff	_=_: upper-lower	_RET_: current
   (progn
     (setq projectile-completion-system 'helm)
     (setq projectile-mode-line '(:eval (format " P[%s]" (projectile-project-name))))))
-
-(use-package yasnippet
-  :ensure t
-  :diminish yas-minor-mode
-  :hook (after-init . yas-global-mode)
-  :prefixed-bind ("is" . yas-expand))
 
 (use-package irony
   :disabled
@@ -884,51 +893,6 @@ _p_rev	_u_pper	_E_diff	_=_: upper-lower	_RET_: current
   :config
   (add-to-list 'flycheck-ghc-search-path (expand-file-name "~/.xmonad/lib")))
 
-;; Copied from emacs web config.
-(use-package js2-mode
-  :ensure t
-  :mode
-  ("\\.js$" . js2-mode)
-  ("\\.json$" . js2-jsx-mode)
-  :config
-  (progn
-    (custom-set-variables '(js2-strict-inconsistent-return-warning nil))
-    (custom-set-variables '(js2-strict-missing-semi-warning nil))
-
-    (setq js-indent-level 2)
-    (setq js2-indent-level 2)
-    (setq js2-basic-offset 2)))
-
-;; tern :- IDE like features for javascript and completion
-;; http://ternjs.net/doc/manual.html#emacs
-(use-package tern
-  :ensure t
-  :hook (js2-mode . tern-mode))
-
-;; company backend for tern
-;; http://ternjs.net/doc/manual.html#emacs
-(use-package company-tern
-  :ensure t
-  :after (tern js2-mode company)
-  :commands company-tern
-  :init
-  (add-to-list 'company-backends 'company-tern))
-
-;; Run a JavaScript interpreter in an inferior process window
-;; https://github.com/redguardtoo/js-comint
-(use-package js-comint
-  :ensure t
-  :config
-  (setq inferior-js-program-command "node"))
-
-;; js2-refactor :- refactoring options for emacs
-;; https://github.com/magnars/js2-refactor.el
-(use-package js2-refactor
-  :ensure t
-  :hook (js2-mode . js2-refactor-mode)
-  :config
-  (js2r-add-keybindings-with-prefix "C-c j r"))
-
 (use-package cc-mode
   :init
   (add-hook
@@ -1055,13 +1019,6 @@ _p_rev	_u_pper	_E_diff	_=_: upper-lower	_RET_: current
     ;; Don't insert shebang proactively.
     (remove-hook 'find-file-hook 'insert-shebang)))
 
-(use-package ess
-  :disabled
-  :bind (:map inferior-ess-mode-map
-              ("C-<up>". comint-previous-matching-input-from-input)
-              ("C-<down>" . comint-next-matching-input-from-input)
-              ("C-x t" . comint-dynamic-complete-filename)))
-
 (use-package org
   :ensure t
   :pin gnu
@@ -1169,13 +1126,13 @@ _p_rev	_u_pper	_E_diff	_=_: upper-lower	_RET_: current
             ;; Use a database of parsed tags
             global-semanticdb-minor-mode
             ;; Decorate buffers with additional semantic information
-            global-semantic-decoration-mode
+            ;; global-semantic-decoration-mode
             ;; Highlight the name of the function you're currently in
             global-semantic-highlight-func-mode
             ;; show the name of the function at the top in a sticky
             global-semantic-stickyfunc-mode
             ;; Generate a summary of the current tag when idle
-                                        ; global-semantic-idle-summary-mode
+            ;; global-semantic-idle-summary-mode
 
             ;; Show a breadcrumb of location during idle time
             global-semantic-idle-breadcrumbs-mode
@@ -1189,10 +1146,6 @@ _p_rev	_u_pper	_E_diff	_=_: upper-lower	_RET_: current
   (progn
     (which-function-mode +1)
     (setq which-func-unknown "")))
-
-(use-package evil
-  :ensure t
-  :defer 10)
 
 (use-package epa
   :config
