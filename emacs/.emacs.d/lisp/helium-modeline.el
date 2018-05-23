@@ -29,6 +29,7 @@
 (require 'flycheck)
 (require 'let-alist)
 (require 'all-the-icons)
+(require 'window-numbering)
 
 (defgroup helium-mode-line nil
   "Group for the faces of Helium mode line."
@@ -91,6 +92,13 @@
 
 (defvar helium-mode-line-height 28 "Height of the mode-line.")
 (defvar helium-mode-line-block-width 1 "Width of the left XPM block on the mode-line.")
+
+(defun helium--window-number-string ()
+  "Get window number string for current window.
+
+Return `nil' if unavailable."
+  (when (cdr (gethash (selected-frame) window-numbering-table))
+    (window-numbering-get-number-string)))
 
 (defun helium--project-root-for-prefix-strip ()
   "Get the path to the root of the project."
@@ -241,7 +249,7 @@ ACTIVE-P: Boolean representing whether the modeline is active or not."
             ((lhs
               (list
                (helium--make-block-xpm)
-               (powerline-raw (concat " " (window-numbering-get-number-string)) .block-face 'r)
+               (powerline-raw (concat " " (helium--window-number-string)) .block-face 'r)
                (powerline-raw (if buffer-read-only "" "") .default-face 'l)
                (powerline-raw (if (buffer-modified-p) "" "") .default-face 'l)
                (powerline-raw (helium--project-name) .highlight-face 'l)
