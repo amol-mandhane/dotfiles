@@ -15,7 +15,15 @@
 
 (setq-default fill-column 80)
 (setq-default indent-tabs-mode nil)
-(setq visible-bell t)
+(setq visible-bell nil
+      ring-bell-function
+      (lambda ()
+        (let ((orig-fg (face-foreground 'mode-line)))
+          (set-face-foreground 'mode-line "#F2804F")
+          (run-with-idle-timer
+           0.1 nil
+           (lambda (fg) (set-face-foreground 'mode-line fg))
+           orig-fg))))
 
 (setq ns-use-srgb-colorspace nil)
 
@@ -227,14 +235,14 @@
 
 (use-package whitespace
   :diminish global-whitespace-mode
-  :config
+  :hook (prog-mode . whitespace-mode)
+  :hook (text-mode . whitespace-mode)
+  :hook (before-save . delete-trailing-whitespace)
+  :init
   (progn
     (setq whitespace-style '(face lines-tail))
     (setq whitespace-line-column 80)
-    (global-whitespace-mode +1)
-
-    (setq-default require-final-newline t)
-    (add-hook 'before-save-hook #'delete-trailing-whitespace)))
+    (setq-default require-final-newline t)))
 
 (use-package highlight-indent-guides
   :ensure t
