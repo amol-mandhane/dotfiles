@@ -498,7 +498,21 @@
 
 (use-package avy
   :ensure t
-  :chords (("jj" . avy-goto-word-1)))
+  :chords (("jj" . avy-goto-word-1)
+           ("ee" . avy-goto-word-end-1))
+  :config
+  (defun avy-goto-word-end-1 (char)
+    (interactive (list (read-char "char: " t)))
+    (avy-goto-word-1 (string-to-char (string char)))
+    (forward-sexp)))
+
+(use-package dumb-jump
+  :ensure t
+  :chords (("dj" . dumb-jump-go)
+           ("db" . dumb-jump-back)
+           ("dl" . dumb-jump-quick-look))
+  :config
+  (add-to-list 'dumb-jump-project-denoters "BUILD"))
 
 (use-package compile
   :prefixed-bind (("cc" . compile)
@@ -1262,12 +1276,31 @@ _u_nread
   :ensure t
   :hook (after-init . elfeed-goodies/setup))
 
-(use-package challenger-deep-theme
+(use-package material-theme
   :ensure t
   :config
   (progn
-    (load-theme 'challenger-deep t)
-    (set-frame-font "Iosevka-18")))
+    (load-theme 'material t)
+    (set-frame-font "Iosevka-18")
+    (set-face-attribute 'default nil
+                        :background "#212121"
+                        :foreground "#eeffff")
+    (set-face-attribute 'font-lock-constant-face nil
+                        :foreground "#C792EA")
+    (set-face-attribute 'font-lock-keyword-face nil
+                        :foreground "#2BA3FF")
+    (set-face-attribute 'font-lock-preprocessor-face nil
+                        :inherit 'bold
+                        :foreground "#2BA3FF"
+                        :weight 'normal)
+    (set-face-attribute 'font-lock-string-face nil
+                        :foreground "#C3E88D")
+    (set-face-attribute 'font-lock-type-face nil
+                        :foreground "#FFCB6B")
+    (set-face-attribute 'font-lock-variable-name-face nil
+                        :foreground "#FF5370")
+    (set-face-attribute 'mode-line nil
+                        :box '(:style released-button))))
 
 (use-package spaceline
   :disabled
@@ -1286,7 +1319,7 @@ _u_nread
   :hook (window-setup . powerline-helium-theme))
 
 (use-package theme-enhancement
-  :hook (after-init . (lambda () (theme-enhancement/apply nil :italics :org))))
+  :hook (after-init . (lambda () (theme-enhancement/apply :bold :italics :org))))
 
 (use-package display-line-numbers
   :hook (after-init . global-display-line-numbers-mode)
