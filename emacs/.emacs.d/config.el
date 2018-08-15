@@ -499,7 +499,7 @@
 (use-package avy
   :ensure t
   :chords (("jj" . avy-goto-word-1)
-           ("ee" . avy-goto-word-end-1))
+           ("kk" . avy-goto-word-end-1))
   :config
   (defun avy-goto-word-end-1 (char)
     (interactive (list (read-char "char: " t)))
