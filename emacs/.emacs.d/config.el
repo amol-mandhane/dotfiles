@@ -235,6 +235,7 @@
 
 (use-package whitespace
   :diminish global-whitespace-mode
+  :diminish whitespace-mode
   :hook (prog-mode . whitespace-mode)
   :hook (text-mode . whitespace-mode)
   :hook (before-save . delete-trailing-whitespace)

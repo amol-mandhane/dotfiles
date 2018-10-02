@@ -11,6 +11,6 @@
      (file-name-handler-alist nil)
      (load-prefer-newer t)
      (gc-cons-threshold 640000000))
-  (load-file "~/.emacs.d/config.elc"))
+  (load-file "~/.emacs.d/config.el"))
 (provide 'init)
 ;;; init.el ends here
