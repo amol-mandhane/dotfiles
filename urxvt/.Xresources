@@ -56,7 +56,7 @@ urxvt*color14: #018773
 urxvt*color7: #c2c2c2
 urxvt*color15: #c2c2c2
 
-URxvt*font: xft:Inconsolata:pixelsize=18
+URxvt*font: xft:Inconsolata:pixelsize=20
 URxvt*letterSpace: -1
 
 URxvt.scrollstyle: plain
@@ -73,7 +73,7 @@ URxvt.urlLauncher: sensible-browser
 URxvt.matcher.button: 1
 
 URxvt.loginShell:           true
-URxvt.saveLines:            50
+URxvt.saveLines:            10000
 URxvt.internalBorder:       16
 
 ! Rofi config.

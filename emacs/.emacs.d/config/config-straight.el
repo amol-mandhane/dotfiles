@@ -22,5 +22,16 @@
 (setq straight-recipes-gnu-elpa-use-mirror t)
 (setq straight-recipe-repositories '(org-elpa melpa gnu-elpa-mirror))
 
+(use-package f
+  :straight t
+  :demand t)
+(use-package s
+  :straight t
+  :demand t)
+(use-package dash
+  :straight t
+  :demand t)
+
+
 (provide 'config-straight)
 ;;; config-straight.el ends here
