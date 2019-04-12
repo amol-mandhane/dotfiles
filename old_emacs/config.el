@@ -960,7 +960,7 @@ _p_rev	_u_pper	_E_diff	_=_: upper-lower	_RET_: current
   :ensure t
   :mode ("\\.py\\'" . python-mode)
   :init
-  (setq python-shell-interpreter "ipython"
+  (setq python-shell-interpreter "/usr/local/bin/ipython"
         python-shell-interpreter-args "--simple-prompt -i"))
 
 (use-package anaconda-mode

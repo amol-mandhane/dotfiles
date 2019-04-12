@@ -24,4 +24,10 @@ source ~/.machine_zshrc
 export GOPATH=$HOME/gopackages
 export PATH=$PATH:$GOPATH/bin:~/.local/bin
 
+function revert-expand-or-complete {
+  zle expand-or-complete
+}
+
+zle -N expand-or-complete-with-indicator revert-expand-or-complete
+
 # stack config set system-ghc --global true
