@@ -27,19 +27,19 @@
 (size-indication-mode +1)
 (blink-cursor-mode -1)
 
-(use-package anti-zenburn-theme
+(use-package gruvbox-theme
   :straight t
   :config
-  (load-theme 'anti-zenburn t))
+  (load-theme 'gruvbox-light-soft t))
 
 (use-package theme-enhancement
-  :after (anti-zenburn-theme)
+  :after (gruvbox-theme)
   :hook (after-init . theme-enhancement/apply))
 
 (use-package minions
   :straight t
+  :hook (after-init . minions-mode)
   :config
-  (minions-mode +1)
   (setq minions-mode-line-lighter "[...]"
         minions-direct '(flymake-mode
                          company-mode
@@ -73,6 +73,7 @@
               highlight-indent-guides-auto-even-face-perc 4))
 
 (use-package theme-enhancement
+  :commands theme-enhancement/apply
   :hook (after-init . (lambda () (theme-enhancement/apply :bold :italics :org))))
 
 (provide 'config-ui)

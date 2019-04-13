@@ -263,7 +263,15 @@
 
 (use-package window-numbering
   :straight t
-  :hook (after-init . window-numbering-mode))
+  :hook (after-init . window-numbering-mode)
+  :config
+  (defun window-numbering-get-number-string (&optional w)
+    (let ((s (int-to-string (window-numbering-get-number w))))
+      (propertize
+       (concat " " s " ")
+       'face (if (moody-window-active-p)
+                 '(:background "tomato1" :inherit 'window-numbering-face)
+               'window-numbering-face)))))
 
 (use-package window-purpose
   :straight t
