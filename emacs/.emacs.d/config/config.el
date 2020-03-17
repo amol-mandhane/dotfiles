@@ -21,7 +21,17 @@
 (require 'config-lang-python)
 (require 'config-lang-text)
 
-;; TODO: Set up terminal, elfeed.
+;; Terminal
+(use-package vterm
+  :straight t)
+
+(use-package multi-libvterm
+  :straight (multi-libvterm
+             :type git
+             :host github
+             :repo "suonlight/multi-libvterm")
+  :prefixed-bind (("tn" . multi-libvterm)
+                  ("tp" . multi-libvterm-projectile)))
 
 (require 'config-machine)
 

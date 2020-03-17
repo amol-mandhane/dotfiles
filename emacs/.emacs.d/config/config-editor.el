@@ -31,8 +31,6 @@
               custom-file "/dev/null")
 
 (prefer-coding-system 'utf-8)
-(setq coding-system-for-read 'utf-8
-      coding-system-for-write 'utf-8)
 
 (use-package uniquify
   :config (setq uniquify-buffer-name-style 'forward))

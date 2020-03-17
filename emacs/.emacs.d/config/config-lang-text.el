@@ -14,7 +14,6 @@
          ("\\.markdown\\'" . markdown-mode)))
 
 (use-package tex
-  :disabled
   :straight auctex
   :pin gnu
   :config
@@ -23,7 +22,6 @@
   (setq TeX-PDF-mode t))
 
 (use-package company-auctex
-  :disabled
   :straight t
   :after (company tex)
   :hook (after-init . company-auctex-init))
