@@ -14,9 +14,6 @@
      (gc-cons-threshold 640000000))
   (add-to-list 'load-path (expand-file-name "config" user-emacs-directory))
   (add-to-list 'load-path (expand-file-name "lisp" user-emacs-directory))
-  (add-to-list
-   'load-path
-   (expand-file-name "straight/repos/straight.el" user-emacs-directory))
   (require 'config))
 
 (add-hook 'after-init-hook (lambda () (server-start)))

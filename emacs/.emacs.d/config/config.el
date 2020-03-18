@@ -33,6 +33,9 @@
   :prefixed-bind (("tn" . multi-libvterm)
                   ("tp" . multi-libvterm-projectile)))
 
+(use-package hyperbole
+  :straight t)
+
 (require 'config-machine)
 
 (provide 'config)

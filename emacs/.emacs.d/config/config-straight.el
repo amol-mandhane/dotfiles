@@ -5,6 +5,9 @@
 
 ;;; Code:
 
+(setq straight-recipes-gnu-elpa-use-mirror t)
+(setq straight-recipe-repositories '(org-elpa melpa gnu-elpa-mirror))
+
 (defvar bootstrap-version)
 (let ((bootstrap-file
        (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
@@ -19,8 +22,11 @@
   (load bootstrap-file nil 'nomessage))
 
 (straight-use-package 'use-package)
-(setq straight-recipes-gnu-elpa-use-mirror t)
-(setq straight-recipe-repositories '(org-elpa melpa gnu-elpa-mirror))
+
+(setq
+ straight-default-files-directive
+ '("[!.]*" "[!.]*/[!.]*" "[!.]*/[!.]*/[!.]*"
+   (:exclude ".dir-locals.el" "test.el" "tests.el" "*-test.el" "*-tests.el")))
 
 (use-package f
   :straight t
