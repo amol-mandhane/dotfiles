@@ -93,6 +93,7 @@ Other modes will use Flymake.")
 
 (use-package flymake
   :commands flymake-mode
+  :prefixed-bind (("cs" . flymake-show-diagnostics-buffer))
   :init
   (add-hook
    'prog-mode-hook

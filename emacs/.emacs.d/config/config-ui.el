@@ -14,7 +14,7 @@
      0.1 nil
      (lambda (fg) (set-face-foreground 'mode-line fg)) orig-fg)))
 
-(set-frame-font "Iosevka-10")
+(set-frame-font "Iosevka-10" nil nil)
 (setq-default cursor-type 'bar)
 
 (setq visible-bell nil
@@ -27,13 +27,33 @@
 (size-indication-mode +1)
 (blink-cursor-mode -1)
 
-(use-package gruvbox-theme
+(use-package display-line-numbers
+  ;; Conflicts with flymake diagnostics buffer.
+  ;; :hook (after-init . global-display-line-numbers-mode)
+  :hook (prog-mode . display-line-numbers-mode)
+  :hook (text-mode . display-line-numbers-mode)
+  :hook (fundamental-mode . display-line-numbers-mode)
+  :hook (protobuf-mode . display-line-numbers-mode)
+  :init
+  (setq display-line-numbers-widen t
+        display-line-numbers-grow-only t
+        display-line-numbers-width 5))
+
+;; (use-package gruvbox-theme
+;;   :straight t)
+(use-package doom-themes
   :straight t
   :config
-  (load-theme 'gruvbox-light-soft t))
+  (load-theme 'doom-snazzy t)
+  (add-hook
+   'after-init-hook
+   #'(lambda ()  (set-face-attribute 'helm-match nil :foreground "black"))))
+(use-package solaire-mode
+  :straight t
+  :hook (after-init . solaire-global-mode))
 
 (use-package theme-enhancement
-  :after (gruvbox-theme)
+  :after (doom-themes)
   :hook (after-init . theme-enhancement/apply))
 
 (use-package minions
@@ -53,18 +73,6 @@
   (setq x-underline-at-descent-line t)
   (moody-replace-mode-line-buffer-identification)
   (moody-replace-vc-mode))
-
-(use-package display-line-numbers
-  ;; Conflicts with flymake diagnostics buffer.
-  ;; :hook (after-init . global-display-line-numbers-mode)
-  :hook (prog-mode . display-line-numbers-mode)
-  :hook (text-mode . display-line-numbers-mode)
-  :hook (fundamental-mode . display-line-numbers-mode)
-  :init
-  (setq display-line-numbers-widen t
-        display-line-numbers-grow-only t
-        display-line-numbers-width 5)
-  (set-face-attribute 'line-number-current-line nil :inherit 'fringe))
 
 (use-package highlight-indent-guides
   :straight t

@@ -23,7 +23,6 @@
   :prefixed-bind (("gs" . magit-status)))
 
 (use-package diff-hl
-  :unless (restricted-config-p)
   :straight t
   :after (hydra)
   :hook (find-file . diff-hl-mode)
