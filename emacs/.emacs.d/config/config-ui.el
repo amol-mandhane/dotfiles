@@ -81,8 +81,10 @@
               highlight-indent-guides-auto-even-face-perc 4))
 
 (use-package theme-enhancement
+  :after (moody)
   :commands theme-enhancement/apply
-  :hook (after-init . (lambda () (theme-enhancement/apply :bold :italics :org))))
+  :hook (after-init . (lambda () (theme-enhancement/apply :bold :italics :org)))
+  :hook (after-init . theme-minimalize))
 
 (provide 'config-ui)
 ;;; config-ui.el ends here

@@ -25,13 +25,13 @@
 (use-package vterm
   :straight t)
 
-(use-package multi-libvterm
-  :straight (multi-libvterm
+(use-package multi-vterm
+  :straight (multi-vterm
              :type git
              :host github
-             :repo "suonlight/multi-libvterm")
-  :prefixed-bind (("tn" . multi-libvterm)
-                  ("tp" . multi-libvterm-projectile)))
+             :repo "suonlight/multi-vterm")
+  :prefixed-bind (("tn" . multi-vterm)
+                  ("tp" . multi-vterm-projectile)))
 
 (use-package hyperbole
   :straight t)

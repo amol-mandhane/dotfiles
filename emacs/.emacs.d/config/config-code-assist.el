@@ -106,6 +106,7 @@ Other modes will use Flymake.")
   :hook (flymake-mode . flymake-diagnostic-at-point-mode))
 
 (use-package semantic
+  :disabled
   :hook (prog-mode . semantic-mode)
   :init
   (setq semantic-default-submodes

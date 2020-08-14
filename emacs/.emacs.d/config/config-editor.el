@@ -189,6 +189,10 @@
                   ("tt" . helm-semantic-or-imenu))
   :config
   (require 'helm-config)
+  (setq
+   completion-styles
+   `(basic partial-completion emacs22 initials
+           ,(if (version<= emacs-version "27.0") 'helm-flex 'flex)))
   (setq helm-move-to-line-cycle-in-source t
         helm-ff-search-library-in-sexp t
         helm-scroll-amount 8
@@ -268,8 +272,10 @@
       (propertize
        (concat " " s " ")
        'face (if (moody-window-active-p)
-                 '(:background "tomato1" :inherit 'window-numbering-face)
-               'window-numbering-face)))))
+                 '(:background "tomato1" :inherit 'window-numbering-face
+                   :box (:line-width 4 :color "tomato1"))
+               '(:background "darkgrey" :inherit 'window-numbering-face
+                 :box (:line-width 4 :color "darkgrey")))))))
 
 (use-package window-purpose
   :straight t

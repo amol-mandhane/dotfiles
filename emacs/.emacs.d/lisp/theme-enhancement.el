@@ -137,5 +137,38 @@ Currently these are borrowed from Cyberpunk theme."
     (when org
       (theme-enhancement--org-mode))))
 
+(defun theme-minimalize ()
+  "Clean up the clutter."
+  (add-to-list 'default-frame-alist '(internal-border-width . 24))
+  (set-frame-parameter (selected-frame) 'internal-border-width 24)
+  (setq-default
+   header-line-format
+   '("%e"
+     " "
+     (:eval (propertize "%12b" 'face `(:inherit 'mode-line-buffer-id
+                                       :box (:line-width 4 :color ,(face-background 'default)))))
+     "  "
+     (:eval (propertize "%4l:%3c"
+                        'face
+                        `(:foreground ,(face-foreground font-lock-comment-face))))))
+  (setq-default
+   mode-line-format
+   '("%e"
+     (:eval (window-numbering-get-number-string))
+     " "
+     mode-line-mule-info
+     mode-line-client
+     mode-line-modified
+     mode-line-remote
+     mode-line-frame-identification
+     minions-mode-line-modes
+     mode-line-misc-info))
+  (set-face-attribute 'header-line nil
+                      :underline (face-foreground 'default))
+  (set-face-attribute 'mode-line nil
+                      :underline (face-foreground 'default))
+  (set-face-attribute 'mode-line-inactive nil
+                      :underline (face-foreground 'default)))
+
 (provide 'theme-enhancement)
 ;;; theme-enhancement.el ends here
