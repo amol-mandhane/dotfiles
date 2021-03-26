@@ -1,4 +1,5 @@
 .DS_Store
+.uuid
 
 # xmonad
 xmonad.wip/.xmonad/*.jpg

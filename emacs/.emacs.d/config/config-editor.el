@@ -120,12 +120,14 @@
 ;;   :straight t
 ;;   :hook (after-init . global-annoying-arrows-mode))
 
-(defconst disable-mouse--bindings-targets '("bottom-divider" "vertical-line"))
-(use-package disable-mouse
-  :straight t
-  :hook (after-init . global-disable-mouse-mode)
-  :config
-  (defconst disable-mouse--bindings-targets '("bottom-divider" "vertical-line")))
+;; (defconst disable-mouse--bindings-targets '("bottom-divider" "vertical-line"))
+;; (use-package disable-mouse
+;;   :straight t
+;;   :hook (after-init . global-disable-mouse-mode)
+;;   :config
+;;   (defconst disable-mouse--button-events '("up-mouse" "down-mouse" "drag-mouse"))
+;;   (defconst disable-mouse--bindings-targets '("bottom-divider" "vertical-line"))
+;;   (setq disable-mouse-wheel-events nil))
 
 (use-package elec-pair
   :hook (text-mode . electric-pair-local-mode))
@@ -272,9 +274,9 @@
       (propertize
        (concat " " s " ")
        'face (if (moody-window-active-p)
-                 '(:background "tomato1" :inherit 'window-numbering-face
+                 '(:background "tomato1" :inherit window-numbering-face
                    :box (:line-width 4 :color "tomato1"))
-               '(:background "darkgrey" :inherit 'window-numbering-face
+               '(:background "darkgrey" :inherit window-numbering-face
                  :box (:line-width 4 :color "darkgrey")))))))
 
 (use-package window-purpose

@@ -16,8 +16,11 @@
 
 (use-package swiper-helm
   :straight t
+  :after (helm)
   :chords (("??" . swiper-helm))
-  :prefixed-bind ("ss" . swiper-helm))
+  :prefixed-bind ("ss" . swiper-helm)
+  :config
+  (setq swiper-helm-display-function #'helm-default-display-buffer))
 
 (use-package anzu
   :straight t
@@ -39,6 +42,11 @@
   :straight t)
 (use-package wgrep-ag
   :straight t)
+
+(use-package helm-ag
+  :straight t
+  :after (helm)
+  :commands (helm-ag))
 
 (provide 'config-search)
 ;;; config-search.el ends here

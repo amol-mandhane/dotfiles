@@ -65,7 +65,8 @@
                          company-mode
                          flycheck-mode
                          smerge-mode
-                         projectile-mode)))
+                         projectile-mode
+                         lsp-mode)))
 
 (use-package moody
   :straight t

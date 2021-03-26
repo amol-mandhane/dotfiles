@@ -145,7 +145,7 @@ Currently these are borrowed from Cyberpunk theme."
    header-line-format
    '("%e"
      " "
-     (:eval (propertize "%12b" 'face `(:inherit 'mode-line-buffer-id
+     (:eval (propertize "%12b" 'face `(:inherit mode-line-buffer-id
                                        :box (:line-width 4 :color ,(face-background 'default)))))
      "  "
      (:eval (propertize "%4l:%3c"

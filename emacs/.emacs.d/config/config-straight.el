@@ -37,6 +37,9 @@
 (use-package dash
   :straight t
   :demand t)
+(use-package dash-functional
+  :straight t
+  :demand t)
 
 
 (provide 'config-straight)

@@ -60,12 +60,15 @@
           (setq-local buffer-read-only t)))))
   (setq eldoc-message-function #'eldoc-custom-frontend))
 
+(use-package helm-xref
+  :straight t
+  :after (helm))
+
 (use-package compile
   :prefixed-bind (("cc" . compile)
                   ("cr" . recompile)))
 
-(defvar config-flycheck-modes '(emacs-lisp-mode
-                                c-mode
+(defvar config-flycheck-modes '(c-mode
                                 c++-mode
                                 go-mode
                                 haskell-mode)
@@ -137,6 +140,30 @@ Other modes will use Flymake.")
 (use-package eglot
   :straight t
   :commands (eglot-ensure))
+
+(use-package lsp-mode
+  :straight t
+  :demand t
+  :init
+  (setq lsp-keymap-prefix (concat +keybinding/mnemonic-prefix+ " l"))
+  :hook (lsp-mode . lsp-enable-which-key-integration)
+  :config
+  (setq lsp-modeline-diagnostics-enable nil)
+  (setq lsp-headerline-breadcrumb-enable nil)
+  (setq lsp-eldoc-render-all t)
+  (setq lsp-diagnostics-provider :flymake)
+  (setq lsp-imenu-sort-methods '(position kind name))
+  (setq lsp-signature-auto-activate '(:after-completion))
+  (setq lsp-signature-render-documentation t))
+
+(use-package helm-lsp
+  :straight t
+  :after (helm lsp-mode)
+  :commands helm-lsp-workspace-symbol)
+
+(use-package imenu-list
+  :straight t
+  :commands (imenu-list-minor-mode))
 
 (provide 'config-code-assist)
 ;;; config-code-assist.el ends here

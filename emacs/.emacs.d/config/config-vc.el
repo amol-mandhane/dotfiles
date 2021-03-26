@@ -22,6 +22,9 @@
   :straight t
   :prefixed-bind (("gs" . magit-status)))
 
+(use-package with-editor
+  :straight t)
+
 (use-package diff-hl
   :straight t
   :after (hydra)
