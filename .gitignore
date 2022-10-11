@@ -2,9 +2,12 @@
 .uuid
 
 # xmonad
-xmonad.wip/.xmonad/*.jpg
-xmonad.wip/.xmonad/xmonad*
-!xmonad.wip/.xmonad/xmonad.hs
+xmonad/.xmonad/*
+!xmonad/.xmonad/xmonad.hs
+!xmonad/.xmonad/startup.sh
+!xmonad/.xmonad/stack.yaml
+!xmonad/.xmonad/xmonad
+!xmonad/.xmonad/xmonad-contrib
 
 *.pyc
 *.o

@@ -1,3 +1,11 @@
 [submodule "zsh/.zprezto"]
 	path = zsh/.zprezto
 	url = https://github.com/sorin-ionescu/prezto
+[submodule "xmonad/.xmonad/xmonad"]
+	path = xmonad/.xmonad/xmonad
+	url = https://github.com/xmonad/xmonad.git
+	branch = v0.17.1
+[submodule "xmonad/.xmonad/xmonad-contrib"]
+	path = xmonad/.xmonad/xmonad-contrib
+	url = https://github.com/xmonad/xmonad-contrib.git
+	branch = v0.17.1

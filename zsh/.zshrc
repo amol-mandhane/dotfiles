@@ -31,3 +31,6 @@ function revert-expand-or-complete {
 zle -N expand-or-complete-with-indicator revert-expand-or-complete
 
 # stack config set system-ghc --global true
+
+[ -f "/usr/local/google/home/mandhane/.ghcup/env" ] && source "/usr/local/google/home/mandhane/.ghcup/env" # ghcup-env
+
