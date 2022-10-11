@@ -6,7 +6,6 @@
 
 (require 'straight)
 (require 'use-package)
-(require 'helper-lib)
 
 (use-package lean-mode
   :straight t

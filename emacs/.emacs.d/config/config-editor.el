@@ -114,7 +114,9 @@
   :straight t
   :hook (after-init . global-undo-tree-mode)
   :bind (:map undo-tree-visualizer-mode-map
-              ("<RET>" . undo-tree-visualizer-quit)))
+              ("<RET>" . undo-tree-visualizer-quit))
+  :config
+  (setq undo-tree-history-directory-alist '(("." . "~/.emacs.d/undo_tree"))))
 
 ;; (use-package annoying-arrows-mode
 ;;   :straight t

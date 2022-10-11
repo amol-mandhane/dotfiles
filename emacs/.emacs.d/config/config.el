@@ -22,17 +22,7 @@
 (require 'config-lang-text)
 (require 'config-lang-lean)
 
-;; Terminal
-(use-package vterm
-  :straight t)
-
-(use-package multi-vterm
-  :straight (multi-vterm
-             :type git
-             :host github
-             :repo "suonlight/multi-vterm")
-  :prefixed-bind (("tn" . multi-vterm)
-                  ("tp" . multi-vterm-projectile)))
+(require 'config-term)
 
 (use-package hyperbole
   :straight t)

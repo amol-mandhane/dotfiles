@@ -20,20 +20,5 @@
   :config
   (add-hook 'haskell-mode-hook #'turn-on-haskell-indent))
 
-(use-package hindent
-  :straight t
-  :if (executable-find "hindent")
-  :hook (haskell-mode . hindent-mode)
-  :config
-  ;; reformat the buffer using hindent on save
-  (setq hindent-reformat-buffer-on-save t))
-
-(use-package intero
-  :straight t
-  :after (haskell-mode company flycheck)
-  :hook (haskell-mode . intero-mode)
-  :config
-  (add-to-list 'flycheck-ghc-search-path (expand-file-name "~/.xmonad/lib")))
-
 (provide 'config-lang-haskell)
 ;;; config-lang-haskell.el ends here

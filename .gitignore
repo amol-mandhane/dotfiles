@@ -26,6 +26,7 @@ emacs/.emacs.d/config/config-machine.el
 !emacs/.emacs.d/lisp
 !emacs/.emacs.d/lisp/*.el
 *.elc
+*.eln
 
 # Fonts cruft
 fonts/.fonts/google-drive/*
