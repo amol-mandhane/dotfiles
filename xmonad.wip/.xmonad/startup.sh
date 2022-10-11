@@ -51,3 +51,5 @@ fi
 if [ -x "$(command -v xautolock)" ]; then
   xautolock -time 3 -locker "xsecurelock" &
 fi
+
+/usr/share/goobuntu-indicator/goobuntu_indicator.py &

@@ -20,6 +20,7 @@
 (require 'config-lang-shell)
 (require 'config-lang-python)
 (require 'config-lang-text)
+(require 'config-lang-lean)
 
 ;; Terminal
 (use-package vterm

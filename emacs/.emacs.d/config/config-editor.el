@@ -284,9 +284,9 @@
   :demand t
   :config
   (add-to-list 'purpose-user-name-purposes '("*Eldoc help*" . documentation))
+  (add-to-list 'purpose-user-name-purposes '("*Ilist*" . ilist))
   (add-to-list 'purpose-user-mode-purposes
                '(flymake-diagnostics-buffer-mode . diagnostics))
-  (add-to-list 'purpose-user-mode-purposes '(compilation-mode . compile))
   (setq purpose-use-default-configuration t
         purpose-preferred-prompt 'helm)
   (define-key purpose-mode-map (kbd "C-x C-f") nil)

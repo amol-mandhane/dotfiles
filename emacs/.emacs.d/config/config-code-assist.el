@@ -66,7 +66,9 @@
 
 (use-package compile
   :prefixed-bind (("cc" . compile)
-                  ("cr" . recompile)))
+                  ("cr" . recompile))
+  :config
+  (setq compilation-scroll-output t))
 
 (defvar config-flycheck-modes '(c-mode
                                 c++-mode
@@ -162,8 +164,14 @@ Other modes will use Flymake.")
   :commands helm-lsp-workspace-symbol)
 
 (use-package imenu-list
+  :after (window-purpose)
   :straight t
-  :commands (imenu-list-minor-mode))
+  :commands (imenu-list-minor-mode)
+  :config
+  (setq purpose-special-action-sequences
+        (delete
+         '(imenu-list-purpose-display-condition imenu-list-display-buffer)
+         purpose-special-action-sequences)))
 
 (provide 'config-code-assist)
 ;;; config-code-assist.el ends here

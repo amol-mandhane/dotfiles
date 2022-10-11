@@ -31,6 +31,7 @@ import           XMonad.Layout.Spacing            (smartSpacing)
 import           XMonad.Layout.SubLayouts         (GroupMsg (UnMerge), onGroup,
                                                    pullGroup, subLayout)
 import           XMonad.Layout.Tabbed             (addTabs)
+import           XMonad.Layout.ThreeColumns       as XThreeCol
 import           XMonad.Layout.WindowNavigation   (windowNavigation)
 import           XMonad.StackSet                  (focusDown', focusUp')
 import qualified XMonad.StackSet                  as XStack
@@ -267,6 +268,12 @@ resourceUserConfigManagerHook = composeOne [
 myLayouts =
   twoThirdRatioTiling X.|||
   X.Mirror twoThirdRatioTiling X.|||
+  twoColumns X.|||
+  X.Mirror twoColumns X.|||
+  threeColumns X.|||
+  X.Mirror threeColumns X.|||
   X.Full
   where
     twoThirdRatioTiling = X.Tall 1 (2/100) (2/3)
+    twoColumns = X.Tall 1 (1/100) (1/2)
+    threeColumns = XThreeCol.ThreeCol 1 (1/100) (1/3)

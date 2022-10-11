@@ -61,7 +61,7 @@ modules-right = battery backlight volume date
 
 [bar/desktop]
 inherit = commonbar
-modules-left = cpu memory swap
+modules-left = cpu memory ;swap
 modules-center = xmonad
 modules-right = volume date
 

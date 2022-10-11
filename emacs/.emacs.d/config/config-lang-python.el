@@ -5,6 +5,7 @@
 ;;; Code:
 (require 'straight)
 (require 'use-package)
+(require 'helper-lib)
 
 (use-package python
   :straight t
@@ -15,12 +16,14 @@
 
 (use-package elpy
   :straight t
+  :unless (restricted-config-p)
   :hook (after-init . elpy-enable)
   :config
   (setq elpy-eldoc-show-current-function nil))
 
 (use-package py-yapf
   :straight t
+  :unless (restricted-config-p)
   :commands py-yapf)
 
 (provide 'config-lang-python)
