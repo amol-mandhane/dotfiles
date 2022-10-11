@@ -139,29 +139,36 @@ Other modes will use Flymake.")
   :after (semantic-mode)
   :demand t)
 
+(use-package project
+  :straight t)
+
 (use-package eglot
   :straight t
+  :demand t
+  :after (project)
   :commands (eglot-ensure))
 
-(use-package lsp-mode
-  :straight t
-  :demand t
-  :init
-  (setq lsp-keymap-prefix (concat +keybinding/mnemonic-prefix+ " l"))
-  :hook (lsp-mode . lsp-enable-which-key-integration)
-  :config
-  (setq lsp-modeline-diagnostics-enable nil)
-  (setq lsp-headerline-breadcrumb-enable nil)
-  (setq lsp-eldoc-render-all t)
-  (setq lsp-diagnostics-provider :flymake)
-  (setq lsp-imenu-sort-methods '(position kind name))
-  (setq lsp-signature-auto-activate '(:after-completion))
-  (setq lsp-signature-render-documentation t))
+;; (use-package lsp-mode
+;;   :straight t
+;;   :disabled
+;;   :demand t
+;;   :init
+;;   (setq lsp-keymap-prefix (concat +keybinding/mnemonic-prefix+ " l"))
+;;   :hook (lsp-mode . lsp-enable-which-key-integration)
+;;   :config
+;;   (setq lsp-modeline-diagnostics-enable nil)
+;;   (setq lsp-headerline-breadcrumb-enable nil)
+;;   (setq lsp-eldoc-render-all t)
+;;   (setq lsp-diagnostics-provider :flymake)
+;;   (setq lsp-imenu-sort-methods '(position kind name))
+;;   (setq lsp-signature-auto-activate '(:after-completion))
+;;   (setq lsp-signature-render-documentation t))
 
-(use-package helm-lsp
-  :straight t
-  :after (helm lsp-mode)
-  :commands helm-lsp-workspace-symbol)
+;; (use-package helm-lsp
+;;   :straight t
+;;   :disabled
+;;   :after (helm lsp-mode)
+;;   :commands helm-lsp-workspace-symbol)
 
 (use-package imenu-list
   :after (window-purpose)

@@ -19,6 +19,7 @@
 (require 'config-lang-proto)
 (require 'config-lang-shell)
 (require 'config-lang-python)
+(require 'config-lang-rust)
 (require 'config-lang-text)
 (require 'config-lang-lean)
 
