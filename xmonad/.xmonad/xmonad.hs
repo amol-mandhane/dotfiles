@@ -43,6 +43,7 @@ myManageHook =
       ManageHelpers.isDialog --> doFloat,
       checkModal --> ManageHelpers.doCenterFloat,
       (className =? "plasmashell") --> doIgnore,
+      (className =? "krunner") --> doIgnore <+> doFloat >> hasBorder False,
       dedicatedWorkspacesForApps
     ]
 

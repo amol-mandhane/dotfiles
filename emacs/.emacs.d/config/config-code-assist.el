@@ -8,6 +8,15 @@
 (require 'use-package)
 (require 'config-keybinding)
 
+(use-package project
+  :straight t
+  :config
+  (defun sentinel-file-based-project-root (dir)
+    "Returns directory in tree containing .project.el file if exists."
+    (let ((project-el-dir (locate-dominating-file dir ".project.el")))
+      (when project-el-dir
+        (cons 'vc project-el-dir))))
+  (add-hook 'project-find-functions #'sentinel-file-based-project-root))
 (use-package projectile
   :straight t
   :after (helm)
