@@ -4,8 +4,9 @@
 # xmonad
 xmonad/.xmonad/*
 !xmonad/.xmonad/xmonad.hs
-!xmonad/.xmonad/startup.sh
-!xmonad/.xmonad/stack.yaml
+!xmonad/.xmonad/*.sh
+!xmonad/.xmonad/*.yaml
+!xmonad/.xmonad/*.org
 !xmonad/.xmonad/xmonad
 !xmonad/.xmonad/xmonad-contrib
 

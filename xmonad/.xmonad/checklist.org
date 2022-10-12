@@ -1,0 +1,8 @@
+#+TITLE: KDE Configuration Checklist
+
+1. Update systemctl using script.
+2. Change CapsLock behaviour.
+3. Allow C-M-k, C-M-l, and other keybindings.
+4. Disable KWallet.
+5. Disable startup restoration.
+6. Panels configuration.
