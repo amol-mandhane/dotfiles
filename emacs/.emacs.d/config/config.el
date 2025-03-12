@@ -13,6 +13,7 @@
 (require 'config-code-assist)
 
 (require 'config-lang-lisp)
+(require 'config-lang-bazel)
 (require 'config-lang-c)
 (require 'config-lang-go)
 (require 'config-lang-haskell)
@@ -21,7 +22,7 @@
 (require 'config-lang-python)
 (require 'config-lang-rust)
 (require 'config-lang-text)
-(require 'config-lang-lean)
+;; (require 'config-lang-lean)
 
 (require 'config-term)
 

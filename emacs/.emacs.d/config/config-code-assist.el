@@ -155,7 +155,10 @@ Other modes will use Flymake.")
   :straight t
   :demand t
   :after (project)
-  :commands (eglot-ensure))
+  :bind (("<f12>" . eglot-inlay-hints-mode))
+  :commands (eglot-ensure)
+  :config
+  (add-hook 'eglot-managed-mode-hook (lambda () (eglot-inlay-hints-mode -1))))
 
 ;; (use-package lsp-mode
 ;;   :straight t

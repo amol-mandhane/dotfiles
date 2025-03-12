@@ -10,21 +10,16 @@
 (use-package python
   :straight t
   :mode ("\\.py\\'" . python-mode)
+  :after (company eglot)
+  :hook (python-mode . eglot-ensure)
   :init
   (setq python-shell-interpreter "/usr/local/bin/ipython"
-        python-shell-interpreter-args "--simple-prompt -i"))
-
-(use-package elpy
-  :straight t
-  :unless (restricted-config-p)
-  :hook (after-init . elpy-enable)
+        python-shell-interpreter-args "--simple-prompt -i")
   :config
-  (setq elpy-eldoc-show-current-function nil))
-
-(use-package py-yapf
-  :straight t
-  :unless (restricted-config-p)
-  :commands py-yapf)
+  (add-to-list 'eglot-server-programs
+               '((python-mode) .("ruff" "server")))
+  (add-to-list 'eglot-server-programs
+               '((python-mode) .("pyright-langserver" "--stdio"))))
 
 (provide 'config-lang-python)
 ;;; config-lang-python.el ends here

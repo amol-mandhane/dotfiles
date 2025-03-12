@@ -27,7 +27,7 @@
 
 (setq-default indent-tabs-mode nil
               fill-column 80
-
+              tab-width 2
               custom-file "/dev/null")
 
 (prefer-coding-system 'utf-8)
@@ -159,8 +159,8 @@
               ("C-S-b"    . sp-backward-symbol)
 
               ;; AST re-arrange.
-              ("C-)" . sp-forward-slurp-sexp)
-              ;; ("C-)" . 'sp-slurp-hybrid-sexp)
+              ;; ("C-)" . sp-forward-slurp-sexp)
+              ("C-)" . 'sp-slurp-hybrid-sexp)
               ("C-}" . sp-forward-barf-sexp)
               ("C-(" . sp-backward-slurp-sexp)
               ("C-{" . sp-backward-barf-sexp)
@@ -192,7 +192,7 @@
                   ("ff" . helm-find-files)
                   ("tt" . helm-semantic-or-imenu))
   :config
-  (require 'helm-config)
+  ;; (require 'helm-config)
   (setq
    completion-styles
    `(basic partial-completion emacs22 initials
