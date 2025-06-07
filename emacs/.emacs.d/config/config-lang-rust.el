@@ -14,9 +14,10 @@
   :config
   (setq rustic-lsp-client 'eglot)
   (setq rustic-indent-offset 2)
-  (add-hook rustic-mode-hook #'(lambda () (setq-local whitespace-line-column 100)))
+  (add-hook 'rust-mode-hook #'(lambda () (setq-local whitespace-line-column 100)))
+  (add-hook 'rustic-mode-hook #'(lambda () (setq-local whitespace-line-column 100)))
   (add-to-list 'eglot-server-programs
-             '((rust-ts-mode rust-mode) .
+             '((rust-ts-mode rust-mode rustic-mode) .
                ("rust-analyzer" :initializationOptions (:check (:command "clippy")))))
   )
 

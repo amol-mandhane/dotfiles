@@ -26,8 +26,8 @@
 
 (require 'config-term)
 
-(use-package hyperbole
-  :straight t)
+;; (use-package hyperbole
+;;   :straight t)
 
 (require 'config-machine)
 

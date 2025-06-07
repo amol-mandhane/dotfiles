@@ -10,6 +10,7 @@
 (use-package python
   :straight t
   :mode ("\\.py\\'" . python-mode)
+  :mode ("\\.pyi\\'" . python-mode)
   :after (company eglot)
   :hook (python-mode . eglot-ensure)
   :init

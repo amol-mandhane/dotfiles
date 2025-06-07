@@ -160,6 +160,11 @@ Other modes will use Flymake.")
   :config
   (add-hook 'eglot-managed-mode-hook (lambda () (eglot-inlay-hints-mode -1))))
 
+(use-package eglot-booster
+  :straight (eglot-booster :type git :host github :repo "jdtsmith/eglot-booster")
+	:after eglot
+	:config	(eglot-booster-mode))
+
 ;; (use-package lsp-mode
 ;;   :straight t
 ;;   :disabled

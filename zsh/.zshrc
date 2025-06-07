@@ -34,3 +34,7 @@ zle -N expand-or-complete-with-indicator revert-expand-or-complete
 # stack config set system-ghc --global true
 
 [ -f "/usr/local/google/home/mandhane/.ghcup/env" ] && source "/usr/local/google/home/mandhane/.ghcup/env" # ghcup-env
+
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion

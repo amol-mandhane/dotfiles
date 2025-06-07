@@ -76,6 +76,8 @@ URxvt.loginShell:           true
 URxvt.saveLines:            10000
 URxvt.internalBorder:       16
 
+URxvt.url-launcher:       firefox
+
 ! Rofi config.
 rofi.levenshtein-sort: true
 rofi.font: Roboto 12
